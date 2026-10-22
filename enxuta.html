@@ -247,6 +247,8 @@ let passes = [];
 const textosLidos = {};
 
 // de qual app é o print, pelas palavras da tela (Uber: "Passe para Motoristas", "por tempo", "Ganhos de"; 99: "Pacote", "Taxa Zero", "Ilimitado")
+// só aceita print da tela de passes de cada app (22/10: não aceitar qualquer imagem)
+const ASSINATURA = {Uber: /passe\s+para\s+motoristas|passe\s+por\s+tempo|passe\s+de\s+ganhos/i, '99': /pacote\s+de\s+(ganhos|tempo|\d+\s*dias?)|taxa\s+zero|renova[cç][aã]o\s+autom/i};
 function appDoPrint(texto) {
   const u = (texto.match(/passe para motoristas|por\s*tempo|ganhos de|uber/gi) || []).length;
   const n = (texto.match(/pacote|taxa zero|ilimitado|v[aá]lido por|renova[cç][aã]o/gi) || []).length;
@@ -278,7 +280,9 @@ function lerPasses(texto, app) {
       if (/ganhos\s+(de\s+)?R|pacote\s+de\s+\d|\d\s*h\b.*(tempo|passe)/i.test(prox)) break;
       const w = dinheiro(prox); if (w.length) preco = w[w.length - 1];
     }
-    if (preco > 0 && tam > 0 && preco < (tipo == 'ganhos' ? tam : 2000)) achados.push({app, tipo, preco, tam, ...(validade && validade != 180 ? {validade} : {})});
+    // preço com sentido (22/10): tempo de R$ 3 a R$ 300 por dia; pacote cobrando de 2% a 60% do limite
+    const faz = tipo == 'tempo' ? tam >= 6 && tam <= 744 && preco / Math.max(1, tam / 24) >= 3 && preco / Math.max(1, tam / 24) <= 300 : tam >= 50 && tam <= 20000 && preco / tam >= 0.02 && preco / tam <= 0.6;
+    if (preco > 0 && tam > 0 && faz) achados.push({app, tipo, preco, tam, ...(validade && validade != 180 ? {validade} : {})});
   });
   // sem repetidos
   return achados.filter((p, i) => achados.findIndex(q => q.tipo == p.tipo && q.tam == p.tam) == i);
@@ -302,7 +306,7 @@ document.querySelectorAll('.print input[type=file]').forEach(inp => inp.onchange
   const fs = [...inp.files], app = inp.dataset.app; if (!fs.length) return;
   const caixa = inp.closest('.print'), estado = caixa.querySelector('.estado');
   estado.className = 'estado';
-  let novos = 0, falhou = 0, repetido = 0, outro = 0;
+  let novos = 0, falhou = 0, repetido = 0, outro = 0, estranho = 0;
   vistos[app] = vistos[app] || new Set();
   for (const [k, f] of fs.entries()) {
     // o mesmo arquivo de novo não conta
@@ -316,6 +320,7 @@ document.querySelectorAll('.print input[type=file]').forEach(inp => inp.onchange
       // print do outro app no quadro errado: recusa
       const de = appDoPrint(data.text);
       if (de && de != app) { outro++; continue; }
+      if (!ASSINATURA[app].test(data.text)) { ASSINATURA[app == 'Uber' ? '99' : 'Uber'].test(data.text) ? outro++ : estranho++; continue; }
       vistos[app].add(id);
       // a mesma oferta (mesmo tipo e tamanho) em dois prints conta uma vez só; fica o preço do print mais novo
       const lidos = lerPasses(data.text, app);
@@ -330,6 +335,7 @@ document.querySelectorAll('.print input[type=file]').forEach(inp => inp.onchange
     estado.textContent = `${tot} oferta${tot > 1 ? 's' : ''} da ${app}. Se alguma ficou de fora, mande outro print.`;
   }
   const avisos = [outro && `⛔ ${outro > 1 ? `${outro} prints são` : 'Esse print é'} da ${app == 'Uber' ? '99' : 'Uber'}, não da ${app}. Mande no quadro ${app == 'Uber' ? 'da 99' : 'da Uber'}.`,
+    estranho && `⛔ ${estranho > 1 ? `${estranho} imagens não são` : 'Essa imagem não é'} da tela de passes da ${app}. Mande o print de ${app == 'Uber' ? 'Menu → Passe para Motoristas' : 'Pacote Taxa Zero'}.`,
     repetido && `${repetido > 1 ? `${repetido} prints já tinham` : 'Esse print já tinha'} sido enviado${repetido > 1 ? 's' : ''}.`,
     novosApp.length && `Achei ${novosApp.length > 1 ? 'ofertas' : 'uma oferta'} que a calculadora ainda não conhece ("${novosApp[0]}"${novosApp.length > 1 ? ' e outras' : ''}): por enquanto ${novosApp.length > 1 ? 'ficam' : 'fica'} de fora da conta.`,
     falhou && `⛔ Não consegui ler ${falhou > 1 ? `${falhou} prints` : 'um print'}: tire de novo com as opções na tela.`].filter(Boolean);
