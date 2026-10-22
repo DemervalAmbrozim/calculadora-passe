@@ -999,7 +999,7 @@ function mostrarMes() {
   if (mesApps.some(x => [...Array(SEMANAS)].some((_, w) => semanaMes(x, w).some(v => v > 3000)))) return msg('Tem dia passando de R$ 3.000: lance quanto entra em cada dia');
   const contas = contasMes();
   if (!contas.length) return msg('Lance pelo menos um dia em alguma semana');
-  let h = `<div class="card"><p class="destaque">O passe do seu mês</p>${contas.map(blocoMes).join('')}
+  let h = `<div class="card"><p class="destaque">O passe do seu mês</p><p class="aviso">📸 <b>Conta feita com as ofertas do seu print de ${dataCurta(new Date())}.</b> A oferta mudou? Mande o print novo e refaça o mês.</p>${contas.map(blocoMes).join('')}
     <a class="btn zap" href="https://wa.me/55${mesCel}?text=${encodeURIComponent(textoMes(contas))}" target="_blank" rel="noopener">Mandar o mês pro meu WhatsApp</a></div>
     <div class="card bloco-cmp"><span class="etq-cmp">📊 Compare as ofertas</span><h2>Quanto você paga de passe no mês em cada oferta</h2><p class="dica" style="margin-top:0">Com as 4 semanas que você lançou. A 1ª é a que pede menos.</p>`;
   contas.forEach(c => { const max = Math.max(...c.planos.map(x => x.passe));
@@ -1015,7 +1015,7 @@ function mostrarMes() {
 }
 
 function textoMes(contas) {
-  const l = ['*Meu mês na Calculadora de Passe*', ''];
+  const l = ['*Meu mês na Calculadora de Passe*', `Com as ofertas do print de ${dataCurta(new Date())}`, ''];
   contas.forEach(c => { const pl = c.planos[0];
     l.push(`*${c.app}:* ${pl.nome}`, `${real(pl.passe)} de passe no mês inteiro. Para levar os ${real(pl.T)}, fazer ${real(pl.P)} no app:`);
     pl.sems.forEach((x, w) => l.push(x.T ? `Semana ${w + 1}: fazer ${real(x.precisa)} (fazia ${real(x.T)})` : `Semana ${w + 1}: não roda`)); l.push(''); });
