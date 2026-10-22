@@ -742,15 +742,15 @@ function mostrar(contas, cel) {
   const zap = `https://wa.me/55${cel}?text=${encodeURIComponent(textoZap(contas))}`;
   let h = `<div class="card"><p class="destaque">O passe da sua semana</p>${topo}
     <a class="btn zap" href="${zap}" target="_blank" rel="noopener">Mandar o resultado pro meu WhatsApp</a></div>
-    <div class="card"><h2>Quanto de passe você paga em cada oferta</h2><p class="dica" style="margin-top:0"><b class="realce">Com a sua semana</b>, quanto vai para o passe por mês. A primeira é a mais viável.</p>`;
+    <div class="card"><h2>Quanto você paga de passe em cada oferta</h2><p class="dica" style="margin-top:0"><b class="realce">Na sua semana.</b> A 1ª é a mais barata.</p>`;
   contas.forEach(c => {
     const max = Math.max(...c.ops.map(o => o.custo)), total = c.G.reduce((a, b) => a + b, 0);
-    h += `<div class="cmp-app ${c.app == '99' ? 'n99' : 'uber'}"><div class="app-rot"><span class="logo ${c.app == '99' ? 'l99' : 'luber'}">${c.app}</span> sua semana de ${real(total)}</div><div class="cmp">` + c.ops.map((o, i) => `
+    h += `<div class="cmp-app ${c.app == '99' ? 'n99' : 'uber'}"><div class="app-rot"><span class="logo ${c.app == '99' ? 'l99' : 'luber'}">${c.app}</span> sua semana de ${real(total)}</div><div class="cmp">` + c.ops.filter((o, i) => i == 0 || o.mistura || !c.ops.some((x, j) => j < i && !x.mistura && x.passes[0] === o.passes[0])).map((o, i) => `
       <div class="linha ${i == 0 ? 'top' : ''}">
         <div class="nome">${i == 0 ? '★ ' : ''}${o.curto}</div>
-        <div class="valor">${real(o.custo * 52 / 12)}<small> de passe/mês</small></div>
+        <div class="valor">${o.custo < 10 ? brlc(o.custo) : real(o.custo)}<small> por semana</small></div>
         <div class="barra"><i style="width:${Math.max(4, 100 * o.custo / max).toFixed(0)}%"></i></div>
-        <div class="obs">${i == 0 ? 'A mais viável pra você' : (o.custo - c.ops[0].custo) * 52 / 12 < 0.5 ? 'Mesmo valor da mais viável' : `+${real((o.custo - c.ops[0].custo) * 52 / 12)} por mês`}${o.detalhe ? ` • ${o.detalhe}` : ''}${o.alerta ? ` • ${o.alerta}` : ''}</div>
+        <div class="obs">${o.custo * 52 / 12 < 10 ? brlc(o.custo * 52 / 12) : real(o.custo * 52 / 12)} por mês • ${i == 0 ? 'A mais barata pra você' : (o.custo - c.ops[0].custo) * 52 / 12 < 0.5 ? 'Mesmo valor da 1ª' : `+${real((o.custo - c.ops[0].custo) * 52 / 12)} por mês que a 1ª`}</div>
       </div>`).join('') + '</div></div>';
   });
   const txt = encodeURIComponent('Fiz a conta do passe da Uber e da 99 aqui, dia a dia da minha semana. Faz a sua: ' + location.origin + location.pathname + '?o=zap');
