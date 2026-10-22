@@ -113,6 +113,9 @@ input.errado,select.errado{border-color:var(--verm);box-shadow:0 0 0 3px var(--v
 .nums span{font-size:12px;color:var(--suave)}
 .outras{margin-top:14px}.sem-passe{margin-top:14px}.sem-passe summary{cursor:pointer}.ex-app{margin-top:10px}.ex-app .lado{align-items:end}.erro-campo{display:block;color:var(--verm);font-size:12px;font-weight:600;margin:3px 0 0;min-height:0}.erro-campo:empty{display:none}.passe.avulso.com-erro{border-color:var(--verm)!important;background:var(--verm-l)}.passe .invalido{border-color:var(--verm)!important;outline:1px solid var(--verm)}.bloco-cmp{background:var(--dourado-l);border:2px solid var(--dourado);margin-top:26px}.bloco-cmp .cmp-app{background:var(--cartao)}.etq-cmp{display:inline-block;background:var(--dourado);color:#14202C;font-weight:700;font-size:13px;padding:3px 10px;border-radius:99px;margin-bottom:6px}.cmp .valor small{display:block;font-size:12px;text-align:right}.realce{display:inline;background:#FFE58A;color:#14202C;padding:0 4px;border-radius:4px}.bom{color:var(--verde)}.ruim{color:var(--verm)}
 .bloco-mes{border:2px solid var(--verde,#1a7f37)}
+.memo td:not(:first-child),.memo th:not(:first-child){white-space:nowrap}
+.semtab{display:flex;gap:6px;margin:10px 0}.semtab .aba{padding:6px 0;font-size:12px;white-space:nowrap;font-weight:700;color:var(--texto)}.semtab .aba small{display:block;font-weight:400;color:var(--suave);font-size:12px}
+.pix img{width:220px;max-width:100%;display:block;margin:8px auto;background:#fff;padding:8px;border-radius:12px}
 .aviso{background:var(--ambar-l);border-radius:12px;padding:10px 12px;font-size:14px;margin-top:10px}
 .destaque{font-size:15px;margin:0 0 4px}
 .btn.zap{background:#1FA855;text-align:center;text-decoration:none;margin-top:12px}
@@ -225,6 +228,8 @@ ul.regras li{margin:6px 0}
 </section>
 
 <section class="oculto" id="resultado"></section>
+<section class="card oculto" id="mes"></section>
+<section class="oculto" id="resmes"></section>
 
 </div></main>
 <datalist id="carros"><option>Onix</option><option>Onix Plus</option><option>HB20</option><option>HB20S</option><option>Argo</option><option>Cronos</option><option>Mobi</option><option>Kwid</option><option>Logan</option><option>Sandero</option><option>Virtus</option><option>Polo</option><option>Voyage</option><option>Gol</option><option>Corolla</option><option>Yaris</option><option>Etios</option><option>City</option><option>Fit</option><option>Spin</option><option>Cobalt</option><option>Prisma</option><option>Versa</option><option>Kicks</option><option>Tracker</option><option>Creta</option><option>T-Cross</option><option>Nivus</option><option>Pulse</option><option>Renegade</option><option>Compass</option><option>Corolla Cross</option><option>HR-V</option><option>Dolphin Mini</option><option>Song Plus</option></datalist>
@@ -823,19 +828,199 @@ function mostrar(contas, cel) {
   });
   h += `<p class="aviso">📅 <b>A conta é por semana, não por mês:</b> as semanas do mês não são iguais (a última costuma ser mais fraca). Numa semana diferente, o passe mais viável pode mudar: simule de novo.</p>
     <button class="btn claro" id="simular">Simular outra semana</button></div>
-    <div class="card bloco-mes" id="mensal"><p><b>🗓️ Quer a conta do mês todo?</b> As 4 semanas do mês, cada uma com o valor dela, e o passe que passa de uma semana para a outra.</p>
-    <button class="btn" id="querMes">Quero o mês todo: R$ 9,90</button></div>`;
+    ${cartaoMes(cel)}`;
   const txt = encodeURIComponent('Fiz a conta do passe da Uber e da 99 aqui, dia a dia da minha semana. Faz a sua: ' + location.origin + location.pathname + '?o=zap');
   h += `<div class="card"><a class="btn" style="text-align:center;text-decoration:none" href="https://wa.me/?text=${txt}">Mandar para outro motorista</a>
     <button class="btn claro" onclick="location.reload()">Refazer a conta</button></div>`;
   ['#p1', '#p2', '#pf', '#p3'].forEach(id => $(id).classList.add('oculto'));
   const res = $('#resultado'); res.innerHTML = h; res.classList.remove('oculto'); window.scrollTo({top: 0, behavior: 'smooth'});
   // volta para a semana com os dias preenchidos; o novo resultado sai direto, sem pedir o contato nem gravar de novo
-  // teste de preço do mensal (22/10): só anota quem clica com o preço na tela; nada é cobrado
-  $('#querMes').onclick = () => {
-    guardar({nome: 'INTERESSE MENSAL', celular: cel, carro: 'interesse', ano: 2000, apps: contas.map(c => c.app).join('+'), origem: new URLSearchParams(location.search).has('teste') ? 'mensal-teste' : 'mensal-990', aceite_lgpd: false});
-    $('#mensal').innerHTML = `<p>✅ <b>Anotado!</b> A conta do mês todo ainda está sendo preparada. Quando abrir, avisamos você no WhatsApp (${cel.slice(0, 2)}) ${cel.slice(2, -4)}-${cel.slice(-4)}. Nada foi cobrado.</p>`; };
+  prepararMes(contas, cel);
   $('#simular').onclick = () => { simulando = cel; res.classList.add('oculto'); $('#pf').classList.remove('oculto'); $('#ir4').textContent = 'Ver o resultado desta semana'; $('#pf').scrollIntoView({behavior: 'smooth'}); };
+}
+// ===== O MÊS TODO (22/10): 4 semanas diferentes, pago à parte. Pronto e DESLIGADO até ele mandar ligar. =====
+// ligado:false → o resultado só mostra o teste de preço (anota quem clica, nada é cobrado).
+// ?mes=teste → abre o mês sem cobrar, para conferir. Com ligado:true o ?mes=teste não vale mais.
+const CONFIG_MES = {ligado: false, preco: 9.9, dias: 30};
+const testeMes = !CONFIG_MES.ligado && new URLSearchParams(location.search).get('mes') == 'teste';
+const SEMANAS = 4;
+let mesApps = [], mesCel = null;
+
+const liberadoAte = cel => { try { const d = localStorage.getItem('calc-mes-' + cel); return d && new Date(d) > new Date() ? new Date(d) : null; } catch (e) { return null; } };
+const guardarLib = (cel, ate) => { try { localStorage.setItem('calc-mes-' + cel, ate); } catch (e) { /* sem memória no navegador: o servidor confere de novo */ } };
+const dataCurta = d => d.toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit'});
+const celTxt = cel => `(${cel.slice(0, 2)}) ${cel.slice(2, -4)}-${cel.slice(-4)}`;
+
+function cartaoMes(cel) {
+  const topo = '<p><b>🗓️ Quer a conta do mês todo?</b> As 4 semanas do mês, cada uma com o valor dela (a última costuma ser mais fraca), e o passe que vale para o mês inteiro.</p>';
+  if (testeMes) return `<div class="card bloco-mes" id="mensal">${topo}<button class="btn" id="querMes">Montar o meu mês (teste, sem cobrar)</button></div>`;
+  if (CONFIG_MES.ligado) { const ate = liberadoAte(cel);
+    return `<div class="card bloco-mes" id="mensal">${topo}<button class="btn" id="querMes">${ate ? `Abrir o meu mês (liberado até ${dataCurta(ate)})` : `Ver o mês todo: ${brlc(CONFIG_MES.preco)} no Pix`}</button><p class="dica">${ate ? '' : `Pagamento único. Libera o mês todo por ${CONFIG_MES.dias} dias neste celular, para simular quantas vezes quiser.`}</p></div>`; }
+  return `<div class="card bloco-mes" id="mensal">${topo}<button class="btn" id="querMes">Quero o mês todo: R$ 9,90</button></div>`;
+}
+
+function prepararMes(contas, cel) {
+  mesApps = contas.map(c => c.app); mesCel = cel;
+  if (testeMes || (CONFIG_MES.ligado && liberadoAte(cel))) return $('#querMes').onclick = abrirMes;
+  if (CONFIG_MES.ligado) {
+    $('#querMes').onclick = pagar;
+    // pagou em outro aparelho ou limpou o navegador: o servidor sabe
+    chamar({acao: 'liberado', celular: cel}).then(r => { if (r.ate) { guardarLib(cel, r.ate); $('#querMes').textContent = `Abrir o meu mês (liberado até ${dataCurta(new Date(r.ate))})`; $('#querMes').onclick = abrirMes; } }).catch(() => {});
+    return;
+  }
+  // teste de preço (22/10): só anota quem clica com o preço na tela; nada é cobrado
+  $('#querMes').onclick = () => {
+    guardar({nome: 'INTERESSE MENSAL', celular: cel, carro: 'interesse', ano: 2000, apps: mesApps.join('+'), origem: new URLSearchParams(location.search).has('teste') ? 'mensal-teste' : 'mensal-990', aceite_lgpd: false});
+    $('#mensal').innerHTML = `<p>✅ <b>Anotado!</b> A conta do mês todo ainda está sendo preparada. Quando abrir, avisamos você no WhatsApp ${celTxt(cel)}. Nada foi cobrado.</p>`; };
+}
+
+// a função do pagamento (Supabase Edge Function "mensal", Pix pelo Mercado Pago)
+async function chamar(d) {
+  const r = await fetch(CONFIG.url + '/functions/v1/mensal', {method: 'POST', headers: {apikey: CONFIG.chave, 'Content-Type': 'application/json'}, body: JSON.stringify(d)});
+  if (!r.ok) throw new Error('mensal ' + r.status);
+  return r.json();
+}
+
+async function pagar() {
+  const box = $('#mensal'); box.innerHTML = '<p>Gerando o Pix…</p>';
+  try {
+    const r = await chamar({acao: 'criar', celular: mesCel});
+    box.innerHTML = `<div class="pix"><p><b>Pix de ${brl(CONFIG_MES.preco)}</b> para liberar o mês todo por ${CONFIG_MES.dias} dias no celular ${celTxt(mesCel)}.</p>
+      <img alt="QR Code do Pix" src="data:image/png;base64,${r.qr.replace(/[^A-Za-z0-9+/=]/g, '')}">
+      <label for="pixcopia">Pix copia e cola</label><input id="pixcopia" readonly>
+      <button class="btn" id="copiar">Copiar o código do Pix</button>
+      <p class="dica" id="pixst" aria-live="polite">Esperando o pagamento… a tela abre sozinha quando o Pix cair.</p></div>`;
+    $('#pixcopia').value = r.copia;
+    $('#copiar').onclick = () => { $('#pixcopia').select(); (navigator.clipboard ? navigator.clipboard.writeText(r.copia) : Promise.reject()).then(() => msg('Código copiado: cole no app do seu banco'), () => { document.execCommand('copy'); msg('Código copiado'); }); };
+    const fim = Date.now() + 30 * 60 * 1000;
+    const olhar = async () => {
+      if (!document.body.contains($('#pixst'))) return;
+      if (Date.now() > fim) { $('#pixst').innerHTML = 'O Pix expirou. <button class="link" id="denovo">Gerar outro</button>'; $('#denovo').onclick = pagar; return; }
+      try { const st = await chamar({acao: 'status', id: r.id}); if (st.pago) { guardarLib(mesCel, st.ate); msg('Pagamento confirmado!'); return abrirMes(); } } catch (e) { /* tenta de novo */ }
+      setTimeout(olhar, 5000);
+    };
+    setTimeout(olhar, 5000);
+  } catch (e) {
+    box.innerHTML = '<p>Não consegui gerar o Pix agora. Nada foi cobrado.</p><button class="btn" id="denovo">Tentar de novo</button>'; $('#denovo').onclick = pagar;
+  }
+}
+
+// ---- o formulário: 4 semanas, a 1ª já vem com a semana informada ----
+const semanaMes = (app, w) => DIAS.map((_, i) => { const el = $(`#m-${w}-${app}-${i}`); return el ? num(el.value) || 0 : 0; });
+function abrirMes() {
+  const a = mesApps, dois = a.length > 1, cl = `sem${dois ? ' tres' : ''}`;
+  const cab = `<div class="${cl}"><span></span>${a.map(x => `<span class="cab">${x} (R$)</span>`).join('')}${dois ? '<span class="cab">Total</span>' : ''}</div>`;
+  $('#mes').innerHTML = `<h2>O seu mês, semana a semana</h2>
+    <p class="dica" style="margin-top:0">As 4 semanas já vieram com a sua <b class="realce">semana informada</b>. Mude as que são diferentes: a semana fraca, a de folga, a do pagamento. Dia de folga: em branco.</p>
+    <div class="semtab">${[...Array(SEMANAS)].map((_, w) => `<button class="aba${w ? '' : ' on'}" data-w="${w}">Semana ${w + 1}<small id="mt-${w}"></small></button>`).join('')}</div>
+    ${[...Array(SEMANAS)].map((_, w) => `<div class="sem-mes" data-w="${w}"${w ? ' hidden' : ''}>${cab}${DIAS.map((d, i) => `<div class="${cl}"><label>${CURTO[i]}</label>${a.map(x => `<input id="m-${w}-${x}-${i}" inputmode="decimal" placeholder="não rodo" value="${semanaDe(x)[i] || ''}">`).join('')}${dois ? `<span class="tot" id="mtd-${w}-${i}"></span>` : ''}</div>`).join('')}
+      ${w ? `<p class="dica" style="text-align:center"><button class="link" data-copia="${w}">Igual à semana 1</button> · <button class="link" data-menos="${w}">10% mais fraca que a semana 1</button></p>` : ''}</div>`).join('')}
+    <div class="${cl} soma"><label>Mês</label>${a.map(x => `<span class="tot" id="mm-${x}"></span>`).join('')}${dois ? '<span class="tot" id="mm-tot"></span>' : ''}</div>
+    <button class="btn" id="verMes">Ver o meu mês</button>
+    <button class="btn claro" id="voltaSem">Voltar ao resultado da semana</button>`;
+  const totais = () => {
+    let m = a.map(() => 0);
+    for (let w = 0; w < SEMANAS; w++) {
+      const t = a.map(x => semanaMes(x, w).reduce((s, v) => s + v, 0)); t.forEach((v, k) => m[k] += v);
+      $('#mt-' + w).textContent = t.some(v => v) ? real(t.reduce((s, v) => s + v, 0)) : 'não roda';
+      if (dois) DIAS.forEach((_, i) => { const d = a.reduce((s, x) => s + semanaMes(x, w)[i], 0); $(`#mtd-${w}-${i}`).textContent = d ? real(d) : ''; });
+    }
+    a.forEach((x, k) => $('#mm-' + x).textContent = m[k] ? real(m[k]) : '—');
+    if (dois) $('#mm-tot').textContent = real(m[0] + m[1]);
+  };
+  $('#mes').querySelectorAll('input').forEach(el => el.oninput = totais);
+  $('#mes').querySelectorAll('.semtab .aba').forEach(b => b.onclick = () => {
+    $('#mes').querySelectorAll('.semtab .aba').forEach(x => x.classList.toggle('on', x === b));
+    $('#mes').querySelectorAll('.sem-mes').forEach(x => x.hidden = x.dataset.w != b.dataset.w); });
+  const copiar = (w, f) => { a.forEach(x => DIAS.forEach((_, i) => { const v = semanaMes(x, 0)[i]; $(`#m-${w}-${x}-${i}`).value = v ? String(Math.round(v * f)) : ''; })); totais(); };
+  $('#mes').querySelectorAll('[data-copia]').forEach(b => b.onclick = () => copiar(+b.dataset.copia, 1));
+  $('#mes').querySelectorAll('[data-menos]').forEach(b => b.onclick = () => copiar(+b.dataset.menos, 0.9));
+  $('#verMes').onclick = mostrarMes;
+  $('#voltaSem').onclick = () => { $('#mes').classList.add('oculto'); $('#resmes').classList.add('oculto'); $('#resultado').classList.remove('oculto'); window.scrollTo({top: 0, behavior: 'smooth'}); };
+  totais();
+  ['#resultado', '#resmes'].forEach(id => $(id).classList.add('oculto'));
+  $('#mes').classList.remove('oculto'); window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+// ---- a conta do mês: a mesma régua da semana (precisaCom), somada semana a semana ----
+// um passe por vez: o plano é o MESMO passe o mês todo; o passe por tempo pode variar de semana para semana (cada um acaba sozinho)
+const chaveOp = o => o.mistura ? 'mx' : (o.emendado ? 'em' : o.longo ? 'lg' : o.passes[0].tipo == 'tempo' ? 'tp' : 'gn') + ':' + passes.indexOf(o.passes[0]);
+// passe emendado ou longo custa o mesmo toda semana, rode o quanto rodar
+const fixoSem = (o0, G) => { const p = o0.passes[0], T = G.reduce((a, b) => a + b, 0), custo = 7 * p.preco / durac(p);
+  return {...o0, custo, uso: G.map(v => v > 0 ? {p, paga: custo * v / T} : null)}; };
+function opcoesMes(app, Ws) {
+  const T = Ws.map(G => G.reduce((a, b) => a + b, 0)), sem = Ws.map((G, w) => T[w] > 0 ? opcoes(app, G) : null), base = new Map(), planos = [];
+  sem.forEach(ops => ops && ops.forEach(o => { if (!o.mistura && !base.has(chaveOp(o))) base.set(chaveOp(o), o); }));
+  const montar = (nome, curto, tipo, escolhe) => {
+    const sems = Ws.map((G, w) => { if (!sem[w]) return {G, T: 0, o: null, precisa: 0}; const o = escolhe(w); return o ? {G, T: T[w], o, precisa: precisaCom(o, T[w])} : null; });
+    if (sems.some(x => !x)) return;
+    const Tm = T.reduce((a, b) => a + b, 0), P = sems.reduce((a, x) => a + x.precisa, 0);
+    planos.push({nome, curto, tipo, sems, T: Tm, P, passe: P - Tm, custo: sems.reduce((a, x) => a + (x.o ? x.o.custo : 0), 0)});
+  };
+  base.forEach((o0, k) => { const p = o0.passes[0], solto = p.tipo == 'tempo' && !o0.emendado && !o0.longo;
+    montar(solto ? `Passe de ${horas(p)} por ${brlc(p.preco)}, nos dias que você roda` : o0.longo || p.tipo != 'tempo' ? curto(p) : o0.nome,
+      solto ? `${horas(p)} por ${brlc(p.preco)}` : o0.curto, p.tipo,
+      w => sem[w].find(x => !x.mistura && chaveOp(x) == k) || (o0.emendado || o0.longo ? fixoSem(o0, Ws[w]) : null)); });
+  // por tempo, o mais viável de cada semana (24 h numa, 72 h na outra): só entra se sair mais barato que o mesmo passe o mês todo
+  const fixo = Math.min(Infinity, ...planos.filter(x => x.tipo == 'tempo').map(x => x.P));
+  montar('Passe por tempo, o mais viável de cada semana', 'Por tempo, escolhendo a cada semana', 'tempo',
+    w => sem[w].filter(x => x.passes[0].tipo == 'tempo' && !x.longo).sort((x, y) => precisaCom(x, T[w]) - precisaCom(y, T[w]))[0]);
+  const ult = planos[planos.length - 1];
+  if (ult && ult.curto == 'Por tempo, escolhendo a cada semana' && !(ult.P < fixo - 1)) planos.pop();
+  return planos.sort((a, b) => a.P - b.P || a.custo - b.custo);
+}
+
+function contasMes() {
+  return mesApps.map(app => { const Ws = [...Array(SEMANAS)].map((_, w) => semanaMes(app, w));
+    return {app, Ws, planos: Ws.some(G => G.some(v => v > 0)) ? opcoesMes(app, Ws) : []}; }).filter(c => c.planos.length);
+}
+
+function blocoMes(c) {
+  const pl = c.planos[0], p0 = pl.sems.find(x => x.o).o.passes[0], ganhos = pl.tipo != 'tempo';
+  const aCada = pl.curto == 'Por tempo, escolhendo a cada semana';
+  const linhas = pl.sems.map((x, w) => x.T ? `<tr><td style="white-space:nowrap">Semana ${w + 1}</td><td>${real(x.T)}</td><td><b>${real(x.precisa)}</b></td><td class="ruim">+${real(x.precisa - x.T)}</td></tr>${aCada ? `<tr><td colspan="4" class="p" style="padding-top:0">${x.o.mistura ? x.o.detalhe : x.o.curto}</td></tr>` : ''}` : `<tr><td>Semana ${w + 1}</td><td colspan="3" style="text-align:left;color:var(--suave)">não roda</td></tr>`).join('');
+  // semana a semana: a meta de cada dia (mesma tabela da semana)
+  const dias = pl.sems.map((x, w) => { if (!x.T) return ''; const pd = precisaDia({app: c.app, G: x.G, ops: [x.o]});
+    return `<p class="dica" style="margin:10px 0 0"><b>Semana ${w + 1}</b>${aCada ? `: ${x.o.mistura ? x.o.detalhe : x.o.curto}` : ''}</p><table class="memo"><tr><th>Dia</th><th>Fazia</th><th>Precisa fazer</th><th>A mais</th></tr>${x.G.map((v, i) => v > 0 ? `<tr><td>${CURTO[i]}</td><td>${real(v)}</td><td><b>${real(pd[i])}</b></td><td class="ruim">+${real(pd[i] - v)}</td></tr>` : '').join('')}</table>`; }).join('');
+  // semana em que outra oferta pediria bem menos: avisa, lembrando que é um passe por vez
+  const dicas = pl.sems.map((x, w) => { if (!x.T) return ''; const b = opcoes(c.app, x.G)[0], d = x.precisa - precisaCom(b, x.T);
+    return d >= 10 && chaveOp(b) != chaveOp(x.o) ? `<p class="aviso">💡 <b>Semana ${w + 1}:</b> ${b.curto} pediria ${real(d)} a menos nessa semana. Só vale trocar se o passe anterior já tiver acabado: é um passe por vez.</p>` : ''; }).join('');
+  const npac = ganhos ? pl.P / p0.tam : 0;
+  const como = ganhos ? `<p class="aviso">💰 <b>Como sai do bolso:</b> o app desconta os ${brlc(p0.preco)} de cada pacote das primeiras corridas, até completar o valor; só depois o dinheiro cai. ${npac >= 1 ? `No seu mês, são uns ${npac.toLocaleString('pt-BR', {maximumFractionDigits: 1})} pacotes: quando um acaba, o app compra outro.` : `Um pacote atravessa o seu mês: no seu ritmo, dura umas ${(SEMANAS / npac).toLocaleString('pt-BR', {maximumFractionDigits: 1})} semanas.`}</p>`
+    : `<p class="aviso">📅 <b>Toda semana:</b> cada passe é descontado das primeiras corridas e só depois o dinheiro cai. Sem o a mais, você não chega no mês informado.</p>`;
+  return `<div class="app-rot"><span class="logo ${c.app == '99' ? 'l99' : 'luber'}">${c.app}</span> no seu mês</div><div class="grande">${pl.nome}</div>
+    <p class="dica">Para levar os ${real(pl.T)} do seu <b class="realce">mês informado</b>, faça <b>${real(pl.P)}</b> no app: ${real(pl.passe)} de passe no mês inteiro.</p>
+    <table class="memo"><tr><th>Semana</th><th>Fazia</th><th>Precisa fazer</th><th>A mais</th></tr>${linhas}<tr><th>Mês</th><th>${real(pl.T)}</th><th>${real(pl.P)}</th><th class="ruim">+${real(pl.passe)}</th></tr></table>
+    ${como}${dicas}<details><summary class="dica">Ver a meta de cada dia, semana a semana</summary>${dias}</details>
+    <p class="aviso">⚠️ <b>Cuidado:</b> parou nos ${real(pl.T)} de sempre? No mês, leva só <b>${real(Math.max(0, pl.T - pl.custo))}</b>.</p>`;
+}
+
+function mostrarMes() {
+  if (mesApps.some(x => [...Array(SEMANAS)].some((_, w) => semanaMes(x, w).some(v => v > 3000)))) return msg('Tem dia passando de R$ 3.000: lance quanto entra em cada dia');
+  const contas = contasMes();
+  if (!contas.length) return msg('Lance pelo menos um dia em alguma semana');
+  let h = `<div class="card"><p class="destaque">O passe do seu mês</p>${contas.map(blocoMes).join('')}
+    <a class="btn zap" href="https://wa.me/55${mesCel}?text=${encodeURIComponent(textoMes(contas))}" target="_blank" rel="noopener">Mandar o mês pro meu WhatsApp</a></div>
+    <div class="card bloco-cmp"><span class="etq-cmp">📊 Compare as ofertas</span><h2>Quanto você paga de passe no mês em cada oferta</h2><p class="dica" style="margin-top:0">Com as 4 semanas que você lançou. A 1ª é a que pede menos.</p>`;
+  contas.forEach(c => { const max = Math.max(...c.planos.map(x => x.passe));
+    h += `<div class="cmp-app ${c.app == '99' ? 'n99' : 'uber'}"><div class="app-rot"><span class="logo ${c.app == '99' ? 'l99' : 'luber'}">${c.app}</span> seu mês informado: <span style="white-space:nowrap">${real(c.planos[0].T)}</span></div><div class="cmp">` + c.planos.map((x, i) => `
+      <div class="linha ${i == 0 ? 'top' : ''}"><div class="nome">${i == 0 ? '★ ' : ''}${x.curto}</div>
+        <div class="valor">${real(x.passe)}<small>de passe no mês inteiro</small></div>
+        <div class="barra"><i style="width:${Math.max(4, 100 * x.passe / max).toFixed(0)}%"></i></div>
+        <div class="obs">Para levar os ${real(x.T)}: faça <b>${real(x.P)}</b> no app<br>${i == 0 ? 'A mais barata pra você' : x.passe - c.planos[0].passe < 0.5 ? 'Mesmo valor da 1ª' : `+${real(x.passe - c.planos[0].passe)} de passe no mês que a 1ª`}</div></div>`).join('') + '</div></div>'; });
+  h += `<button class="btn claro" id="mudarMes">Mudar as semanas</button><button class="btn claro" id="voltaSem2">Voltar ao resultado da semana</button></div>`;
+  const r = $('#resmes'); r.innerHTML = h; $('#mes').classList.add('oculto'); r.classList.remove('oculto'); window.scrollTo({top: 0, behavior: 'smooth'});
+  $('#mudarMes').onclick = () => { r.classList.add('oculto'); $('#mes').classList.remove('oculto'); $('#mes').scrollIntoView({behavior: 'smooth'}); };
+  $('#voltaSem2').onclick = () => { r.classList.add('oculto'); $('#resultado').classList.remove('oculto'); window.scrollTo({top: 0, behavior: 'smooth'}); };
+}
+
+function textoMes(contas) {
+  const l = ['*Meu mês na Calculadora de Passe*', ''];
+  contas.forEach(c => { const pl = c.planos[0];
+    l.push(`*${c.app}:* ${pl.nome}`, `${real(pl.passe)} de passe no mês inteiro. Para levar os ${real(pl.T)}, fazer ${real(pl.P)} no app:`);
+    pl.sems.forEach((x, w) => l.push(x.T ? `Semana ${w + 1}: fazer ${real(x.precisa)} (fazia ${real(x.T)})` : `Semana ${w + 1}: não roda`)); l.push(''); });
+  l.push('O app desconta o passe das primeiras corridas; só depois o dinheiro cai.', 'Refaça a conta quando a oferta mudar: ' + location.origin + location.pathname);
+  return l.join('\n');
 }
 </script>
 </body>
