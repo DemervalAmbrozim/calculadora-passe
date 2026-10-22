@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.jsdelivr.net blob:; worker-src 'self' blob: https://cdn.jsdelivr.net; connect-src 'self' https://cdn.jsdelivr.net https://ixeuemgxmteuezcqovtz.supabase.co blob: data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; base-uri 'self'; form-action 'self'; object-src 'none'">
+<link rel="icon" href="marca-logo.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacidade • Calculadora de Passe</title>
+<meta name="robots" content="noindex">
+<style>
+:root{--fundo:#EEF2F6;--cartao:#fff;--texto:#14202C;--suave:#5E6E7E;--marca:#0F2A44;--verde:#12915A;--borda:#DCE3EA;--claro:#F5F8FB}
+@media (prefers-color-scheme:dark){:root{--fundo:#0B131C;--cartao:#15202B;--texto:#E6EDF3;--suave:#9DB0C2;--borda:#2A3A4A;--claro:#1B2836;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fundo);color:var(--texto);font:16px/1.55 Inter,system-ui,sans-serif}
+header{background:var(--marca);color:#fff;padding:28px 16px 64px}
+header .marca{max-width:620px;margin:0 auto;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.75}
+header h1{max-width:620px;margin:8px auto 0;font-size:26px;line-height:1.2}
+header p{max-width:620px;margin:10px auto 0;color:#fff;opacity:.85;font-size:15px}
+main{max-width:620px;margin:-44px auto 0;padding:0 16px 32px}
+.card{background:var(--cartao);border-radius:18px;padding:20px;margin-bottom:12px;box-shadow:0 1px 3px rgba(15,42,68,.08)}
+.card h2{font-size:17px;margin:0 0 10px;display:flex;align-items:center;gap:10px}
+.card h2 span{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:9px;background:var(--claro);font-size:16px}
+ul{margin:0;padding-left:20px}li{margin:4px 0;color:var(--suave)}p{color:var(--suave);margin:0}
+.opcoes{display:grid;gap:8px;margin-top:6px}
+.opcoes label{display:flex;align-items:center;gap:10px;border:1px solid var(--borda);border-radius:12px;padding:12px;cursor:pointer;color:var(--texto);font-size:15px}
+.opcoes input{accent-color:var(--verde);width:18px;height:18px;margin:0}
+.opcoes label:has(input:checked){border-color:var(--verde);background:var(--claro)}
+.rot{display:block;font-size:14px;font-weight:600;margin:14px 0 6px}
+input[type=text]{width:100%;font:inherit;padding:12px;border-radius:12px;border:1px solid var(--borda);background:var(--cartao);color:var(--texto)}
+button{width:100%;margin-top:16px;padding:15px;border:0;border-radius:12px;background:var(--verde);color:#fff;font:inherit;font-weight:700;font-size:16px;cursor:pointer}
+#ret{margin-top:10px;font-weight:600;color:var(--texto)}
+footer{text-align:center;font-size:13px;color:var(--suave);padding:8px 16px 28px}
+footer a{color:inherit}
+</style>
+</head>
+<body>
+<header>
+  <div class="marca">Calculadora de Passe</div>
+  <h1>Como cuidamos dos seus dados</h1>
+  <p>A Calculadora de Passe é uma ferramenta gratuita para motoristas de aplicativo escolherem o passe da Uber e da 99. Aqui você vê o que guardamos, para quê, e como pedir o que quiser sobre os seus dados.</p>
+</header>
+<main>
+  <section class="card">
+    <h2><span>📖</span>Palavras usadas aqui</h2>
+    <p><b>Dado pessoal:</b> qualquer informação que identifica você, como nome e celular. <b>Tratar:</b> tudo o que se faz com o dado, como guardar, usar e apagar. <b>Responsável:</b> quem decide como os dados da calculadora são tratados.</p>
+  </section>
+  <section class="card">
+    <h2><span>📥</span>Como os dados chegam</h2>
+    <p>Só por você: quando preenche o passo 4 e toca em Ver meu resultado, e quando faz um pedido no fim desta página. Além disso, os serviços que mantêm o site no ar registram dados técnicos da visita, explicados mais abaixo.</p>
+  </section>
+  <section class="card">
+    <h2><span>📋</span>O que guardamos</h2>
+    <ul>
+      <li>Nome, celular (WhatsApp), modelo e ano do carro, cidade e estado.</li>
+      <li>Os apps e as categorias em que você roda, o que você faz por dia, as ofertas de passe que você informou e o resultado da conta.</li>
+    </ul>
+  </section>
+  <section class="card">
+    <h2><span>🎯</span>Para que usamos</h2>
+    <ul>
+      <li>Mostrar e mandar o seu resultado (aceite obrigatório para usar a calculadora).</li>
+      <li>Só se você marcar a caixa opcional: avisar pelo WhatsApp quando as ofertas de passe mudarem e mandar novidades para motoristas.</li>
+    </ul>
+    <p style="margin-top:10px">Usamos os dados porque você deu o seu aceite na calculadora (Lei Geral de Proteção de Dados, art. 7º, I), com uma caixa para cada finalidade. Guardamos a data e a versão do texto que você aceitou. Você pode retirar o aceite quando quiser.</p><p style="margin-top:10px">Também usamos o mínimo necessário para proteger a calculadora contra abuso, como limitar cadastros repetidos do mesmo celular (legítimo interesse, art. 7º, IX), e para cumprir a lei, como guardar o registro dos pedidos que você fizer (art. 7º, II).</p><p style="margin-top:10px">Toda mensagem que mandarmos pelo WhatsApp diz como parar de receber: é só responder SAIR.</p>
+  </section>
+  <section class="card">
+    <h2><span>🚫</span>O que não fazemos</h2>
+    <p>Não vendemos os seus dados. Não passamos os seus dados para a Uber, para a 99 nem para outras empresas. O print que você manda é lido no seu próprio celular e não sai dele: guardamos só os valores das ofertas que você confirmou.</p><p>A calculadora não usa cookies e não guarda nada no seu navegador.</p><p>Podemos usar números gerais, sem identificar ninguém (por exemplo, qual passe sai mais vezes como o mais viável), para melhorar a calculadora.</p>
+  </section>
+  <section class="card">
+    <h2><span>👤</span>Quem é o responsável</h2>
+    <p>A Calculadora de Passe tem um responsável pelos dados guardados nela. Para qualquer pedido, dúvida ou para saber quem é o responsável, escreva para <a href="mailto:calculadoradepasse@gmail.com">calculadoradepasse@gmail.com</a>.</p>
+  </section>
+  <section class="card">
+    <h2><span>🔒</span>Onde e por quanto tempo</h2>
+    <p>Os dados ficam num provedor de nuvem com servidores no Brasil (São Paulo), com acesso restrito ao responsável. Guardamos enquanto você quiser receber o resultado e as novidades, e apagamos quando você pedir ou depois de 2 anos sem uso. Depois de apagar, fica só o registro do pedido (a data e o que foi pedido), para provar que atendemos.</p><p>Para funcionar, usamos dois serviços: o provedor do banco de dados (servidores em São Paulo) e o que hospeda o site. Como todo site, eles registram dados técnicos da visita, como o endereço de internet (IP) e o tipo de navegador, para manter o serviço no ar e protegido. O serviço que hospeda o site fica nos Estados Unidos, então esses dados técnicos da visita podem passar por lá. O seu cadastro fica no Brasil.</p><p>A calculadora é para maiores de 18 anos. Se soubermos que guardamos dados de um menor, apagamos.</p><p>Só mostramos os seus dados a alguém se a lei ou uma autoridade exigir. Se a calculadora passar a ser de uma empresa, os dados vão junto com os mesmos compromissos desta página, e avisamos antes. Se acontecer algum incidente de segurança com os seus dados, avisamos você e a Autoridade Nacional de Proteção de Dados (ANPD).</p>
+  </section>
+  <section class="card">
+    <h2><span>⚖️</span>Seus direitos</h2>
+    <p>A qualquer momento você pode pedir para ver, corrigir ou apagar os seus dados, ou para não receber mais mensagens. Faça o pedido abaixo, com o celular que você cadastrou. Respondemos em até 15 dias. Se esta página mudar, a versão nova fica aqui com a data e, se você aceitou mensagens, avisamos pelo WhatsApp.</p>
+  </section>
+  <section class="card">
+    <h2><span>✉️</span>Fazer um pedido</h2>
+    <span class="rot">O que você quer?</span>
+    <div class="opcoes">
+      <label><input type="radio" name="tipo" value="ver" checked>Ver os dados que vocês têm</label>
+      <label><input type="radio" name="tipo" value="corrigir">Corrigir os meus dados</label>
+      <label><input type="radio" name="tipo" value="sair">Não receber mais mensagens</label>
+      <label><input type="radio" name="tipo" value="apagar">Apagar os meus dados</label>
+    </div>
+    <label class="rot" for="cel">Celular cadastrado (com DDD)</label>
+    <input type="text" id="cel" inputmode="numeric" autocomplete="tel" placeholder="(99) 9 9999-9999" maxlength="16">
+    <button id="enviar">Enviar pedido</button>
+    <p id="ret" aria-live="polite"></p>
+  </section>
+</main>
+<footer>Calculadora de Passe · ferramenta independente, sem ligação com a Uber ou a 99 · privacidade versão 5 · atualizado em 22/10/2026<br><a href="termos.html">Termos de uso</a> · <a href="./">Voltar para a calculadora</a></footer>
+<script>
+// o pedido entra no mesmo banco (o público só cadastra); o responsável atende pelo painel
+const CONFIG = { url: 'https://ixeuemgxmteuezcqovtz.supabase.co', chave: 'sb_publishable_QaLESJ7_nc-UQLQjQyJi8Q_fSdxiSXU' };
+const ret = document.getElementById('ret'), celEl = document.getElementById('cel');
+// mesma máscara da calculadora: (99) 9 9999-9999
+celEl.oninput = e => {
+  const d = e.target.value.replace(/\D/g, '').slice(0, 11);
+  e.target.value = d.length > 7 ? `(${d.slice(0, 2)}) ${d[2]} ${d.slice(3, 7)}-${d.slice(7)}` : d.length > 3 ? `(${d.slice(0, 2)}) ${d[2]} ${d.slice(3)}` : d.length > 2 ? `(${d.slice(0, 2)}) ${d.slice(2)}` : d;
+};
+document.getElementById('enviar').onclick = async () => {
+  const cel = celEl.value.replace(/\D/g, ''), tipo = document.querySelector('input[name=tipo]:checked').value;
+  if (!/^[1-9][1-9]9\d{8}$/.test(cel)) { ret.textContent = 'Confira o celular: DDD + 9 + 8 números.'; return; }
+  try {
+    const r = await fetch(CONFIG.url + '/rest/v1/motoristas', {method: 'POST',
+      headers: {apikey: CONFIG.chave, Authorization: 'Bearer ' + CONFIG.chave, 'Content-Type': 'application/json', Prefer: 'return=minimal'},
+      body: JSON.stringify({nome: 'PEDIDO LGPD: ' + tipo, celular: cel, carro: 'pedido', ano: 2000, origem: 'pedido-' + tipo, aceite_lgpd: false})});
+    ret.textContent = r.ok ? '✅ Pedido recebido. Vamos atender em até 15 dias, pelo WhatsApp desse celular.' : 'Não deu certo agora. Tente de novo mais tarde.';
+  } catch (e) { ret.textContent = 'Sem internet agora. Tente de novo mais tarde.'; }
+};
+</script>
+</body></html>

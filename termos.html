@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.jsdelivr.net blob:; worker-src 'self' blob: https://cdn.jsdelivr.net; connect-src 'self' https://cdn.jsdelivr.net https://ixeuemgxmteuezcqovtz.supabase.co blob: data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; base-uri 'self'; form-action 'self'; object-src 'none'">
+<link rel="icon" href="marca-logo.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Termos de uso • Calculadora de Passe</title>
+<meta name="robots" content="noindex">
+<style>
+:root{--fundo:#EEF2F6;--cartao:#fff;--texto:#14202C;--suave:#5E6E7E;--marca:#0F2A44;--verde:#12915A;--borda:#DCE3EA;--claro:#F5F8FB}
+@media (prefers-color-scheme:dark){:root{--fundo:#0B131C;--cartao:#15202B;--texto:#E6EDF3;--suave:#9DB0C2;--borda:#2A3A4A;--claro:#1B2836;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fundo);color:var(--texto);font:16px/1.55 Inter,system-ui,sans-serif}
+header{background:var(--marca);color:#fff;padding:28px 16px 64px}
+header .marca{max-width:620px;margin:0 auto;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.75}
+header h1{max-width:620px;margin:8px auto 0;font-size:26px;line-height:1.2}
+header p{max-width:620px;margin:10px auto 0;color:#fff;opacity:.85;font-size:15px}
+main{max-width:620px;margin:-44px auto 0;padding:0 16px 32px}
+.card{background:var(--cartao);border-radius:18px;padding:20px;margin-bottom:12px;box-shadow:0 1px 3px rgba(15,42,68,.08)}
+.card h2{font-size:17px;margin:0 0 10px;display:flex;align-items:center;gap:10px}
+.card h2 span{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:9px;background:var(--claro);font-size:16px}
+ul{margin:0;padding-left:20px}li{margin:4px 0;color:var(--suave)}p{color:var(--suave);margin:0}
+.opcoes{display:grid;gap:8px;margin-top:6px}
+.opcoes label{display:flex;align-items:center;gap:10px;border:1px solid var(--borda);border-radius:12px;padding:12px;cursor:pointer;color:var(--texto);font-size:15px}
+.opcoes input{accent-color:var(--verde);width:18px;height:18px;margin:0}
+.opcoes label:has(input:checked){border-color:var(--verde);background:var(--claro)}
+.rot{display:block;font-size:14px;font-weight:600;margin:14px 0 6px}
+input[type=text]{width:100%;font:inherit;padding:12px;border-radius:12px;border:1px solid var(--borda);background:var(--cartao);color:var(--texto)}
+button{width:100%;margin-top:16px;padding:15px;border:0;border-radius:12px;background:var(--verde);color:#fff;font:inherit;font-weight:700;font-size:16px;cursor:pointer}
+#ret{margin-top:10px;font-weight:600;color:var(--texto)}
+footer{text-align:center;font-size:13px;color:var(--suave);padding:8px 16px 28px}
+footer a{color:inherit}
+.card p+p{margin-top:8px}
+</style>
+</head>
+<body>
+<header>
+  <div class="marca">Calculadora de Passe</div>
+  <h1>Termos de uso</h1>
+  <p>Ao usar a calculadora, você concorda com estes termos. São curtos: leia antes de usar.</p>
+</header>
+<main>
+  <section class="card">
+    <h2><span>📖</span>Palavras usadas aqui</h2>
+    <p><b>Calculadora:</b> o site Calculadora de Passe e tudo o que ele mostra. <b>Você:</b> quem usa a calculadora. <b>Ofertas:</b> os passes que a Uber e a 99 mostram no seu app. <b>Resultado:</b> a simulação que a calculadora faz com o que você informou.</p>
+  </section>
+  <section class="card">
+    <h2><span>🧮</span>O que é</h2>
+    <p>A Calculadora de Passe é uma ferramenta gratuita de simulação, feita para ajudar motoristas de aplicativo a comparar as ofertas de passe. É uma ferramenta independente, sem ligação com a Uber ou a 99. Uber e 99 são marcas dos seus donos.</p>
+  </section>
+  <section class="card">
+    <h2><span>📲</span>Como a conta é feita</h2>
+    <p>A conta usa só o que você informa: as ofertas que aparecem nos seus prints e o que você fazia por dia. O print é lido no seu próprio celular e não é enviado a ninguém. Confira os valores lidos antes de seguir: se um valor estiver errado, o resultado também fica.</p>
+  </section>
+  <section class="card">
+    <h2><span>🔌</span>Não mexe no seu app</h2>
+    <p>A calculadora não se conecta à Uber nem à 99, não entra na sua conta, não aceita nem recusa corridas e não lê nada do seu celular por conta própria. Ela usa só o print que você escolhe mandar e o que você digita.</p>
+  </section>
+  <section class="card">
+    <h2><span>⚠️</span>Não é orientação financeira</h2>
+    <p>O resultado é uma estimativa com os dados que você informou. Ele não é orientação financeira e não garante ganho. A decisão de comprar ou trocar de passe é sempre sua.</p><p>As regras e os preços dos passes são da Uber e da 99 e podem mudar a qualquer momento, por cidade, categoria ou promoção. Confira sempre no app. Regras conferidas em 21/10/2026.</p><p>A calculadora não tem nenhuma influência sobre esses preços e não responde por diferença entre o que aparece no seu print e o que o app cobra.</p>
+  </section>
+  <section class="card">
+    <h2><span>🆓</span>De graça</h2>
+    <p>Hoje a calculadora é gratuita. Ela pode mostrar anúncios ou ofertas de parceiros, sempre com a indicação de que são anúncios. Se um dia algum recurso passar a ser pago, avisamos antes, e nada é cobrado sem você concordar.</p>
+  </section>
+  <section class="card">
+    <h2><span>🚗</span>No trânsito</h2>
+    <p>Use a calculadora com o carro parado. Nunca preencha nada dirigindo.</p>
+  </section>
+  <section class="card">
+    <h2><span>⚖️</span>Limite de responsabilidade</h2>
+    <p>Na medida permitida pela lei, a Calculadora de Passe não responde por perdas que venham de decisões tomadas com base na simulação, de dados informados errados, de mudanças nas regras e preços dos aplicativos, de períodos em que o site estiver fora do ar ou do uso da calculadora por outra pessoa de forma errada.</p><p>Cuidamos dos dados com medidas de segurança, mas nenhum sistema na internet é totalmente imune a ataques. Se algo acontecer, respondemos como a lei manda e avisamos quem foi afetado.</p>
+  </section>
+  <section class="card">
+    <h2><span>✅</span>Uso correto</h2>
+    <p>A calculadora é para maiores de 18 anos. Use para você, com um cadastro por pessoa. Informe o seu próprio celular e não cadastre dados de outra pessoa. Não é permitido usar robôs, enviar cadastros em massa ou tentar acessar os dados de outros usuários.</p><p>Você responde pela verdade do que informa: o seu nome, o seu celular, os seus prints e os valores da sua semana. Cadastro com dados falsos ou de outra pessoa pode ser apagado.</p><p>Também não é permitido copiar a calculadora, tentar descobrir como o código funciona para reproduzir ou puxar dados do site de forma automática. Quem fizer isso pode ter o acesso bloqueado.</p>
+  </section>
+  <section class="card">
+    <h2><span>©️</span>Marca e conteúdo</h2>
+    <p>O nome, a marca, os textos, as artes e o jeito de fazer a conta são da Calculadora de Passe. Para usar em outro lugar, peça antes. Se você mandar uma sugestão ou ideia, ela pode ser usada para melhorar a calculadora, sem pagamento.</p>
+  </section>
+  <section class="card">
+    <h2><span>🔧</span>Mudanças</h2>
+    <p>A calculadora pode mudar, ficar fora do ar ou ser encerrada sem aviso. Estes termos também podem mudar: a nova versão vale a partir de quando for publicada aqui, e a versão e a data ficam no fim da página. Se você não concordar com uma mudança, é só parar de usar e pedir para apagar os seus dados.</p><p>Se alguma parte destes termos deixar de valer, o resto continua valendo. Deixar de cobrar uma regra uma vez não quer dizer abrir mão dela.</p>
+  </section>
+  <section class="card">
+    <h2><span>👤</span>Responsável e contato</h2>
+    <p>A Calculadora de Passe é mantida por um responsável identificado, que atende pelo contato: <a href="mailto:calculadoradepasse@gmail.com">calculadoradepasse@gmail.com</a>. Seus dados são tratados como explica a página <a href="privacidade.html">Como cuidamos dos seus dados</a>. Vale a lei brasileira, e qualquer disputa é resolvida no foro da cidade onde você mora.</p>
+  </section>
+</main>
+<footer>Calculadora de Passe · ferramenta independente, sem ligação com a Uber ou a 99 · termos versão 3 · 22/10/2026<br><a href="privacidade.html">Privacidade</a> · <a href="./">Voltar para a calculadora</a></footer>
+</body></html>
