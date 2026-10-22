@@ -50,7 +50,7 @@ input:focus,select:focus{border-color:var(--marca2);box-shadow:0 0 0 3px rgba(29
 .imp{font-size:14px;font-weight:700}.imp:empty{display:none}.print.ok .imp{background:#12915A;color:#fff;border-radius:8px;padding:4px 10px}
 .link{border:0;background:none;color:var(--marca2);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer;padding:0}
 @media (prefers-color-scheme:dark){.link,.print.ok .arquivo{color:#8EC5F0}}
-.estado{font-size:14px;margin:8px 0 0;color:var(--suave)}.estado:empty{display:none}.estado.ok{color:var(--verde)}.estado.ruim{color:var(--verm)}
+.estado{font-size:14px;margin:8px 0 0;color:var(--suave)}.estado:empty{display:none}.estado.ok{color:var(--verde)}.estado.ruim{color:var(--verm)}.alerta-print{display:block;margin-top:8px;padding:10px 12px;background:var(--verm-l);border-left:4px solid var(--verm);border-radius:8px;color:var(--texto);font-weight:700;font-size:15px}
 .lado{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:10px}
 .cidade-uf{grid-template-columns:minmax(0,2fr) minmax(0,1fr)}
 .titulo-campo{font-weight:700;color:var(--texto);font-size:14px;margin-top:16px}
@@ -111,7 +111,7 @@ input.errado,select.errado{border-color:var(--verm);box-shadow:0 0 0 3px var(--v
 .nums{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
 .nums b{display:block;font-size:19px}
 .nums span{font-size:12px;color:var(--suave)}
-.outras{margin-top:14px}.sem-passe{margin-top:14px}.sem-passe summary{cursor:pointer}.ex-app{margin-top:10px}.ex-app .lado{align-items:end}.realce{display:inline;background:#FFE58A;color:#14202C;padding:0 4px;border-radius:4px}.bom{color:var(--verde)}.ruim{color:var(--verm)}
+.outras{margin-top:14px}.sem-passe{margin-top:14px}.sem-passe summary{cursor:pointer}.ex-app{margin-top:10px}.ex-app .lado{align-items:end}.erro-campo{display:block;color:var(--verm);font-size:12px;font-weight:600;margin:3px 0 0;min-height:0}.erro-campo:empty{display:none}.passe.avulso.com-erro{border-color:var(--verm)!important;background:var(--verm-l)}.passe .invalido{border-color:var(--verm)!important;outline:1px solid var(--verm)}.bloco-cmp{background:var(--dourado-l);border:2px solid var(--dourado);margin-top:26px}.bloco-cmp .cmp-app{background:var(--cartao)}.etq-cmp{display:inline-block;background:var(--dourado);color:#14202C;font-weight:700;font-size:13px;padding:3px 10px;border-radius:99px;margin-bottom:6px}.cmp .valor small{display:block;font-size:12px;text-align:right}.realce{display:inline;background:#FFE58A;color:#14202C;padding:0 4px;border-radius:4px}.bom{color:var(--verde)}.ruim{color:var(--verm)}
 .aviso{background:var(--ambar-l);border-radius:12px;padding:10px 12px;font-size:14px;margin-top:10px}
 .destaque{font-size:15px;margin:0 0 4px}
 .btn.zap{background:#1FA855;text-align:center;text-decoration:none;margin-top:12px}
@@ -138,7 +138,7 @@ ul.regras li{margin:6px 0}
 <header><div class="wrap">
   <div class="marca">Calculadora de Passe</div>
   <h1>Passe da Uber e da 99:<br><span style="white-space:nowrap">qual compensa pra você?</span></h1>
-  <p>Vamos à sua realidade: em 1 minuto a gente te ajuda a achar a melhor opção para você trabalhar.</p>
+  <p>Em 1 minuto, a melhor opção para o seu jeito de rodar.</p>
 </div></header>
 
 <main><div class="wrap">
@@ -146,7 +146,7 @@ ul.regras li{margin:6px 0}
 <section class="card" id="p1">
   <div class="passo">Passo 1 de 4</div>
   <h2>Em quais categorias você roda?</h2>
-  <p class="dica" style="margin-top:-6px">Marque todas que você roda.</p>
+  
   <div class="app-bloco"><div class="app-cab"><span class="logo luber">Uber</span><button class="todas" data-app="Uber">Marcar todas</button></div>
   <div class="chips" id="cats-Uber">
     <button class="chip" data-app="Uber" data-v="UberX">UberX</button><button class="chip" data-app="Uber" data-v="Uber Comfort">Comfort</button><button class="chip" data-app="Uber" data-v="Uber Black">Black</button><button class="chip" data-app="Uber" data-v="Uber Moto">Moto</button><button class="chip" data-app="Uber" data-v="Uber Flash">Flash</button>
@@ -161,17 +161,17 @@ ul.regras li{margin:6px 0}
 <section class="card oculto" id="p2">
   <div class="passo">Passo 2 de 4</div>
   <h2>Confirme as ofertas de passe</h2>
-  <p class="dica" style="margin-top:-6px">A conta é feita com os preços que o app mostra <b>para você</b>. Escolha como prefere: mandar um print da tela de passes, que a gente lê sozinho, ou digitar as ofertas.</p>
+  <p class="dica" style="margin-top:-6px">Use os preços que o app mostra <b>para você</b>: mande o print ou digite.</p>
   <div class="print" id="print-Uber">
     <div class="print-cab"><span class="logo luber">Uber</span><span class="imp"></span></div>
-    <ol class="passos"><li>Abra o app da Uber</li><li>Menu → <b>Passe para Motoristas</b></li><li>Tire o print das opções (se não couber, tire mais de um)</li></ol>
+    <ol class="passos"><li>Abra o app da Uber</li><li>Menu → <b>Passe para Motoristas</b></li><li>Print das opções (pode ser mais de um)</li></ol>
     <label class="btn arquivo"><span>📷 Enviar o print da Uber</span><input type="file" accept="image/*" multiple data-app="Uber" hidden></label>
     <button class="btn claro digitar" data-app="Uber">⌨️ Digitar as ofertas da Uber</button>
     <p class="estado" aria-live="polite"></p>
   </div>
   <div class="print" id="print-99">
     <div class="print-cab"><span class="logo l99">99</span><span class="imp"></span></div>
-    <ol class="passos"><li>Abra o app da 99</li><li>Tela inicial → <b>Pacote Taxa Zero</b></li><li>Tire o print das opções (se não couber, tire mais de um)</li></ol>
+    <ol class="passos"><li>Abra o app da 99</li><li>Tela inicial → <b>Pacote Taxa Zero</b></li><li>Print das opções (pode ser mais de um)</li></ol>
     <label class="btn arquivo"><span>📷 Enviar o print da 99</span><input type="file" accept="image/*" multiple data-app="99" hidden></label>
     <button class="btn claro digitar" data-app="99">⌨️ Digitar as ofertas da 99</button>
     <p class="estado" aria-live="polite"></p>
@@ -184,21 +184,21 @@ ul.regras li{margin:6px 0}
 <section class="card oculto" id="pf">
   <div class="passo">Passo 3 de 4</div>
   <h2>A régua dos seus passes</h2>
-  <p class="dica" style="margin-top:0">De acordo com as ofertas informadas: quanto você precisa fazer no app, em média por dia, para cada oferta ser a mais viável.</p>
+  <p class="dica" style="margin-top:0">Quanto fazer por dia, em média, para cada oferta ser a mais viável.</p>
   <div id="regua"></div>
   <h2 style="margin-top:22px">Como os passes funcionam</h2>
   <ul class="regras">
-    <li><span class="selo t">Por tempo</span> (24 h, 72 h ou outro prazo): conta da 1ª corrida e corre mesmo com o app desligado.<br>💡 <i>Perfil:</i> quem roda muito no dia, dias cheios e seguidos. O preço é fixo, então quanto mais você faz, mais você vai ganhar, porque você não paga mais sobre cada corrida. É importante acompanhar se as corridas estão melhores após essa alteração para Passes.</li>
-    <li><span class="selo g">Por ganhos</span>: taxa zero até somar o limite ou 180 dias. O que sobrar no prazo não volta.<br>💡 <i>Perfil:</i> quem roda menos por dia, tem dias fracos ou folga no meio da semana. Você paga só sobre o que faz e não perde nada no dia parado. É importante acompanhar se as corridas estão melhores após essa alteração para Passes.</li>
+    <li><span class="selo t">Por tempo</span> conta da 1ª corrida, mesmo com o app desligado. Preço fixo: quanto mais você faz, mais fica com você.<br>💡 Para quem roda muito, dias cheios e seguidos.</li>
+    <li><span class="selo g">Por ganhos</span>: taxa zero nas corridas até somar o valor do pacote (ex.: R$ 2.490). Não chegou nisso em 180 dias? O que faltou se perde.<br>💡 Para quem tem dias fracos ou folgas: não perde nada no dia parado.</li>
   </ul>
   <p style="margin:14px 0 4px"><span class="selo d">Outras dicas</span></p>
   <ul class="regras">
-    <li>Quando um passe acaba, o app deixa o mesmo passe para a próxima compra. Se você quiser mudar para outro, fique atento e busque trocar antes dele acabar ou antes de fazer a primeira viagem após ele ter acabado.</li>
-    <li>É um passe por vez: enquanto um está ativo, não entra outro. Trocar o passe padrão só vale depois que o ativo acaba.</li>
+    <li>Acabou, o app compra o mesmo de novo. Quer outro? Troque antes de acabar.</li>
+    <li>Um passe por vez: o próximo só entra quando o ativo acaba.</li>
   </ul>
-  <div class="gancho"><p>A régua acima considera uma média por dia. Mas nem todo dia é igual: tem dia forte, dia fraco e dia de folga, e é isso que decide o passe certo.</p><b>Agora vamos à sua realidade, dia a dia 👇</b></div>
+  <div class="gancho"><p>A régua é média. Nem todo dia é igual, e é isso que decide o passe certo.</p><b>Agora vamos à sua realidade, dia a dia 👇</b></div>
   <h2 style="margin-top:22px">Agora, quanto você faz dia a dia</h2>
-  <p class="dica" style="margin-top:0">Toque no campo de cada dia e lance quanto você fazia no app antes do passe, mais ou menos, em reais. No dia que você não roda, deixe em branco. É com isso que a gente acha a melhor estratégia de verdade.</p>
+  <p class="dica" style="margin-top:0">Quanto você fazia em cada dia, antes do passe, em reais. Dia de folga: em branco.</p>
   <div id="semana"></div>
   <button class="btn" id="ir4">Ver o meu passe</button>
 </section>
@@ -206,7 +206,7 @@ ul.regras li{margin:6px 0}
 <section class="card oculto" id="p3">
   <div class="passo">Passo 4 de 4</div>
   <h2>Receba o resultado no seu WhatsApp</h2>
-  <p class="dica" style="margin-top:0">O resultado aparece aqui na hora, e com um toque você guarda ele no seu Zap. Se as ofertas de passe mudarem, ou a sua rotina mudar, volte aqui e refaça a conta para ter certeza da melhor opção para você.</p>
+  <p class="dica" style="margin-top:0">O resultado sai aqui na hora e você guarda no Zap. Mudou a oferta ou a rotina? Refaça a conta.</p>
   <label for="nome">Seu nome</label><input id="nome" autocomplete="name">
   <label for="cel">Celular com WhatsApp</label><input id="cel" inputmode="numeric" autocomplete="tel" placeholder="(99) 9 9999-9999" maxlength="16">
   <div class="lado">
@@ -218,7 +218,7 @@ ul.regras li{margin:6px 0}
     <div><label for="uf">Estado</label><select id="uf"><option value="">UF</option><option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option><option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option><option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option><option>SE</option><option>TO</option></select></div>
   </div>
   <label class="check"><input type="checkbox" id="ok"><span>Tenho 18 anos ou mais, li e aceito os <a href="termos.html" target="_blank" rel="noopener">termos de uso</a> e que a Calculadora de Passe guarde estes dados para me mostrar e mandar o meu resultado. <a href="privacidade.html" target="_blank" rel="noopener">Como cuidamos dos dados</a>.</span></label>
-  <label class="check"><input type="checkbox" id="novidades"><span>Quero receber pelo WhatsApp avisos quando as ofertas de passe mudarem e novidades para motoristas. (Opcional: dá para sair quando quiser.)</span></label>
+  <label class="check"><input type="checkbox" id="novidades"><span>Quero avisos no Zap quando as ofertas mudarem (opcional, saio quando quiser).</span></label>
   <button class="btn" id="ver">Ver meu resultado</button>
   <p class="dica" id="erro" style="color:var(--verm)"></p>
 </section>
@@ -247,6 +247,8 @@ let passes = [];
 const textosLidos = {};
 
 // de qual app é o print, pelas palavras da tela (Uber: "Passe para Motoristas", "por tempo", "Ganhos de"; 99: "Pacote", "Taxa Zero", "Ilimitado")
+// só aceita print da tela de passes de cada app (22/10: não aceitar qualquer imagem)
+const ASSINATURA = {Uber: /passe\s+para\s+motoristas|passe\s+por\s+tempo|passe\s+de\s+ganhos/i, '99': /pacote\s+de\s+(ganhos|tempo|\d+\s*dias?)|taxa\s+zero|renova[cç][aã]o\s+autom/i};
 function appDoPrint(texto) {
   const u = (texto.match(/passe para motoristas|por\s*tempo|ganhos de|uber/gi) || []).length;
   const n = (texto.match(/pacote|taxa zero|ilimitado|v[aá]lido por|renova[cç][aã]o/gi) || []).length;
@@ -278,7 +280,9 @@ function lerPasses(texto, app) {
       if (/ganhos\s+(de\s+)?R|pacote\s+de\s+\d|\d\s*h\b.*(tempo|passe)/i.test(prox)) break;
       const w = dinheiro(prox); if (w.length) preco = w[w.length - 1];
     }
-    if (preco > 0 && tam > 0 && preco < (tipo == 'ganhos' ? tam : 2000)) achados.push({app, tipo, preco, tam, ...(validade && validade != 180 ? {validade} : {})});
+    // preço com sentido (22/10): tempo de R$ 3 a R$ 300 por dia; pacote cobrando de 2% a 60% do limite
+    const faz = tipo == 'tempo' ? tam >= 6 && tam <= 744 && preco / Math.max(1, tam / 24) >= 3 && preco / Math.max(1, tam / 24) <= 300 : tam >= 50 && tam <= 20000 && preco / tam >= 0.02 && preco / tam <= 0.6;
+    if (preco > 0 && tam > 0 && faz) achados.push({app, tipo, preco, tam, ...(validade && validade != 180 ? {validade} : {})});
   });
   // sem repetidos
   return achados.filter((p, i) => achados.findIndex(q => q.tipo == p.tipo && q.tam == p.tam) == i);
@@ -302,7 +306,7 @@ document.querySelectorAll('.print input[type=file]').forEach(inp => inp.onchange
   const fs = [...inp.files], app = inp.dataset.app; if (!fs.length) return;
   const caixa = inp.closest('.print'), estado = caixa.querySelector('.estado');
   estado.className = 'estado';
-  let novos = 0, falhou = 0, repetido = 0, outro = 0;
+  let novos = 0, falhou = 0, repetido = 0, outro = 0, estranho = 0;
   vistos[app] = vistos[app] || new Set();
   for (const [k, f] of fs.entries()) {
     // o mesmo arquivo de novo não conta
@@ -316,6 +320,7 @@ document.querySelectorAll('.print input[type=file]').forEach(inp => inp.onchange
       // print do outro app no quadro errado: recusa
       const de = appDoPrint(data.text);
       if (de && de != app) { outro++; continue; }
+      if (!ASSINATURA[app].test(data.text)) { ASSINATURA[app == 'Uber' ? '99' : 'Uber'].test(data.text) ? outro++ : estranho++; continue; }
       vistos[app].add(id);
       // a mesma oferta (mesmo tipo e tamanho) em dois prints conta uma vez só; fica o preço do print mais novo
       const lidos = lerPasses(data.text, app);
@@ -329,12 +334,15 @@ document.querySelectorAll('.print input[type=file]').forEach(inp => inp.onchange
     caixa.querySelector('.arquivo span').textContent = '+ Mandar outro print da ' + app;
     estado.textContent = `${tot} oferta${tot > 1 ? 's' : ''} da ${app}. Se alguma ficou de fora, mande outro print.`;
   }
-  const avisos = [outro && `${outro > 1 ? `${outro} prints parecem` : 'Esse print parece'} da ${app == 'Uber' ? '99' : 'Uber'}: mande no quadro ${app == 'Uber' ? 'da 99' : 'da Uber'}.`,
+  const avisos = [outro && `⛔ ${outro > 1 ? `${outro} prints são` : 'Esse print é'} da ${app == 'Uber' ? '99' : 'Uber'}, não da ${app}. Mande no quadro ${app == 'Uber' ? 'da 99' : 'da Uber'}.`,
+    estranho && `⛔ ${estranho > 1 ? `${estranho} imagens não são` : 'Essa imagem não é'} da tela de passes da ${app}. Mande o print de ${app == 'Uber' ? 'Menu → Passe para Motoristas' : 'Pacote Taxa Zero'}.`,
     repetido && `${repetido > 1 ? `${repetido} prints já tinham` : 'Esse print já tinha'} sido enviado${repetido > 1 ? 's' : ''}.`,
     novosApp.length && `Achei ${novosApp.length > 1 ? 'ofertas' : 'uma oferta'} que a calculadora ainda não conhece ("${novosApp[0]}"${novosApp.length > 1 ? ' e outras' : ''}): por enquanto ${novosApp.length > 1 ? 'ficam' : 'fica'} de fora da conta.`,
-    falhou && `Não consegui ler ${falhou > 1 ? `${falhou} prints` : 'um print'}: tire de novo com as opções na tela.`].filter(Boolean);
-  if (avisos.length) { estado.classList.toggle('ruim', !tot); estado.innerHTML = (tot ? estado.textContent + '<br>' : '') + '⚠️ ' + avisos.join(' '); }
-  else if (!tot) { estado.classList.add('ruim'); estado.textContent = 'Não consegui ler os preços. Tente outro print, com as opções na tela, ou lance avulsa.'; }
+    falhou && `⛔ Não consegui ler ${falhou > 1 ? `${falhou} prints` : 'um print'}: tire de novo com as opções na tela.`].filter(Boolean);
+  // erro de print chama a atenção: caixa vermelha, rola até ela e vibra (pedido dele, 22/10)
+  const alerta = t => { estado.innerHTML = (tot ? estado.textContent : '') + `<span class="alerta-print" role="alert">${t}</span>`; estado.scrollIntoView({behavior: 'smooth', block: 'center'}); try { navigator.vibrate && navigator.vibrate(200); } catch (e) {} };
+  if (avisos.length) alerta(avisos.join('<br>'));
+  else if (!tot) alerta('⛔ Não consegui ler os preços. Tente outro print, com as opções na tela, ou digite as ofertas.');
   inp.value = ''; desenharLista();
 });
 
@@ -354,25 +362,74 @@ const catsEscolhidas = () => [...document.querySelectorAll('[id^=cats-] .chip.on
 const appsEscolhidos = () => ['Uber', '99'].filter(a => document.querySelector(`#cats-${a} .chip.on`));
 
 function desenharLista() {
+  document.querySelectorAll('.print .passe.avulso').forEach(e => e.remove());
   const apps = appsEscolhidos();
   const avulsos = passes.filter(p => p.avulso);
   $('#lista').hidden = !avulsos.length;
   $('#lista').innerHTML = passes.map((p, i) => p.avulso && apps.includes(p.app) ? `
-    <div class="passe avulso">
+    <div class="passe avulso" data-app="${p.app}">
       <div class="topo"><b><span class="tag amb">avulso</span>Lançamento avulso ${avulsos.indexOf(p) + 1}</b><button class="x" data-i="${i}" aria-label="Remover">×</button></div>
       <div class="mini">
         <div><label>App</label><select data-i="${i}" data-k="app"><option ${p.app == 'Uber' ? 'selected' : ''}>Uber</option><option ${p.app == '99' ? 'selected' : ''}>99</option></select></div>
         <div><label>Tipo</label><select data-i="${i}" data-k="tipo"><option value="tempo" ${p.tipo == 'tempo' ? 'selected' : ''}>Por tempo</option><option value="ganhos" ${p.tipo == 'ganhos' ? 'selected' : ''}>Por ganhos</option></select></div>
-        <div><label>Preço (R$)</label><input data-i="${i}" data-k="preco" inputmode="decimal" value="${p.preco || ''}"></div>
-        <div><label>${p.tipo == 'tempo' ? 'Horas (ex.: 12, 24, 48, 72; 7 dias = 168)' : 'Limite de ganhos (R$)'}</label><input data-i="${i}" data-k="tam" inputmode="decimal" value="${p.tam}"></div>
+        <div><label>Preço (R$)</label><input data-i="${i}" data-k="preco" inputmode="decimal" placeholder="ex.: 84,00" value="${p.txt?.preco ?? (p.preco || '')}"><small class="erro-campo" data-e="preco"></small></div>
+        <div><label>${p.tipo == 'tempo' ? 'Duração' : 'Limite de ganhos (R$)'}</label>${p.tipo == 'tempo'
+          ? `<select data-i="${i}" data-k="tam">${HORAS.map(([h, t]) => `<option value="${h}" ${p.tam == h ? 'selected' : ''}>${t}</option>`).join('')}</select>`
+          : `<input data-i="${i}" data-k="tam" inputmode="decimal" placeholder="ex.: 2.490" value="${p.txt?.tam ?? (p.tam || '')}">`}<small class="erro-campo" data-e="tam"></small></div>
       </div>
+      <p class="erro-campo" data-e="geral"></p>
     </div>` : '').join('');
-  $('#lista').querySelectorAll('[data-k]').forEach(el => el.onchange = () => {
+  $('#lista').querySelectorAll('[data-k]').forEach(el => el[el.tagName == 'SELECT' ? 'onchange' : 'oninput'] = () => {
     const p = passes[el.dataset.i]; const k = el.dataset.k;
-    p[k] = (k == 'preco' || k == 'tam') ? num(el.value) : el.value;
-    if (k == 'tipo') { p.tam = p.tipo == 'tempo' ? 24 : 1000; desenharLista(); }
+    if (k == 'preco' || (k == 'tam' && el.tagName == 'INPUT')) { (p.txt ??= {})[k] = el.value; p[k] = numOk(el.value) ? num(el.value) : 0; }
+    else p[k] = k == 'tam' ? +el.value : el.value;
+    // trocar o tipo refaz a oferta (o tamanho de um não serve para o outro); trocar o app move de quadro
+    if (k == 'tipo') { p.tam = p.tipo == 'tempo' ? 24 : 0; if (p.txt) delete p.txt.tam; desenharLista(); }
+    else if (k == 'app') desenharLista(); else checarAvulsos(false);
   });
+  $('#lista').querySelectorAll('input[data-k]').forEach(el => el.onblur = () => { (passes[el.dataset.i].visto ??= {})[el.dataset.k] = true; checarAvulsos(false); });
   $('#lista').querySelectorAll('.x').forEach(b => b.onclick = () => { passes.splice(b.dataset.i, 1); desenharLista(); });
+  // a oferta digitada abre dentro do quadro do próprio app (22/10: abria a da Uber embaixo da 99)
+  $('#lista').querySelectorAll('.passe').forEach(el => { const cx = document.querySelector('#print-' + el.dataset.app); if (cx && cx.offsetParent !== null) cx.querySelector('.estado').before(el); });
+  $('#lista').hidden = !$('#lista').children.length;
+  checarAvulsos(false);
+}
+// lançamento à mão (22/10, "para não perdermos a credibilidade"): cada campo conferido, com a mesma régua das travas do print
+const HORAS = [[12, '12 h'], [24, '24 h (1 dia)'], [36, '36 h'], [48, '48 h (2 dias)'], [72, '72 h (3 dias)'], [96, '96 h (4 dias)'], [120, '120 h (5 dias)'], [168, '7 dias'], [360, '15 dias'], [720, '30 dias']];
+const numOk = t => /^\s*(R\$\s*)?\d[\d.]*(,\d{1,2})?\s*$/i.test(t) && num(t) > 0;
+function erroAvulso(p) {
+  const e = {}, t = p.txt || {};
+  if (!(t.preco ?? '').trim()) e.preco = 'Digite o preço do passe.';
+  else if (!numOk(t.preco)) e.preco = /-/.test(t.preco) ? 'O preço não pode ser negativo.' : /^\s*[\d.,]*0[\d.,]*\s*$/.test(t.preco) && num(t.preco) === 0 ? 'O preço não pode ser zero.' : 'Só números, ex.: 84,00.';
+  if (p.tipo == 'tempo') {
+    if (!HORAS.some(([h]) => h == p.tam)) e.tam = 'Escolha a duração na lista.';
+    else if (!e.preco && p.preco / durac(p) < 3) e.preco = `Muito barato para ${horas(p)}: confira no app.`;
+    else if (!e.preco && p.preco / durac(p) > 300) e.preco = `Muito caro para ${horas(p)}: confira no app.`;
+  } else {
+    if (!(t.tam ?? '').trim()) e.tam = 'Digite o limite de ganhos.';
+    else if (!numOk(t.tam)) e.tam = 'Só números, ex.: 2.490.';
+    else if (p.tam < 50 || p.tam > 20000) e.tam = 'O limite vai de R$ 50 a R$ 20.000.';
+    else if (!e.preco && p.preco / p.tam < 0.02) e.preco = `Muito barato para ${brlc(p.tam)} em ganhos: confira no app.`;
+    else if (!e.preco && p.preco / p.tam > 0.6) e.preco = `Muito caro para ${brlc(p.tam)} em ganhos: confira no app.`;
+  }
+  // repetida: mesmo app, tipo e tamanho de uma oferta que já está na lista (do print ou digitada antes)
+  if (!e.preco && !e.tam && passes.some(q => q !== p && !q.erro && q.app == p.app && q.tipo == p.tipo && q.tam == p.tam && passes.indexOf(q) < passes.indexOf(p)))
+    e.geral = 'Essa oferta já está na lista: não entra de novo na conta. Remova no ×.';
+  return Object.keys(e).length ? e : null;
+}
+// mostra=false: só marca (sem pintar de vermelho o que ele ainda está digitando); mostra=true: pinta tudo
+function checarAvulsos(mostra) {
+  let primeiro = null;
+  passes.forEach(p => { if (p.avulso) p.erro = erroAvulso(p); });
+  document.querySelectorAll('.passe.avulso').forEach(el => {
+    const p = passes[el.querySelector('[data-i]').dataset.i], e = p.erro || {}; let algum = false;
+    el.querySelectorAll('.erro-campo').forEach(m => { const k = m.dataset.e, ver = mostra || k == 'geral' || (p.visto ??= {})[k];
+      if (mostra && k != 'geral') (p.visto ??= {})[k] = true;
+      m.textContent = ver && e[k] || ''; el.querySelector(`[data-k=${k}]`)?.classList.toggle('invalido', !!(ver && e[k]));
+      if (ver && e[k]) { algum = true; primeiro ??= el; } });
+    el.classList.toggle('com-erro', algum);
+  });
+  return primeiro;
 }
 
 // A régua sai dos preços do print; o passe da semana sai do que ele faz em cada dia.
@@ -392,10 +449,10 @@ function desenharRegua() {
     const g = ganhosMelhor(a), linhas = doApp(a).sort((x, y) => (x.tipo == 'tempo') - (y.tipo == 'tempo') || (x.tipo == 'tempo' ? x.preco / durac(x) - y.preco / durac(y) : x.preco / x.tam - y.preco / y.tam)).map(p => {
       if (p.tipo != 'tempo') {
         const q = p.preco / p.tam;
-        return `<div class="regua"><span class="selo g">Por ganhos</span><b>${curto(p)}</b>A cada R$ 100 que você faz no app, ${brl(100 * q)} pagam o passe. ${p === g ? `Precisa fazer ${real(p.tam)} em até 180 dias.` : (p.preco < g.preco ? `A taxa sai mais cara que a do ${curto(g)}, porém o valor do passe é mais acessível.` : `Taxa e passe mais caros que o ${curto(g)}.`)}</div>`;
+        return `<div class="regua"><span class="selo g">Por ganhos</span><b>${curto(p)}</b>${brl(100 * q)} de cada R$ 100 vão para o passe. ${p === g ? `Precisa fazer ${real(p.tam)} em até 180 dias.` : (p.preco < g.preco ? `Taxa maior que a do ${curto(g)}, passe mais barato.` : `Taxa e passe mais caros que o ${curto(g)}.`)}</div>`;
       }
       const d = durac(p), min = g ? p.preco / (g.preco / g.tam) : 0;
-      return `<div class="regua"><span class="selo t">${p.tam} h</span><b>${curto(p)}</b>Custa ${brl(p.preco / d)} por dia${d > 1 ? `, se você rodar os ${d} dias seguidos` : ''}. ${g ? (d == 1 ? `Só vale mais que o pacote de ganhos no dia em que você faz <b style="display:inline">mais de ${real(min)}</b>.` : `Só vale mais que o pacote de ganhos se os ${d} dias somarem <b style="display:inline">mais de ${real(min)}</b> (${real(min / d)} por dia).`) : ''} O relógio corre mesmo com o app desligado.</div>`;
+      return `<div class="regua"><span class="selo t">${p.tam} h</span><b>${curto(p)}</b>Custa ${brl(p.preco / d)} por dia${d > 1 ? `, rodando os ${d} dias seguidos` : ''}. ${g ? (d == 1 ? `Vale mais que o pacote no dia acima de <b style="display:inline">${real(min)}</b>.` : `Vale mais que o pacote se os ${d} dias somarem <b style="display:inline">${real(min)}</b> (${real(min / d)}/dia).`) : ''}</div>`;
     });
     // todas as ofertas do app, cada uma com o tipo e quando ela é a mais barata
     const todas = doApp(a), tg = todas.filter(p => p.tipo != 'tempo').sort((x, y) => x.preco / x.tam - y.preco / y.tam);
@@ -406,7 +463,7 @@ function desenharRegua() {
     const lin = (p, cls, custa, quando) => `<tr class="${cls}"><td><b>${nome(p)}</b><small>${p.tipo == 'tempo' ? '' : 'em ganhos<br>'}por ${brlc(p.preco)}</small></td><td>${custa}</td><td>${quando}</td></tr>`;
     const rows = tg.map(p => p === g
         ? lin(p, 'top', `<b>${pct(p)}</b><small>do que você faz</small>`, `<b>★ até ${lim.length ? real(lim[0].min) : 'qualquer valor'}</b><small>por dia</small>`)
-        : lin(p, 'fora', `<b>${pct(p)}</b><small>do que você faz</small>`, (p.preco < g.preco ? `<small>a taxa sai mais cara que a de cima, porém o valor do passe é mais acessível</small>` : `<small>taxa e passe mais caros que a de cima</small>`)))
+        : lin(p, 'fora', `<b>${pct(p)}</b><small>do que você faz</small>`, (p.preco < g.preco ? `<small>taxa maior, passe mais barato</small>` : `<small>taxa e passe mais caros que a de cima</small>`)))
       .concat(lim.map((x, k) => (k ? '' : '<tr class="grupo"><td colspan="3"><span class="selo t">Por tempo</span></td></tr>') + (() => {
         // outro passe de tempo com a mesma duração e mais barato: este nunca compensa
         const m = lim.find(y => y !== x && durac(y.p) == durac(x.p) && y.p.preco < x.p.preco), d = durac(x.p);
@@ -438,9 +495,9 @@ function desenharSemana() {
     `<p class="dica" style="margin:12px 0 0">Ou dia a dia:</p>` + cab +
     DIAS.map((d, i) => `<div class="${cl}"><label for="s-${a[0]}-${i}">${CURTO[i]}</label>${a.map(x => `<input id="s-${x}-${i}" inputmode="decimal" placeholder="não rodo">`).join('')}${dois ? tot(i) : ''}</div>`).join('') +
     `<div class="${cl} soma"><label>Semana</label>${a.map(x => `<span class="tot" id="w-${x}">—</span>`).join('')}${dois ? '<span class="tot" id="w-tot"></span>' : ''}</div>
-    <p class="titulo-campo" style="margin-bottom:2px">Quanto você vai precisar fazer a mais agora</p><p class="dica" style="margin-top:0">Com o passe, a taxa é paga antes: o app desconta o valor do passe das suas corridas até completar o total, e só depois o dinheiro volta a cair para você. Por isso o valor dele precisa ser somado ao que você fazia para continuar levando o mesmo. No pacote por ganhos isso é a cada pacote (dá para buscar logo nos primeiros dias); no passe por tempo, toda semana.</p><p class="dica" style="margin-top:0">A conta já usa o passe mais viável para a semana que você lançou; o detalhe dia a dia vem no resultado.</p><div id="precisa"><p class="dica">Lance os dias acima e a conta aparece aqui.</p></div>
+    <p class="titulo-campo" style="margin-bottom:2px">Quanto você vai precisar fazer a mais agora</p><p class="dica" style="margin-top:0">O app desconta o passe das suas corridas antes de o dinheiro cair: some o valor dele ao que você fazia. Pacote: a cada pacote. Tempo: toda semana.</p><div id="precisa"><p class="dica">Lance os dias acima e a conta aparece aqui.</p></div>
     <details class="sem-passe"><summary class="titulo-campo">Comparar com rodar sem passe (opcional)</summary>
-    <p class="dica" style="margin-top:4px">Sem passe, o app fica com uma parte de cada corrida. Com o passe, essa parte some e você paga o passe. Para comparar, abra o extrato de uma semana no app e lance os dois valores:</p>
+    <p class="dica" style="margin-top:4px">Abra o extrato de uma semana no app e lance os dois valores:</p>
     ${a.map(x => `<div class="ex-app"><span class="logo ${x == '99' ? 'l99' : 'luber'}">${x}</span><div class="lado"><div><label for="ex-corr-${x}">Valor das corridas (o que os passageiros pagaram)</label><input id="ex-corr-${x}" inputmode="decimal" placeholder="ex.: 2.300"></div><div><label for="ex-caiu-${x}">O que caiu pra você</label><input id="ex-caiu-${x}" inputmode="decimal" placeholder="ex.: 1.700"></div></div></div>`).join('')}
     </details>`;
   const totais = () => {
@@ -472,7 +529,7 @@ function opcoes(app, G) {
   doApp(app).filter(p => p.tipo != 'tempo').forEach(p => {
     const custo = Math.max(total * p.preco / p.tam, p.preco * 7 / validadeDe(p));
     res.push({nome: curto(p), curto: `${brlc(p.tam)} em ganhos por ${brlc(p.preco)}`, passes: [p], custo, uso: G.map((v, i) => v > 0 ? {p, paga: custo * v / total} : null),
-      alerta: total * validadeDe(p) / 7 < p.tam ? `No seu ritmo os ${validadeDe(p)} dias acabam antes de você usar tudo: perde ${real(p.tam - total * validadeDe(p) / 7)} do limite já pago.` : p.tam / total < 1 ? `Acaba em ${diasTxt(7 * p.tam / total)} e o app compra outro sozinho.` : null});
+      alerta: total * validadeDe(p) / 7 < p.tam ? `Vence em ${validadeDe(p)} dias antes de você usar tudo: perde ${real(p.tam - total * validadeDe(p) / 7)}.` : p.tam / total < 1 ? `Acaba em ${diasTxt(7 * p.tam / total)}; o app compra outro.` : null});
   });
   // um passe por vez: o próximo só entra quando o ativo acaba. Misturar diário e 72 h exige trocar o passe padrão antes de cada um acabar.
   const cobrir = tempos => {
@@ -496,8 +553,8 @@ function opcoes(app, G) {
     if (tempos.length > 1 && tipos.size < 2) return;   // a combinação deu um tipo só: já está nas opções sozinhas
     const nome = tipos.size < 2 ? `Só ${curto(melhor.picks[0].p).replace('Passe de ', 'o passe de ')}, ${melhor.picks.length} por semana` :
       'Diário e 72 h: ' + melhor.picks.slice().sort((x, y) => x.ini - y.ini).map(k => `${k.p.tam} h ${k.dias.length > 1 ? `de ${DIAS[k.dias[0]]} a ${DIAS[k.dias[k.dias.length - 1]]}` : `na ${DIAS[k.ini]}`}`).join(' + ');
-    const avisos = [[...tipos].some(p => p.tam < 24) ? `O passe de ${[...tipos].find(p => p.tam < 24).tam} h cobre só ${[...tipos].find(p => p.tam < 24).tam} horas a partir da 1ª corrida: a conta usa 1 por dia rodado. Se o seu dia passa disso, precisa de mais de um no mesmo dia e sai mais caro.` : '', parado ? `${parado} ${parado > 1 ? 'dias' : 'dia'} de passe por semana correndo com você parado.` : '',
-      tipos.size > 1 ? 'Dá trabalho: é um passe por vez, então tem que trocar o passe padrão no app antes de cada um acabar.' : ''].filter(x => x);
+    const avisos = [[...tipos].some(p => p.tam < 24) ? `O passe de ${[...tipos].find(p => p.tam < 24).tam} h: a conta usa 1 por dia. Dia mais longo que isso sai mais caro.` : '', parado ? `${parado} ${parado > 1 ? 'dias' : 'dia'} de passe parado por semana.` : '',
+      tipos.size > 1 ? 'Exige trocar o passe padrão antes de cada um acabar.' : ''].filter(x => x);
     res.push({nome, curto: tipos.size < 2 ? `${melhor.picks[0].p.tam} h por ${brlc(melhor.picks[0].p.preco)}, ${melhor.picks.length} por semana` : 'Misturando 24 h e 72 h', detalhe: tipos.size > 1 ? nome.replace('Diário e 72 h: ', '') : '', passes: [...tipos], custo: melhor.c, uso, alerta: avisos.join(' ') || null, mistura: tipos.size > 1});
   };
   const tempos = doApp(app).filter(p => p.tipo == 'tempo' && durac(p) <= 7), todosTempo = doApp(app).filter(p => p.tipo == 'tempo');
@@ -509,7 +566,7 @@ function opcoes(app, G) {
     const parado = 7 - rodados, porSem = (7 / d).toLocaleString('pt-BR', {maximumFractionDigits: 1});
     res.push({nome: longo ? curto(p) : `Só ${curto(p).replace('Passe de ', 'o passe de ')}, um atrás do outro`, curto: longo ? `${horas(p)} por ${brlc(p.preco)}` : `${horas(p)} por ${brlc(p.preco)}, um atrás do outro`, passes: [p], custo, emendado: !longo, longo,
       uso: G.map(v => v > 0 ? {p, paga: custo * v / total} : null),
-      alerta: (longo ? `É pago de uma vez a cada ${d} dias (${brlc(p.preco)}): na média, ${real(custo)} por semana.` : `Um passe emenda no outro, sem pausa: dá uns ${porSem} por semana (7 a cada ${d} semanas), então o dia da troca muda de uma semana para outra.`) + (parado ? ` ${parado} ${parado > 1 ? 'dias' : 'dia'} de passe por semana correndo com você parado.` : '')}); });
+      alerta: (longo ? `${brlc(p.preco)} a cada ${d} dias: ${real(custo)} de passe na semana inteira.` : `Um emendado no outro: uns ${porSem} por semana; o dia da troca varia.`) + (parado ? ` ${parado} ${parado > 1 ? 'dias' : 'dia'} de passe parado por semana.` : '')}); });
   if (tempos.length > 1) cobrir(tempos);
   return res.sort((a, b) => a.custo - b.custo);
 }
@@ -522,13 +579,16 @@ $('#ir2').onclick = () => {
   if (!appsEscolhidos().length) return msg('Marque pelo menos uma categoria, da Uber ou da 99');
   mostrarCats(); desenharLista(); $('#p2').classList.remove('oculto'); $('#p2').scrollIntoView({behavior: 'smooth'});
 };
-$('#mais').onclick = () => { passes.push({app: appsEscolhidos()[0] || 'Uber', tipo: 'tempo', preco: 0, tam: 24, avulso: true}); desenharLista(); };
+$('#mais').onclick = () => { passes.push({app: appsEscolhidos()[0] || 'Uber', tipo: 'tempo', preco: 0, tam: 24, avulso: true, txt: {}}); desenharLista(); };
 // digitar é uma opção do mesmo tamanho que o print: ninguém é obrigado a mandar print da tela do app
 document.querySelectorAll('.digitar').forEach(b => b.onclick = () => {
-  passes.push({app: b.dataset.app, tipo: 'ganhos', preco: 0, tam: 1000, avulso: true}); desenharLista();
+  passes.push({app: b.dataset.app, tipo: 'ganhos', preco: 0, tam: 0, avulso: true, txt: {}}); desenharLista();
   const ult = [...document.querySelectorAll('#lista .passe')].pop(); if (ult) { ult.scrollIntoView({behavior: 'smooth', block: 'center'}); ult.querySelector('[data-k=preco]')?.focus(); }
 });
 $('#ir3').onclick = () => {
+  // oferta digitada com erro ou incompleta trava a régua até corrigir ou remover
+  const ruim = checarAvulsos(true);
+  if (ruim) { ruim.scrollIntoView({behavior: 'smooth', block: 'center'}); navigator.vibrate?.(200); return msg('Corrija a oferta em vermelho (ou remova no ×)'); }
   const falta = appsEscolhidos().filter(a => !validos().some(p => p.app == a));
   if (falta.length == appsEscolhidos().length) return msg(`Mande o print da ${falta.join(' e da ')} (ou lance os passes à mão)`);
   // nem todo mundo roda nos dois: o app sem print sai da conta e a gente segue com o outro
@@ -540,7 +600,7 @@ $('#ir4').onclick = () => {
   if (!appsEscolhidos().some(a => semanaDe(a).some(v => v > 0))) return msg('Diga quanto você faz em pelo menos um dia');
   $('#p3').classList.remove('oculto'); $('#p3').scrollIntoView({behavior: 'smooth'});
 };
-const validos = () => passes.filter(p => appsEscolhidos().includes(p.app) && p.preco > 0 && p.tam > 0);
+const validos = () => passes.filter(p => appsEscolhidos().includes(p.app) && p.preco > 0 && p.tam > 0 && !p.erro);
 
 // celular com WhatsApp: 11 números, DDD válido (11 a 99), começa com 9 e não é tudo igual
 const celOk = c => /^[1-9][1-9]9\d{8}$/.test(c) && !/^(\d)\1+$/.test(c.slice(2));
@@ -591,13 +651,13 @@ function textoZap(contas) {
   const linhas = ['*Meu resultado na Calculadora de Passe*', ''];
   contas.forEach(c => {
     const o = c.ops[0];
-    linhas.push(`*${c.app}:* ${o.nome}`, `Custa ${brl(o.custo)} por semana (${brl(o.custo * 52 / 12)} por mês).`);
+    linhas.push(`*${c.app}:* ${o.nome}`, `${brl(o.custo)} de passe na semana inteira (${brl(o.custo * 52 / 12)} por mês).`);
     const t = document.createElement('div'); t.innerHTML = pesado(c) + metaSemana(c) + semPasse(c) + caixa(c); if (t.textContent.trim()) linhas.push(...[...t.children].map(e => e.textContent.trim()));
     const pd = precisaDia(c);
     c.G.forEach((v, i) => { if (v > 0) linhas.push(`• ${CURTO[i]}: fazia ${real(v)}, agora preciso fazer ${real(pd[i])} (+${real(pd[i] - v)})`); });
     linhas.push('');
   });
-  linhas.push('Se eu parar no mesmo valor de antes, o passe sai do meu bolso: a meta é o que eu preciso fazer no app.');
+  linhas.push('Parar no valor de antes = passe saindo do meu bolso.');
   linhas.push('Refaça a conta quando o preço mudar: ' + location.origin + location.pathname + '?o=meu-zap');
   return linhas.join('\n');
 }
@@ -614,7 +674,7 @@ function memoria(c) {
   let nota = '';
   if (diario && g) {
     const min = diario.preco / (g.preco / g.tam), fortes = c.G.map((v, i) => v > min ? CURTO[i] : null).filter(x => x), fracos = c.G.map((v, i) => v > 0 && v <= min ? CURTO[i] : null).filter(x => x);
-    nota = `<p class="dica">O diário (${brlc(diario.preco)}) só vale mais que o pacote de ganhos no dia acima de ${real(min)}. ${!fortes.length ? `Na sua ${SI} nenhum dia passa disso.` : !fracos.length ? `Na sua ${SI} todos os dias passam.` : `Na sua ${SI}: ${fortes.join(', ')} passa${fortes.length > 1 ? 'm' : ''}; ${fracos.join(', ')} não.`} ${o.passes[0].tipo == 'tempo' ? (fracos.length ? 'Os dias fracos ficam abaixo, mas os fortes pagam a diferença: na semana, o passe por tempo é mais viável.' : 'Por isso o passe por tempo é mais viável.') : (fortes.length ? 'É um passe por vez: com o pacote ativo, não dá para usar o diário só nos dias fortes. Na semana, o pacote é mais viável.' : 'Por isso o pacote de ganhos é mais viável.')}</p>`;
+    nota = `<p class="dica">O diário (${brlc(diario.preco)}) vale mais que o pacote no dia acima de ${real(min)}. ${!fortes.length ? `Na sua ${SI} nenhum dia passa disso.` : !fracos.length ? `Na sua ${SI} todos os dias passam.` : `Na sua ${SI}: ${fortes.join(', ')} passa${fortes.length > 1 ? 'm' : ''}; ${fracos.join(', ')} não.`} ${o.passes[0].tipo == 'tempo' ? (fracos.length ? 'Os fortes compensam os fracos: o passe por tempo é mais viável.' : 'Por isso, passe por tempo.') : (fortes.length ? 'Um passe por vez: não dá para usar o diário só nos dias fortes. O pacote é mais viável.' : 'Por isso, pacote de ganhos.')}</p>`;
   }
   // quanto custa a mais rodar em cada dia, com o mesmo tipo de passe: é aqui que o dia fraco aparece
   const tempo = o.passes[0].tipo == 'tempo', fracosAvisos = c.G.map((v, i) => {
@@ -622,16 +682,16 @@ function memoria(c) {
     const G2 = c.G.map((x, k) => k == i ? 0 : x), alt = G2.some(x => x > 0) ? Math.min(...opcoes(c.app, G2).filter(x => (x.passes[0].tipo == 'tempo') == tempo).map(x => x.custo)) : 0;
     const marg = o.custo - alt, sobra = v - marg;
     if (!(sobra < v / 2)) return '';
-    return `<div class="aviso">⚠️ <b>${DIAS[i][0].toUpperCase() + DIAS[i].slice(1)}:</b> você faz ${real(v)}, mas rodar nesse dia custa ${brl(marg)} a mais de passe. ${sobra < -0.5 ? `Dá prejuízo de ${brl(-sobra)}: com esse passe, melhor não rodar.` : sobra < 0.5 ? 'Não sobra nada pelo dia inteiro: com esse passe, melhor não rodar.' : `Sobram só ${brl(sobra)} pelo dia inteiro.`}${total - v - alt > 0 ? ` Sem esse dia, a semana deixa ${brl(total - v - alt)} no seu bolso (com ele, ${brl(Math.max(0, total - o.custo))}).` : ''}</div>`;
+    return `<div class="aviso">⚠️ <b>${DIAS[i][0].toUpperCase() + DIAS[i].slice(1)}:</b> faz ${real(v)}, mas custa ${brl(marg)} de passe. ${sobra < -0.5 ? `Prejuízo de ${brl(-sobra)}: melhor não rodar.` : sobra < 0.5 ? 'Não sobra nada: melhor não rodar.' : `Sobram só ${brl(sobra)}.`}${total - v - alt > 0 ? ` Sem ele, a semana deixa ${brl(total - v - alt)} (com ele, ${brl(Math.max(0, total - o.custo))}).` : ''}</div>`;
   }).join('');
   let semFracos = '';
   if (!tempo && diario && g) {
     const min = diario.preco / (g.preco / g.tam), G3 = c.G.map(v => v > min * 0.6 ? v : 0), tirou = c.G.map((v, i) => v > 0 && !(G3[i] > 0) ? DIAS[i] : null).filter(x => x);
     const o3 = tirou.length && G3.some(v => v > 0) ? opcoes(c.app, G3)[0] : null, t3 = G3.reduce((a, b) => a + b, 0);
     if (o3 && o3.passes[0].tipo == 'tempo' && t3 - o3.custo > total - o.custo)
-      semFracos = `<p class="dica">🔎 São os dias fracos (${tirou.join(' e ')}) que seguram você no pacote: com passe por tempo, eles teriam que pagar o passe inteiro. Se você não rodasse neles, o melhor seria <b style="display:inline">${o3.curto}</b> e a semana deixaria ${brl(t3 - o3.custo)} no bolso (hoje, ${brl(total - o.custo)}).</p>`;
+      semFracos = `<p class="dica">🔎 São os dias fracos (${tirou.join(' e ')}) seguram você no pacote. Sem eles, o melhor seria <b style="display:inline">${o3.curto}</b> e a semana deixaria ${brl(t3 - o3.custo)} no bolso (hoje, ${brl(total - o.custo)}).</p>`;
   }
-  return `<p class="dica" style="margin:6px 0 0">${o.longo ? 'Para levar o mesmo que você levava antes do passe, na média, a meta de cada dia passa a ser:' : tempo ? 'Para levar o mesmo que você levava antes do passe, toda semana a meta de cada dia passa a ser:' : 'Para levar o mesmo que você levava antes do passe, a meta de cada dia do pacote passa a ser:'}</p><table class="memo"><tr><th>Dia</th><th>Fazia</th><th>Precisa fazer</th><th>A mais</th></tr>${linhas}
+  return `<p class="dica" style="margin:6px 0 0">${o.longo ? 'Meta de cada dia para levar o mesmo (média):' : tempo ? 'Meta de cada dia, toda semana, para levar o mesmo:' : 'Meta de cada dia do pacote para levar o mesmo:'}</p><table class="memo"><tr><th>Dia</th><th>Fazia</th><th>Precisa fazer</th><th>A mais</th></tr>${linhas}
     <tr><th>Semana</th><th>${real(total)}</th><th>${real(tp)}</th><th class="ruim">+${real(tp - total)}</th></tr></table>${nota}${semFracos}${fracosAvisos}
     ${o.alerta ? `<div class="aviso">${o.alerta}</div>` : ''}`;
 }
@@ -642,12 +702,12 @@ function memoria(c) {
 function caixa(c) {
   const o = c.ops[0], p = o.passes[0], rodados = c.G.filter(v => v > 0).length, total = c.G.reduce((a, b) => a + b, 0), media = total / rodados;
   if (!(media > 0)) return '';
-  if (p.tipo == 'tempo' && !o.longo) return `<p class="aviso">📅 <b>Vale para toda semana:</b> no passe por tempo cada passe é pago quando começa: o app desconta das suas primeiras corridas até completar o valor, e só depois o dinheiro volta a cair para você. Então não tem semana mais leve. Enquanto você usar esse passe, a meta acima vale para todas as semanas.</p>`;
+  if (p.tipo == 'tempo' && !o.longo) return `<p class="aviso">📅 <b>Vale para toda semana:</b> cada passe é descontado das primeiras corridas e só depois o dinheiro cai. Não tem semana mais leve.</p>`;
   const pagar = p.preco / media, dura = p.tam / media, sem = dura / rodados;
-  return `<p class="aviso">💰 <b>Como sai do bolso:</b> quando o ${o.longo ? 'passe' : 'pacote'} começa, o app desconta os ${brlc(p.preco)} das suas corridas até completar o valor: até lá, o que você faz vai para o passe, e só depois o dinheiro volta a cair para você. Na semana que você informou, você faz ${real(total)} em ${rodados} ${rodados > 1 ? 'dias' : 'dia'}, uma média de ${real(media)} por dia: ${pagar < 0.95 ? `as primeiras corridas do primeiro dia, até juntar ${brlc(p.preco)}, só pagam o passe` : Math.abs(pagar - 1) < 0.05 ? 'o primeiro dia de trabalho só paga o passe' : `os primeiros ${diasTxt(pagar)} de trabalho só pagam o passe`}. Por isso, nesse período, busque o valor novo: assim você não fura o que fazia antes.</p>${p.preco > total ? (() => {
+  return `<p class="aviso">💰 <b>Como sai do bolso:</b> os ${brlc(p.preco)} saem das suas primeiras corridas; só depois o dinheiro cai. Na sua média de ${real(media)} por dia, ${pagar < 0.95 ? `as primeiras corridas do primeiro dia, até juntar ${brlc(p.preco)}, só pagam o passe` : Math.abs(pagar - 1) < 0.05 ? 'o primeiro dia de trabalho só paga o passe' : `os primeiros ${diasTxt(pagar)} de trabalho só pagam o passe`}. Nesses dias, busque o valor novo.</p>${p.preco > total ? (() => {
     // pacote mais caro que a semana inteira: o desconto do saldo pesa por semanas
     const menor = doApp(c.app).filter(q => q.tipo != 'tempo' && q.preco < p.preco).sort((a, b) => a.preco - b.preco)[0], om = menor && c.ops.find(x => x.passes[0] === menor);
-    return `<p class="aviso">⚠️ <b>${o.longo ? 'Passe' : 'Pacote'} pesado para o seu ritmo:</b> os ${brlc(p.preco)} são mais do que você faz em uma semana inteira (${real(total)}). Se o saldo no app não cobrir, o desconto pode pesar por semanas.${om ? ` O pacote menor (${curto(menor)}) sai só ${real(Math.max(0, om.custo - o.custo) * 52 / 12)} a mais por mês e pesa menos de cada vez.` : ''}</p>`; })() : ''}`;
+    return `<p class="aviso">⚠️ <b>${o.longo ? 'Passe' : 'Pacote'} pesado para o seu ritmo:</b> os ${brlc(p.preco)} passam da sua semana inteira (${real(total)}): o desconto pode pesar por semanas.${om ? ` O menor (${curto(menor)}) sai só ${real(Math.max(0, om.custo - o.custo) * 52 / 12)}/mês a mais e pesa menos.` : ''}</p>`; })() : ''}`;
 }
 // a meta de cada dia: por ganhos, o passe cobra também sobre o que vem a mais (v ÷ (1 − preço/limite)); por tempo, soma a parte do passe daquele dia
 function precisaDia(c) {
@@ -685,19 +745,22 @@ function combinacoes(c) {
   const hoje = metaSemanaValor(c);
   return res.filter(r => r.req < hoje - 10).sort((a, b) => a.req - b.req).slice(0, 3).map(r => ({...r, txt: txt(r.dias)}));
 }
+// dias que ele roda hoje e que a opção deixa de fora: vira folga (pedido dele, 22/10)
+const folgaTxt = (c, r) => { const f = c.G.map((v, i) => v > 0 && !r.dias.includes(i) ? i : -1).filter(i => i >= 0);
+  return !f.length ? '' : f.join() == '5,6' ? ' <b class="bom" style="display:inline">e ainda descansa no fim de semana</b>' : ` <b class="bom" style="display:inline">e ainda folga ${f.map(i => (i > 4 ? 'no ' : 'na ') + DIAS[i]).join(' e ')}</b>`; };
 function outras(c) {
   const quer = metaDe(c.app), hoje = metaSemanaValor(c), cs = combinacoes(c);
-  if (!cs.length) return c.ops[0].passes[0].tipo == 'tempo' ? '' : `<p class="dica">🔁 Com o pacote de ganhos, mudar os dias em que você roda não muda o total da semana: o passe cobra a mesma parte de cada corrida. Muda só a meta de cada dia.</p>`;
+  if (!cs.length) return c.ops[0].passes[0].tipo == 'tempo' ? '' : `<p class="dica">🔁 No pacote de ganhos, mudar os dias não muda o total da semana, só a meta de cada dia.</p>`;
   const faixa = G => { const v = G.filter(x => x > 0).map(Math.round), a = Math.min(...v), b = Math.max(...v); return a == b ? `${real(a)} por dia` : `${real(a)} a ${real(b)} por dia`; };
-  return `<div class="outras"><p class="titulo-campo" style="margin:0 0 2px">🔁 Outras formas de levar os mesmos ${real(quer)}</p><p class="dica" style="margin-top:0">Se você mudar os dias em que roda, o passe mais viável muda e a meta de cada dia também. Escolha a que cabe na sua rotina. Nas opções por tempo a meta vale toda semana; nos pacotes por ganhos ela pesa no começo de cada pacote.</p>` +
-    cs.map(r => `<div class="regua"><b>${r.nome} (${r.txt})</b>Meta: <b style="display:inline">${faixa(r.G)}</b>, com ${curto(r.o.passes[0]).replace('Passe de ', 'o passe de ')}${r.o.passes[0].tipo == 'tempo' ? (r.o.longo ? `, pago a cada ${durac(r.o.passes[0])} dias` : r.o.emendado ? ', um atrás do outro' : `, ${Math.round(r.o.custo / r.o.passes[0].preco)} por semana`) : ''}.<br>Semana: ${real(r.req)} no app, <span class="bom">${real(hoje - r.req)} a menos por semana, na média, que no seu jeito de hoje</span>.</div>`).join('') + '</div>';
+  return `<div class="outras"><p class="titulo-campo" style="margin:0 0 2px">🔁 Outras formas de levar os mesmos ${real(quer)}</p><p class="dica" style="margin-top:0">Mudando os dias, muda o passe e a meta. Escolha a que cabe na sua rotina.</p>` +
+    cs.map(r => `<div class="regua"><b>${r.nome} (${r.txt})</b>Meta: <b style="display:inline">${faixa(r.G)}</b>, com ${curto(r.o.passes[0]).replace('Passe de ', 'o passe de ')}${r.o.passes[0].tipo == 'tempo' ? (r.o.longo ? `, pago a cada ${durac(r.o.passes[0])} dias` : r.o.emendado ? ', um atrás do outro' : `, ${Math.round(r.o.custo / r.o.passes[0].preco)} por semana`) : ''}.<br>Semana: ${real(r.req)} no app, <span class="bom">${real(hoje - r.req)} a menos que hoje</span>${folgaTxt(c, r)}.</div>`).join('') + '</div>';
 }
 const metaSemanaValor = c => precisaDia(c).reduce((a, b) => a + b, 0);
 // semana fraca: o passe come uma parte grande do que ele faz, e aí rodar sem passe pode sair melhor
 function pesado(c) {
   const total = metaDe(c.app), custo = c.ops[0].custo, pct = Math.round(100 * custo / total);
-  if (custo >= total) return `<p class="aviso">⛔ <b>Com essa semana, nenhum passe compensa:</b> o mais viável custa ${real(custo)} por semana e você faz ${real(total)}. Rode sem passe, ou volte aqui quando rodar mais dias ou mais horas.</p>`;
-  if (pct >= 30) return `<p class="aviso">⚠️ <b>Atenção:</b> com a semana que você lançou, o passe mais viável fica com ${pct}% do que você faz. Sem passe, o app fica com uma parte de cada corrida: se essa parte for menor que ${pct}%, rodar sem passe sai melhor. Para ter certeza, preencha o campo do extrato no passo 3.</p>`;
+  if (custo >= total) return `<p class="aviso">⛔ <b>Com essa semana, nenhum passe compensa:</b> o passe custa ${real(custo)} na semana inteira e você faz ${real(total)}. Rode sem passe.</p>`;
+  if (pct >= 30) return `<p class="aviso">⚠️ <b>Atenção:</b> o passe fica com ${pct}% do que você faz. Se o app cobra menos que isso sem passe, rode sem. Confira com o extrato no passo 3.</p>`;
   return '';
 }
 // o nome do passe por tempo como ele vai usar: um tipo só (quantos por semana) ou a mistura de 24 h e 72 h
@@ -713,7 +776,7 @@ function semPasse(c) {
   const t = taxaDe(c.app), N = metaDe(c.app), o = c.ops[0], p = o.passes[0];
   if (t == null || !(N > 0)) return '';
   const G = N / (1 - t), fica = p.tipo == 'tempo' ? G - o.custo : G * (1 - p.preco / p.tam), dif = fica - N;
-  return `<p class="aviso">⚖️ <b>Sem passe × com passe (pelo seu extrato):</b> o app fica com ${real(100 * t)} de cada R$ 100 em corridas. Sem passe, a sua semana deixa os ${real(N)} de sempre. Com ${p.tipo == 'tempo' ? (o.mistura ? `os passes misturados (${o.detalhe}, ${real(o.custo)} por semana)` : 'o passe de ' + o.curto) : curto(p)}, as mesmas corridas aparecem como ${real(G)} no app, sem a parte dele, e depois de pagar o passe ${fica > 0 ? `deixam <b>${real(fica)}</b>` : `<b>não cobrem nem o passe</b>`}: ${Math.abs(dif) < 10 ? 'praticamente o mesmo' : dif > 0 ? `<b class="bom">${real(dif)} a mais por semana</b>` : `<b class="ruim">${real(-dif)} a menos por semana</b>`}. ${dif >= 10 ? 'Com as mesmas corridas, o passe compensa para você.' : dif <= -10 ? 'Com as mesmas corridas, rodar sem passe compensa mais para você.' : 'Com as mesmas corridas, tanto faz.'}</p>`;
+  return `<p class="aviso">⚖️ <b>Sem passe × com passe (pelo seu extrato):</b> sem passe, o app fica com ${real(100 * t)} de cada R$ 100 e você leva ${real(N)}. Com ${p.tipo == 'tempo' ? (o.mistura ? `os passes misturados (${o.detalhe}, ${real(o.custo)} por semana)` : 'o passe de ' + o.curto) : curto(p)}, as mesmas corridas dão ${real(G)} e, pago o passe, ${fica > 0 ? `deixam <b>${real(fica)}</b>` : `<b>não cobrem nem o passe</b>`}: ${Math.abs(dif) < 10 ? 'praticamente o mesmo' : dif > 0 ? `<b class="bom">${real(dif)} a mais por semana</b>` : `<b class="ruim">${real(-dif)} a menos por semana</b>`}. ${dif >= 10 ? 'O passe compensa.' : dif <= -10 ? 'Sem passe compensa mais.' : 'Tanto faz.'}</p>`;
 }
 // quanto fazer no app para levar o que levava antes
 // por tempo: toda semana; por ganhos: o passe é pago a cada pacote, então o valor a mais é por pacote (dá para concentrar no começo)
@@ -721,35 +784,36 @@ function metaSemana(c) {
   const quer = metaDe(c.app), o = c.ops[0], p = o.passes[0], rodados = c.G.filter(v => v > 0).length;
   if (!(quer > 0)) return '';
   const precisa = metaSemanaValor(c);
-  if (o.longo) return `<p class="destaque">🎯 Sua semana na ${c.app} dá ${real(quer)}. Com o passe mais viável para ela (${curto(p)}), o passe é pago de uma vez a cada ${durac(p)} dias. Na média, para continuar levando esses ${real(quer)}, você precisa fazer <b>${real(precisa)} no app</b> por semana: <b class="ruim">${real(precisa - quer)} a mais</b>. Os ${brlc(p.preco)} saem de uma vez: o app desconta das suas corridas, a partir do início de cada passe, até completar o valor, e só depois o dinheiro volta a cair para você. Se você não fizer esse a mais, não chega nos ${real(quer)} da ${SI}: nos primeiros dias de cada passe, busque o valor a mais antes de voltar ao seu ritmo.</p>`;
-  if (p.tipo == 'tempo') return `<p class="destaque">🎯 Sua semana na ${c.app} dá ${real(quer)}. Com o passe mais viável para ela (${nomeTempo(o)}), para continuar levando esses ${real(quer)} você precisa fazer <b>${real(precisa)} no app</b> toda semana: <b class="ruim">${real(precisa - quer)} a mais</b>. Isso porque o app desconta cada passe das suas corridas, assim que ele começa, até completar o valor: só depois o dinheiro volta a cair para você. Se você não fizer esse a mais, não chega nos ${real(quer)} da ${SI}. Como cada passe é pago quando começa, isso vale para todas as semanas.</p>`;
+  if (o.longo) return `<p class="destaque">🎯 Sua semana na ${c.app} dá ${real(quer)}. Com ${curto(p)}, faça <b>${real(precisa)} no app</b> por semana, na média: <b class="ruim">${real(precisa - quer)} a mais</b>. O app desconta os ${brlc(p.preco)} das suas corridas a cada ${durac(p)} dias, e só depois o dinheiro cai: sem esse a mais, você não chega na ${SI}.</p>`;
+  if (p.tipo == 'tempo') return `<p class="destaque">🎯 Sua semana na ${c.app} dá ${real(quer)}. Com ${nomeTempo(o)}, faça <b>${real(precisa)} no app</b> toda semana: <b class="ruim">${real(precisa - quer)} a mais</b>. O app desconta cada passe das suas corridas, e só depois o dinheiro cai: sem esse a mais, você não chega na ${SI}.</p>`;
   // quantos pacotes entram por semana no ritmo novo (o passe cobra também sobre o que vem a mais)
   const dura = p.tam / (precisa / rodados), porSem = precisa / p.tam, n1 = v => v.toLocaleString('pt-BR', {maximumFractionDigits: 1});
   const ciclo = porSem >= 1.15 ? `cada pacote dura ${dura < 0.95 ? '' : 'uns '}${diasTxt(dura)} ${dura < 1.05 ? 'rodado' : 'rodados'}, menos que uma semana: entram uns ${n1(porSem)} pacotes por semana` : porSem >= 0.85 ? 'cada pacote dura mais ou menos 1 semana' : `cada pacote dura cerca de ${n1(1 / porSem)} semanas`;
-  return `<p class="destaque">🎯 Sua semana na ${c.app} dá ${real(quer)}. Com o passe mais viável para ela (${curto(p)}), o passe é pago a cada pacote, não toda semana. No seu ritmo, ${ciclo}. Para continuar levando esses ${real(quer)}, em cada pacote você precisa fazer <b class="ruim">${brlc(p.preco)} a mais</b> que o seu ritmo de antes${porSem >= 0.85 ? `: na semana, <b>${real(precisa)} no app</b>, <b class="ruim">${real(precisa - quer)} a mais</b>` : ''}. Isso porque o app desconta os ${brlc(p.preco)} das suas corridas a partir do início de cada pacote, até completar o valor do passe: só depois o dinheiro volta a cair para você. Se você não fizer esse a mais, não chega nos ${real(quer)} da ${SI}.</p>
-    <p class="dica">${porSem >= 1.15 ? `Como o pacote acaba em poucos dias, na prática isso vale para toda semana: siga a meta de cada dia da tabela.` : `Dá para fazer de dois jeitos: buscar os ${brlc(p.preco)} a mais logo nos primeiros dias, quando o passe é descontado, e depois voltar ao seu ritmo até o pacote acabar; ou dividir esse valor pelos dias do pacote, seguindo a meta da tabela.`} Quando o pacote acaba, o app compra outro sozinho e o ciclo recomeça. Essa conta sempre pode deixar dúvida sobre a melhor opção, e a Uber e a 99 também podem mandar promoções de passe: por isso, refaça a conta a cada pacote novo.</p>`;
+  return `<p class="destaque">🎯 Sua semana na ${c.app} dá ${real(quer)}. Com ${curto(p)}, o passe é pago a cada pacote: ${ciclo}. Em cada pacote, faça <b class="ruim">${brlc(p.preco)} a mais</b> que antes${porSem >= 0.85 ? `: na semana, <b>${real(precisa)} no app</b>, <b class="ruim">${real(precisa - quer)} a mais</b>` : ''}. O app desconta o pacote das suas corridas, e só depois o dinheiro cai: sem esse a mais, você não chega na ${SI}.</p>
+    <p class="dica">${porSem >= 1.15 ? `O pacote dura poucos dias: siga a meta da tabela toda semana.` : `Busque os ${brlc(p.preco)} a mais nos primeiros dias, ou divida pelos dias do pacote (tabela).`} Refaça a conta a cada pacote novo: as ofertas mudam.</p>`;
 }
 
 function mostrar(contas, cel) {
   const topo = contas.map(c => { const o = c.ops[0];
     return `<div class="app-rot"><span class="logo ${c.app == '99' ? 'l99' : 'luber'}">${c.app}</span> na sua semana</div><div class="grande">${o.nome}</div>${memoria(c)}${metaSemana(c)}${semPasse(c)}${caixa(c)}
-      ${pesado(c)}<p class="aviso">⚠️ <b>Cuidado:</b> ${metaDe(c.app) - o.custo <= 0 ? `o passe custa ${real(o.custo)} por semana, mais do que os ${real(metaDe(c.app))} que você faz.` : o.passes[0].tipo == 'tempo' && !o.longo ? `se você parar nos mesmos ${real(metaDe(c.app))} de sempre, ${real(o.custo)} vão para o passe e você leva só <b>${real(metaDe(c.app) - o.custo)}</b> na semana.` : `se você ficar no mesmo ritmo de sempre, os ${brlc(o.passes[0].preco)} de cada ${o.longo ? 'passe' : 'pacote'} saem do que era seu: na média, você leva só <b>${real(metaDe(c.app) - o.custo)}</b> por semana em vez de ${real(metaDe(c.app))}.`}</p>${outras(c)}`; }).join('');
+      ${pesado(c)}<p class="aviso">⚠️ <b>Cuidado:</b> ${metaDe(c.app) - o.custo <= 0 ? `o passe custa ${real(o.custo)} na semana inteira, mais do que os ${real(metaDe(c.app))} que você faz.` : o.passes[0].tipo == 'tempo' && !o.longo ? `parou nos ${real(metaDe(c.app))} de sempre? Leva só <b>${real(metaDe(c.app) - o.custo)}</b> na semana.` : `no ritmo de sempre, você leva só <b>${real(metaDe(c.app) - o.custo)}</b> por semana, não ${real(metaDe(c.app))}.`}</p>${outras(c)}`; }).join('');
   const zap = `https://wa.me/55${cel}?text=${encodeURIComponent(textoZap(contas))}`;
   let h = `<div class="card"><p class="destaque">O passe da sua semana</p>${topo}
     <a class="btn zap" href="${zap}" target="_blank" rel="noopener">Mandar o resultado pro meu WhatsApp</a></div>
-    <div class="card"><h2>Quanto de passe você paga em cada oferta</h2><p class="dica" style="margin-top:0"><b class="realce">Com a semana que você lançou</b> e as ofertas dos prints que você mandou, quanto vai para o passe por mês em cada uma. Quanto menor, melhor: a primeira é a mais viável.</p>`;
+    <div class="card bloco-cmp"><span class="etq-cmp">📊 Compare as ofertas</span><h2>Quanto você paga de passe em cada oferta</h2><p class="dica" style="margin-top:0">Com a sua <b class="realce">semana informada</b>. A 1ª é a mais barata.</p>`;
   contas.forEach(c => {
     const max = Math.max(...c.ops.map(o => o.custo)), total = c.G.reduce((a, b) => a + b, 0);
-    h += `<div class="cmp-app ${c.app == '99' ? 'n99' : 'uber'}"><div class="app-rot"><span class="logo ${c.app == '99' ? 'l99' : 'luber'}">${c.app}</span> sua semana de ${real(total)}</div><div class="cmp">` + c.ops.map((o, i) => `
+    h += `<div class="cmp-app ${c.app == '99' ? 'n99' : 'uber'}"><div class="app-rot"><span class="logo ${c.app == '99' ? 'l99' : 'luber'}">${c.app}</span> sua semana informada: <span style="white-space:nowrap">${real(total)}</span></div><div class="cmp">` + c.ops.filter((o, i) => i == 0 || o.mistura || !c.ops.some((x, j) => j < i && !x.mistura && x.passes[0] === o.passes[0])).map((o, i) => `
       <div class="linha ${i == 0 ? 'top' : ''}">
         <div class="nome">${i == 0 ? '★ ' : ''}${o.curto}</div>
-        <div class="valor">${real(o.custo * 52 / 12)}<small> de passe/mês</small></div>
+        <div class="valor">${o.custo < 10 ? brlc(o.custo) : real(o.custo)}<small>de passe na semana inteira</small></div>
         <div class="barra"><i style="width:${Math.max(4, 100 * o.custo / max).toFixed(0)}%"></i></div>
-        <div class="obs">${i == 0 ? 'A mais viável pra você' : (o.custo - c.ops[0].custo) * 52 / 12 < 0.5 ? 'Mesmo valor da mais viável' : `${real((o.custo - c.ops[0].custo) * 52 / 12)} a mais de passe por mês`}${o.detalhe ? ` • ${o.detalhe}` : ''}${o.alerta ? ` • ${o.alerta}` : ''}</div>
+        <div class="obs">${o.custo * 52 / 12 < 10 ? brlc(o.custo * 52 / 12) : real(o.custo * 52 / 12)} por mês • ${i == 0 ? 'A mais barata pra você' : (o.custo - c.ops[0].custo) * 52 / 12 < 0.5 ? 'Mesmo valor da 1ª' : `+${real((o.custo - c.ops[0].custo) * 52 / 12)} por mês que a 1ª`}</div>
       </div>`).join('') + '</div></div>';
   });
+  h += '</div>';
   const txt = encodeURIComponent('Fiz a conta do passe da Uber e da 99 aqui, dia a dia da minha semana. Faz a sua: ' + location.origin + location.pathname + '?o=zap');
-  h += `<a class="btn" style="text-align:center;text-decoration:none" href="https://wa.me/?text=${txt}">Mandar para outro motorista</a>
+  h += `<div class="card"><a class="btn" style="text-align:center;text-decoration:none" href="https://wa.me/?text=${txt}">Mandar para outro motorista</a>
     <button class="btn claro" onclick="location.reload()">Refazer a conta</button></div>`;
   ['#p1', '#p2', '#pf', '#p3'].forEach(id => $(id).classList.add('oculto'));
   const res = $('#resultado'); res.innerHTML = h; res.classList.remove('oculto'); window.scrollTo({top: 0, behavior: 'smooth'});
