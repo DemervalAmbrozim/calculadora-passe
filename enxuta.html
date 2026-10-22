@@ -50,7 +50,7 @@ input:focus,select:focus{border-color:var(--marca2);box-shadow:0 0 0 3px rgba(29
 .imp{font-size:14px;font-weight:700}.imp:empty{display:none}.print.ok .imp{background:#12915A;color:#fff;border-radius:8px;padding:4px 10px}
 .link{border:0;background:none;color:var(--marca2);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer;padding:0}
 @media (prefers-color-scheme:dark){.link,.print.ok .arquivo{color:#8EC5F0}}
-.estado{font-size:14px;margin:8px 0 0;color:var(--suave)}.estado:empty{display:none}.estado.ok{color:var(--verde)}.estado.ruim{color:var(--verm)}
+.estado{font-size:14px;margin:8px 0 0;color:var(--suave)}.estado:empty{display:none}.estado.ok{color:var(--verde)}.estado.ruim{color:var(--verm)}.alerta-print{display:block;margin-top:8px;padding:10px 12px;background:var(--verm-l);border-left:4px solid var(--verm);border-radius:8px;color:var(--texto);font-weight:700;font-size:15px}
 .lado{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:10px}
 .cidade-uf{grid-template-columns:minmax(0,2fr) minmax(0,1fr)}
 .titulo-campo{font-weight:700;color:var(--texto);font-size:14px;margin-top:16px}
@@ -329,12 +329,14 @@ document.querySelectorAll('.print input[type=file]').forEach(inp => inp.onchange
     caixa.querySelector('.arquivo span').textContent = '+ Mandar outro print da ' + app;
     estado.textContent = `${tot} oferta${tot > 1 ? 's' : ''} da ${app}. Se alguma ficou de fora, mande outro print.`;
   }
-  const avisos = [outro && `${outro > 1 ? `${outro} prints parecem` : 'Esse print parece'} da ${app == 'Uber' ? '99' : 'Uber'}: mande no quadro ${app == 'Uber' ? 'da 99' : 'da Uber'}.`,
+  const avisos = [outro && `⛔ ${outro > 1 ? `${outro} prints são` : 'Esse print é'} da ${app == 'Uber' ? '99' : 'Uber'}, não da ${app}. Mande no quadro ${app == 'Uber' ? 'da 99' : 'da Uber'}.`,
     repetido && `${repetido > 1 ? `${repetido} prints já tinham` : 'Esse print já tinha'} sido enviado${repetido > 1 ? 's' : ''}.`,
     novosApp.length && `Achei ${novosApp.length > 1 ? 'ofertas' : 'uma oferta'} que a calculadora ainda não conhece ("${novosApp[0]}"${novosApp.length > 1 ? ' e outras' : ''}): por enquanto ${novosApp.length > 1 ? 'ficam' : 'fica'} de fora da conta.`,
-    falhou && `Não consegui ler ${falhou > 1 ? `${falhou} prints` : 'um print'}: tire de novo com as opções na tela.`].filter(Boolean);
-  if (avisos.length) { estado.classList.toggle('ruim', !tot); estado.innerHTML = (tot ? estado.textContent + '<br>' : '') + '⚠️ ' + avisos.join(' '); }
-  else if (!tot) { estado.classList.add('ruim'); estado.textContent = 'Não consegui ler os preços. Tente outro print, com as opções na tela, ou lance avulsa.'; }
+    falhou && `⛔ Não consegui ler ${falhou > 1 ? `${falhou} prints` : 'um print'}: tire de novo com as opções na tela.`].filter(Boolean);
+  // erro de print chama a atenção: caixa vermelha, rola até ela e vibra (pedido dele, 22/10)
+  const alerta = t => { estado.innerHTML = (tot ? estado.textContent : '') + `<span class="alerta-print" role="alert">${t}</span>`; estado.scrollIntoView({behavior: 'smooth', block: 'center'}); try { navigator.vibrate && navigator.vibrate(200); } catch (e) {} };
+  if (avisos.length) alerta(avisos.join('<br>'));
+  else if (!tot) alerta('⛔ Não consegui ler os preços. Tente outro print, com as opções na tela, ou digite as ofertas.');
   inp.value = ''; desenharLista();
 });
 
@@ -685,12 +687,15 @@ function combinacoes(c) {
   const hoje = metaSemanaValor(c);
   return res.filter(r => r.req < hoje - 10).sort((a, b) => a.req - b.req).slice(0, 3).map(r => ({...r, txt: txt(r.dias)}));
 }
+// dias que ele roda hoje e que a opção deixa de fora: vira folga (pedido dele, 22/10)
+const folgaTxt = (c, r) => { const f = c.G.map((v, i) => v > 0 && !r.dias.includes(i) ? i : -1).filter(i => i >= 0);
+  return !f.length ? '' : f.join() == '5,6' ? ' <b class="bom" style="display:inline">e ainda descansa no fim de semana</b>' : ` <b class="bom" style="display:inline">e ainda folga ${f.map(i => (i > 4 ? 'no ' : 'na ') + DIAS[i]).join(' e ')}</b>`; };
 function outras(c) {
   const quer = metaDe(c.app), hoje = metaSemanaValor(c), cs = combinacoes(c);
   if (!cs.length) return c.ops[0].passes[0].tipo == 'tempo' ? '' : `<p class="dica">🔁 No pacote de ganhos, mudar os dias não muda o total da semana, só a meta de cada dia.</p>`;
   const faixa = G => { const v = G.filter(x => x > 0).map(Math.round), a = Math.min(...v), b = Math.max(...v); return a == b ? `${real(a)} por dia` : `${real(a)} a ${real(b)} por dia`; };
   return `<div class="outras"><p class="titulo-campo" style="margin:0 0 2px">🔁 Outras formas de levar os mesmos ${real(quer)}</p><p class="dica" style="margin-top:0">Mudando os dias, muda o passe e a meta. Escolha a que cabe na sua rotina.</p>` +
-    cs.map(r => `<div class="regua"><b>${r.nome} (${r.txt})</b>Meta: <b style="display:inline">${faixa(r.G)}</b>, com ${curto(r.o.passes[0]).replace('Passe de ', 'o passe de ')}${r.o.passes[0].tipo == 'tempo' ? (r.o.longo ? `, pago a cada ${durac(r.o.passes[0])} dias` : r.o.emendado ? ', um atrás do outro' : `, ${Math.round(r.o.custo / r.o.passes[0].preco)} por semana`) : ''}.<br>Semana: ${real(r.req)} no app, <span class="bom">${real(hoje - r.req)} a menos por semana, na média, que no seu jeito de hoje</span>.</div>`).join('') + '</div>';
+    cs.map(r => `<div class="regua"><b>${r.nome} (${r.txt})</b>Meta: <b style="display:inline">${faixa(r.G)}</b>, com ${curto(r.o.passes[0]).replace('Passe de ', 'o passe de ')}${r.o.passes[0].tipo == 'tempo' ? (r.o.longo ? `, pago a cada ${durac(r.o.passes[0])} dias` : r.o.emendado ? ', um atrás do outro' : `, ${Math.round(r.o.custo / r.o.passes[0].preco)} por semana`) : ''}.<br>Semana: ${real(r.req)} no app, <span class="bom">${real(hoje - r.req)} a menos que hoje</span>${folgaTxt(c, r)}.</div>`).join('') + '</div>';
 }
 const metaSemanaValor = c => precisaDia(c).reduce((a, b) => a + b, 0);
 // semana fraca: o passe come uma parte grande do que ele faz, e aí rodar sem passe pode sair melhor
