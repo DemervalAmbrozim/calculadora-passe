@@ -362,11 +362,12 @@ const catsEscolhidas = () => [...document.querySelectorAll('[id^=cats-] .chip.on
 const appsEscolhidos = () => ['Uber', '99'].filter(a => document.querySelector(`#cats-${a} .chip.on`));
 
 function desenharLista() {
+  document.querySelectorAll('.print .passe.avulso').forEach(e => e.remove());
   const apps = appsEscolhidos();
   const avulsos = passes.filter(p => p.avulso);
   $('#lista').hidden = !avulsos.length;
   $('#lista').innerHTML = passes.map((p, i) => p.avulso && apps.includes(p.app) ? `
-    <div class="passe avulso">
+    <div class="passe avulso" data-app="${p.app}">
       <div class="topo"><b><span class="tag amb">avulso</span>Lançamento avulso ${avulsos.indexOf(p) + 1}</b><button class="x" data-i="${i}" aria-label="Remover">×</button></div>
       <div class="mini">
         <div><label>App</label><select data-i="${i}" data-k="app"><option ${p.app == 'Uber' ? 'selected' : ''}>Uber</option><option ${p.app == '99' ? 'selected' : ''}>99</option></select></div>
@@ -379,8 +380,12 @@ function desenharLista() {
     const p = passes[el.dataset.i]; const k = el.dataset.k;
     p[k] = (k == 'preco' || k == 'tam') ? num(el.value) : el.value;
     if (k == 'tipo') { p.tam = p.tipo == 'tempo' ? 24 : 1000; desenharLista(); }
+    if (k == 'app') desenharLista();
   });
   $('#lista').querySelectorAll('.x').forEach(b => b.onclick = () => { passes.splice(b.dataset.i, 1); desenharLista(); });
+  // a oferta digitada abre dentro do quadro do próprio app (22/10: abria a da Uber embaixo da 99)
+  $('#lista').querySelectorAll('.passe').forEach(el => { const cx = document.querySelector('#print-' + el.dataset.app); if (cx && cx.offsetParent !== null) cx.querySelector('.estado').before(el); });
+  $('#lista').hidden = !$('#lista').children.length;
 }
 
 // A régua sai dos preços do print; o passe da semana sai do que ele faz em cada dia.
