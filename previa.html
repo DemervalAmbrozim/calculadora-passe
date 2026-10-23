@@ -53,7 +53,7 @@ input:focus,select:focus{border-color:var(--marca2);box-shadow:0 0 0 3px rgba(29
 .estado{font-size:14px;margin:8px 0 0;color:var(--suave)}.estado:empty{display:none}.estado.ok{color:var(--verde)}.estado.ruim{color:var(--verm)}.alerta-print{display:block;margin-top:8px;padding:10px 12px;background:var(--verm-l);border-left:4px solid var(--verm);border-radius:8px;color:var(--texto);font-weight:700;font-size:15px}
 .lado{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:10px}
 .cidade-uf{grid-template-columns:minmax(0,2fr) minmax(0,1fr)}
-.titulo-campo{font-weight:700;color:var(--texto);font-size:14px;margin-top:16px}
+.titulo-campo{font-weight:700;color:var(--texto);font-size:14px;margin-top:16px}.bloco-precisa{margin-top:18px;padding:14px;border:2px solid var(--dourado);border-radius:14px;background:var(--dourado-l)}.tit-precisa{margin:0 0 4px;font-size:18px;font-weight:800;line-height:1.25;color:var(--texto)}
 .chips{display:flex;gap:8px;flex-wrap:wrap}
 .chip{border:1px solid var(--borda);background:var(--campo);color:var(--texto);border-radius:999px;padding:9px 16px;font:inherit;font-weight:600;cursor:pointer}
 .chip.on{background:var(--marca);color:#fff;border-color:var(--marca)}
@@ -543,7 +543,7 @@ function desenharSemana() {
     `<p class="dica" style="margin:12px 0 0">Ou dia a dia:</p>` + cab +
     DIAS.map((d, i) => `<div class="${cl}"><label for="s-${a[0]}-${i}">${CURTO[i]}</label>${a.map(x => `<input id="s-${x}-${i}" inputmode="decimal" placeholder="não rodo">`).join('')}${dois ? tot(i) : ''}</div>`).join('') +
     `<div class="${cl} soma"><label>Semana</label>${a.map(x => `<span class="tot" id="w-${x}">—</span>`).join('')}${dois ? '<span class="tot" id="w-tot"></span>' : ''}</div>
-    <p class="titulo-campo" style="margin-bottom:2px">Quanto você vai precisar fazer a mais agora</p><p class="dica" style="margin-top:0">O app desconta o passe das suas corridas antes de o dinheiro cair: some o valor dele ao que você fazia. Pacote: a cada pacote. Tempo: toda semana.</p><div id="precisa"><p class="dica">Lance os dias acima e a conta aparece aqui.</p></div>`;
+    <div class="bloco-precisa"><p class="tit-precisa">💰 Quanto você vai precisar fazer a mais agora</p><p class="dica" style="margin-top:0">O app desconta o passe das suas corridas antes de o dinheiro cair: some o valor dele ao que você fazia. Pacote: a cada pacote. Tempo: toda semana.</p><div id="precisa"><p class="dica">Lance os dias acima e a conta aparece aqui.</p></div></div>`;
   const totais = () => {
     if (dois) DIAS.forEach((_, i) => {
       const t = a.reduce((s, x) => s + (num($(`#s-${x}-${i}`).value) || 0), 0); $('#t-' + i).textContent = t ? real(t) : ''; });
