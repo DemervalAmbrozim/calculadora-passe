@@ -962,7 +962,8 @@ function mostrar(contas, cel) {
 // ligado:false → o resultado só mostra o teste de preço (anota quem clica, nada é cobrado).
 // ?mes=teste → abre o mês sem cobrar, para conferir. Com ligado:true o ?mes=teste não vale mais.
 const CONFIG_MES = {ligado: false, preco: 9.9, dias: 30, sims: 5};   // 23/10: 1 Pix = 5 simulações do mês, contadas no servidor
-const testeMes = !CONFIG_MES.ligado && new URLSearchParams(location.search).get('mes') == 'teste';
+// a prévia (previa.html) abre sempre com o mês em teste: tudo que está pronto aparece para ele revisar (23/10)
+const ePrevia = location.pathname.endsWith('previa.html'), testeMes = !CONFIG_MES.ligado && (ePrevia || new URLSearchParams(location.search).get('mes') == 'teste');
 const SEMANAS = 4;
 let mesApps = [], mesCel = null;
 
@@ -1005,7 +1006,7 @@ function prepararMes(contas, cel) {
   }
   // teste de preço (22/10): só anota quem clica com o preço na tela; nada é cobrado
   $('#querMes').onclick = () => {
-    guardar({nome: 'INTERESSE MENSAL', celular: cel, carro: 'interesse', ano: 2000, apps: mesApps.join('+'), origem: new URLSearchParams(location.search).has('teste') ? 'mensal-teste' : 'mensal-990', aceite_lgpd: $('#ok').checked, versao_aceite: 'termos-v4+privacidade-v6-2026-10-23'});
+    guardar({nome: 'INTERESSE MENSAL', celular: cel, carro: 'interesse', ano: 2000, apps: mesApps.join('+'), origem: ePrevia || new URLSearchParams(location.search).has('teste') ? 'mensal-teste' : 'mensal-990', aceite_lgpd: $('#ok').checked, versao_aceite: 'termos-v4+privacidade-v6-2026-10-23'});
     $('#mensal').innerHTML = `<p>✅ <b>Anotado!</b> A conta do mês todo ainda está sendo preparada. Quando abrir, avisamos você no WhatsApp ${celTxt(cel)}. Nada foi cobrado.</p>`; };
 }
 
