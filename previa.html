@@ -177,7 +177,6 @@ ul.regras li{margin:6px 0}
     <label class="btn arquivo"><span>📷 Enviar o print da Uber</span><input type="file" accept="image/*" multiple data-app="Uber" hidden></label>
     <button class="btn claro digitar" data-app="Uber">⌨️ Digitar as ofertas da Uber</button>
     <p class="estado" aria-live="polite"></p>
-    <div class="pct" data-app="Uber" hidden></div>
   </div>
   <div class="print" id="print-99">
     <div class="print-cab"><span class="logo l99">99</span><span class="imp"></span></div>
@@ -185,7 +184,6 @@ ul.regras li{margin:6px 0}
     <label class="btn arquivo"><span>📷 Enviar o print da 99</span><input type="file" accept="image/*" multiple data-app="99" hidden></label>
     <button class="btn claro digitar" data-app="99">⌨️ Digitar as ofertas da 99</button>
     <p class="estado" aria-live="polite"></p>
-    <div class="pct" data-app="99" hidden></div>
   </div>
   <div id="lista" hidden></div>
   <p class="dica" style="text-align:center;margin-top:14px">Faltou alguma oferta no print? <button class="link" id="mais">Lançar avulsa</button></p>
@@ -344,7 +342,7 @@ document.querySelectorAll('.print input[type=file]').forEach(inp => inp.onchange
   }
   const tot = passes.filter(p => p.app == app && p.lido).length, novosApp = [...new Set(novosFormatos.filter(x => x.app == app).map(x => x.linha))];
   if (tot) {
-    caixa.classList.add('ok'); caixa.querySelector('.imp').textContent = '✓ Importado com sucesso'; desenharPct();
+    caixa.classList.add('ok'); caixa.querySelector('.imp').textContent = '✓ Importado com sucesso';
     caixa.querySelector('.arquivo span').textContent = '+ Mandar outro print da ' + app;
     estado.textContent = `${tot} oferta${tot > 1 ? 's' : ''} da ${app}. Se alguma ficou de fora, mande outro print.`;
   }
@@ -434,7 +432,7 @@ function erroAvulso(p) {
 // mostra=false: só marca (sem pintar de vermelho o que ele ainda está digitando); mostra=true: pinta tudo
 function checarAvulsos(mostra) {
   let primeiro = null;
-  passes.forEach(p => { if (p.avulso) p.erro = erroAvulso(p); }); desenharPct();
+  passes.forEach(p => { if (p.avulso) p.erro = erroAvulso(p); });
   document.querySelectorAll('.passe.avulso').forEach(el => {
     const p = passes[el.querySelector('[data-i]').dataset.i], e = p.erro || {}; let algum = false;
     el.querySelectorAll('.erro-campo').forEach(m => { const k = m.dataset.e, ver = mostra || k == 'geral' || (p.visto ??= {})[k];
@@ -450,7 +448,7 @@ function checarAvulsos(mostra) {
   return primeiro;
 }
 
-// logo que lê o print (23/10, ele: "trabalhar com o percentual por tempo e por ganho"): quanto de cada R$ 100 vai para o passe.
+// na tela da régua, junto com a tabela de cada app (23/10, ele: "trabalhar com o percentual por tempo e por ganho"): quanto de cada R$ 100 vai para o passe.
 // Pacote: o mesmo % todo dia. Por tempo: o preço é fixo, então o % depende de quanto ele faz no dia (R$ 200, 300 e 400 de exemplo).
 const PCT_DIAS = [200, 300, 400];
 function desenharPct() {
@@ -521,7 +519,7 @@ function desenharRegua() {
         return lin(x.p, '', custa, g ? `<b>acima de ${real(x.min)}</b><small>${d > 1 ? `de média nos ${d} dias` : 'no dia'}</small>` : '');
       })())).join('');
     const tab = `<table class="rg"><tr><th>Oferta</th><th>Custa</th><th>Mais viável</th></tr>${tg.length ? '<tr class="grupo"><td colspan="3"><span class="selo g">Por ganhos</span></td></tr>' : ''}${rows}</table>`;
-    return `<div class="rg-app" data-app="${a}"${a != appsEscolhidos()[0] ? ' hidden' : ''}><p class="dica" style="margin-top:0">${todas.length} oferta${todas.length > 1 ? 's' : ''} da ${a}: ${tg.length} por ganhos e ${lim.length} por tempo.</p>${tab}<details><summary class="dica">Ver a conta de cada passe</summary>${linhas.join('')}</details></div>`;
+    return `<div class="rg-app" data-app="${a}"${a != appsEscolhidos()[0] ? ' hidden' : ''}><p class="dica" style="margin-top:0">${todas.length} oferta${todas.length > 1 ? 's' : ''} da ${a}: ${tg.length} por ganhos e ${lim.length} por tempo.</p>${tab}<div class="pct" data-app="${a}"></div><details><summary class="dica">Ver a conta de cada passe</summary>${linhas.join('')}</details></div>`;
   }).join('');
   // com Uber e 99, uma aba para cada app (fica curto)
   const ap = appsEscolhidos();
@@ -532,6 +530,7 @@ function desenharRegua() {
       $('#regua').querySelectorAll('.rg-app').forEach(x => x.hidden = x.dataset.app != b.dataset.app);
     });
   } else $('#regua').insertAdjacentHTML('afterbegin', `<div class="abas"><span class="logo ${ap[0] == '99' ? 'l99' : 'luber'}">${ap[0]}</span></div>`);
+  desenharPct();
 }
 // atalho: um valor médio para todos os dias, ou para seg a sex e sáb e dom; depois dá para ajustar dia a dia
 const RAPIDO = [['Todos', [0, 1, 2, 3, 4, 5, 6]], ['Seg-Sex', [0, 1, 2, 3, 4]], ['Sáb-Dom', [5, 6]]];
