@@ -76,7 +76,7 @@ input:focus,select:focus{border-color:var(--marca2);box-shadow:0 0 0 3px rgba(29
 .gancho{margin:22px 0 0;padding:16px;border-radius:14px;background:var(--marca);color:#fff}.gancho p{margin:0 0 8px;font-size:15px;color:#fff;opacity:.9}.gancho b{display:block;font-size:19px;line-height:1.3}
 .abas{display:flex;gap:8px;margin-bottom:10px}.aba{flex:1;border:2px solid var(--borda);background:var(--campo);border-radius:12px;padding:8px;cursor:pointer}.aba.on{border-color:var(--marca2)}
 .logo{display:inline-block;font-weight:800;font-size:15px;border-radius:8px;padding:3px 12px}.luber{background:#000;color:#fff}.l99{background:#FFD400;color:#111}
-.passe.avulso .mini{grid-template-columns:1fr 1fr}.passe.avulso{border:2px dashed var(--ambar);background:var(--ambar-l)}
+.passe.avulso .mini{grid-template-columns:1fr 1fr}.passe.avulso select{padding:12px 4px 12px 8px;font-size:15px}.av-ok.falta{color:var(--ambar)}.av-ok{margin:6px 0 0;font-size:13px;font-weight:700;color:var(--verde,#1E8E4E)}.av-ok:empty{display:none}.passe.avulso.pronta{border-style:solid;border-color:var(--verde,#1E8E4E)}.passe.avulso{border:2px dashed var(--ambar);background:var(--ambar-l)}
 .of{padding:10px 0;border-bottom:1px solid var(--borda)}.of:last-child{border-bottom:0}.of b{display:block;font-size:15px;margin-top:4px}.of span{font-size:13px;color:var(--suave)}.of.top b{color:var(--dourado)}.of.fora b{color:var(--suave)}
 .x{border:0;background:none;color:var(--suave);font-size:22px;cursor:pointer;line-height:1}
 .mini{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
@@ -382,7 +382,7 @@ function desenharLista() {
   $('#lista').hidden = !avulsos.length;
   $('#lista').innerHTML = passes.map((p, i) => p.avulso && apps.includes(p.app) ? `
     <div class="passe avulso" data-app="${p.app}">
-      <div class="topo"><b><span class="tag amb">avulso</span>Lançamento avulso ${avulsos.indexOf(p) + 1}</b><button class="x" data-i="${i}" aria-label="Remover">×</button></div>
+      <div class="topo"><b>Lançamento avulso ${avulsos.filter(q => q.app == p.app).indexOf(p) + 1}</b><button class="x" data-i="${i}" aria-label="Remover">×</button></div>
       <div class="mini">
         <div><label>App</label><select data-i="${i}" data-k="app"><option ${p.app == 'Uber' ? 'selected' : ''}>Uber</option><option ${p.app == '99' ? 'selected' : ''}>99</option></select></div>
         <div><label>Tipo</label><select data-i="${i}" data-k="tipo"><option value="tempo" ${p.tipo == 'tempo' ? 'selected' : ''}>Por tempo</option><option value="ganhos" ${p.tipo == 'ganhos' ? 'selected' : ''}>Por ganhos</option></select></div>
@@ -391,7 +391,7 @@ function desenharLista() {
           ? `<select data-i="${i}" data-k="tam">${HORAS.map(([h, t]) => `<option value="${h}" ${p.tam == h ? 'selected' : ''}>${t}</option>`).join('')}</select>`
           : `<input data-i="${i}" data-k="tam" inputmode="decimal" placeholder="ex.: 2.490" value="${p.txt?.tam ?? (p.tam || '')}">`}<small class="erro-campo" data-e="tam"></small></div>
       </div>
-      <p class="erro-campo" data-e="geral"></p>
+      <p class="erro-campo" data-e="geral"></p><p class="av-ok"></p>
     </div>` : '').join('');
   $('#lista').querySelectorAll('[data-k]').forEach(el => el[el.tagName == 'SELECT' ? 'onchange' : 'oninput'] = () => {
     const p = passes[el.dataset.i]; const k = el.dataset.k;
@@ -442,6 +442,10 @@ function checarAvulsos(mostra) {
       m.textContent = ver && e[k] || ''; el.querySelector(`[data-k=${k}]`)?.classList.toggle('invalido', !!(ver && e[k]));
       if (ver && e[k]) { algum = true; primeiro ??= el; } });
     el.classList.toggle('com-erro', algum);
+    // não tem botão de salvar: completa, a oferta já entra na conta (23/10, ele procurou o botão)
+    // incompleta: diz o que falta, sem pintar de vermelho enquanto ele ainda digita
+    const ok = el.querySelector('.av-ok'), falta = p.erro && !algum ? Object.values(p.erro)[0] : '';
+    ok.textContent = !p.erro ? '✓ Entrou na conta. Não precisa salvar.' : falta ? `Ainda não entrou na conta: ${falta.charAt(0).toLowerCase() + falta.slice(1)}` : ''; ok.classList.toggle('falta', !!p.erro); el.classList.toggle('pronta', !p.erro);
   });
   return primeiro;
 }
