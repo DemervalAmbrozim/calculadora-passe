@@ -101,7 +101,7 @@ input:focus,select:focus{border-color:var(--marca2);box-shadow:0 0 0 3px rgba(29
 .sem.soma{border-top:2px solid var(--borda);padding-top:8px;margin-top:8px}.sem.soma .tot{text-align:center;font-size:14px;white-space:nowrap}.sem.soma .tot:last-child{text-align:right}
 input.errado,select.errado{border-color:var(--verm);box-shadow:0 0 0 3px var(--verm-l)}input.certo{border-color:var(--verde)}
 .precisa-app{background:var(--ambar-l);border-radius:12px;padding:10px 12px;margin-top:8px}.precisa-app .destaque{margin:6px 0 0;font-size:14px}
-.sem .cab{font-size:12px;font-weight:700;color:var(--suave)}.sem input{margin:0}
+.sem .cab{font-size:12px;font-weight:700;color:var(--suave)}.sem input{margin:0}.sem input.invalido{border-color:var(--verm)!important;outline:1px solid var(--verm);background:var(--verm-l)}
 .memo{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}.memo th,.memo td{padding:6px 4px;border-bottom:1px solid var(--borda);text-align:right}.memo th:first-child,.memo td:first-child{text-align:left}.memo td.p{text-align:left;font-size:12px;color:var(--suave)}
 .cmp{margin-top:6px}.cmp .linha{display:grid;grid-template-columns:1fr auto;gap:4px 10px;padding:10px 0;border-bottom:1px solid var(--borda)}.cmp .linha:last-child{border-bottom:0}
 .cmp .nome{font-weight:600;font-size:14px}.cmp .top .nome{color:var(--dourado);font-weight:800}.cmp .valor{font-weight:800;white-space:nowrap;text-align:right}.cmp .valor small{font-weight:600;color:var(--suave);font-size:12px}
@@ -247,6 +247,24 @@ ul.regras li{margin:6px 0}
 const CONFIG = { url: 'https://ixeuemgxmteuezcqovtz.supabase.co', chave: 'sb_publishable_QaLESJ7_nc-UQLQjQyJi8Q_fSdxiSXU' };   // fase de teste: projeto do Recibo Saúde, tabela própria
 
 const $ = s => document.querySelector(s);
+// valor de um dia no app (23/10, ele lançou 50.000 num sábado e passou): em branco = não roda; senão de R$ 10 a R$ 1.500
+const DIA_MIN = 10, DIA_MAX = 1500;
+const erroDia = t => { const s = String(t || '').trim().replace(/^R\$\s*/i, ''); if (!s) return '';
+  if (s.startsWith('-')) return 'não pode ser negativo';
+  if (!/^[\d.,]+$/.test(s)) return 'só números';
+  const v = num(s); if (!(v > 0)) return 'zero: se não roda, deixe em branco';
+  return v < DIA_MIN ? `muito baixo (a partir de R$ ${DIA_MIN})` : v > DIA_MAX ? `muito alto (até R$ 1.500 por dia no app)` : ''; };
+const valorDia = el => !el || erroDia(el.value) ? 0 : num(el.value) || 0;
+// nome do campo para a mensagem: s-Uber-5 → Sábado na Uber; m-2-Uber-5 → Semana 3, sábado na Uber; r-Uber-1 → Atalho Seg-Sex na Uber
+const rotuloDia = id => { const q = id.split('-'), cap = t => t[0].toUpperCase() + t.slice(1);
+  return q[0] == 's' ? `${cap(DIAS[q[2]])} na ${q[1]}` : q[0] == 'm' ? `Semana ${+q[1] + 1}, ${DIAS[q[3]]} na ${q[2]}` : `Atalho ${RAPIDO[q[2]][0]} na ${q[1]}`; };
+// pinta de vermelho os campos errados e escreve embaixo; devolve o 1º campo errado
+const conferirDias = (box, saida) => { let pri = null; const lin = [];
+  box.querySelectorAll('input[id^="s-"], input[id^="m-"], input[id^="r-"]').forEach(el => { const e = erroDia(el.value); el.classList.toggle('invalido', !!e);
+    if (e) { pri ??= el; lin.push(`${rotuloDia(el.id)}: ${e}`); } });
+  if (saida) saida.innerHTML = lin.slice(0, 3).join('<br>') + (lin.length > 3 ? `<br>e mais ${lin.length - 3} campo${lin.length > 4 ? 's' : ''}` : ''); return pri; };
+const barrarDias = (box, saida) => { const el = conferirDias(box, saida); if (!el) return false;
+  el.scrollIntoView({behavior: 'smooth', block: 'center'}); navigator.vibrate?.(200); msg('Corrija o valor em vermelho'); return true; };
 const msg = t => { const el = $('#toast'); el.textContent = t; el.hidden = false; clearTimeout(msg.t); msg.t = setTimeout(() => el.hidden = true, 3500); };
 const brl = v => 'R$ ' + v.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 const num = s => { s = String(s || '').trim().replace(/[^\d,.-]/g, ''); if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.'); else if (/^\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, ''); return parseFloat(s); };
@@ -542,16 +560,17 @@ function desenharSemana() {
     RAPIDO.map(([n], k) => `<div class="${cl}"><label>${n}</label>${a.map(x => `<input id="r-${x}-${k}" inputmode="decimal" placeholder="média">`).join('')}${dois ? `<span class="tot" id="rt-${k}"></span>` : ''}</div>`).join('') + '</div>' +
     `<p class="dica" style="margin:12px 0 0">Ou dia a dia:</p>` + cab +
     DIAS.map((d, i) => `<div class="${cl}"><label for="s-${a[0]}-${i}">${CURTO[i]}</label>${a.map(x => `<input id="s-${x}-${i}" inputmode="decimal" placeholder="não rodo">`).join('')}${dois ? tot(i) : ''}</div>`).join('') +
-    `<div class="${cl} soma"><label>Semana</label>${a.map(x => `<span class="tot" id="w-${x}">—</span>`).join('')}${dois ? '<span class="tot" id="w-tot"></span>' : ''}</div>
+    `<div class="${cl} soma"><label>Semana</label>${a.map(x => `<span class="tot" id="w-${x}">—</span>`).join('')}${dois ? '<span class="tot" id="w-tot"></span>' : ''}</div><p class="erro-campo" id="err-sem"></p>
     <p class="tit-precisa"><span>💰 Quanto você vai precisar fazer a mais agora</span></p><p class="dica" style="margin-top:0">O app desconta o passe das suas corridas antes de o dinheiro cair: some o valor dele ao que você fazia. Pacote: a cada pacote. Tempo: toda semana.</p><div id="precisa"><p class="dica">Lance os dias acima e a conta aparece aqui.</p></div>`;
   const totais = () => {
+    conferirDias($('#semana'), $('#err-sem'));
     if (dois) DIAS.forEach((_, i) => {
-      const t = a.reduce((s, x) => s + (num($(`#s-${x}-${i}`).value) || 0), 0); $('#t-' + i).textContent = t ? real(t) : ''; });
+      const t = a.reduce((s, x) => s + valorDia($(`#s-${x}-${i}`)), 0); $('#t-' + i).textContent = t ? real(t) : ''; });
     // a semana é a soma dos dias, por app e no total
     const w = a.map(x => semanaDe(x).reduce((s, v) => s + v, 0));
     a.forEach((x, k) => $('#w-' + x).textContent = w[k] ? real(w[k]) : '—');
     if (dois) { const t = w[0] + w[1]; $('#w-tot').textContent = t ? real(t) : '';
-      RAPIDO.forEach((_, k) => { const t = a.reduce((s, x) => s + (num($(`#r-${x}-${k}`).value) || 0), 0); $('#rt-' + k).textContent = t ? real(t) : ''; }); }
+      RAPIDO.forEach((_, k) => { const t = a.reduce((s, x) => s + valorDia($(`#r-${x}-${k}`)), 0); $('#rt-' + k).textContent = t ? real(t) : ''; }); }
     // a gente já diz quanto ele precisa fazer, com o passe mais barato da semana dele
     const h = a.map(x => { const G = semanaDe(x), ops = G.some(v => v > 0) ? opcoes(x, G) : [];
       return ops.length ? `<div class="precisa-app"><span class="logo ${x == '99' ? 'l99' : 'luber'}">${x}</span>${metaSemana({app: x, G, ops})}</div>` : ''; }).join('');
@@ -563,7 +582,7 @@ function desenharSemana() {
 }
 // o que ele quer continuar levando por semana = a soma dos dias que ele informou
 const metaDe = app => semanaDe(app).reduce((s, v) => s + v, 0);
-const semanaDe = app => DIAS.map((_, i) => { const el = $(`#s-${app}-${i}`); return el ? num(el.value) || 0 : 0; });
+const semanaDe = app => DIAS.map((_, i) => valorDia($(`#s-${app}-${i}`)));
 
 // todas as formas de pagar a semana de um app, da mais barata para a mais cara
 // por ganhos: o pacote sozinho (cada real no app gasta preço/limite; se não usar o limite em 180 dias, paga o preço pelo prazo)
@@ -658,6 +677,7 @@ $('#ir3').onclick = () => {
 };
 let simulando = null;
 $('#ir4').onclick = () => {
+  if (barrarDias($('#semana'), $('#err-sem'))) return;
   if (!appsEscolhidos().some(a => semanaDe(a).some(v => v > 0))) return msg('Diga quanto você faz em pelo menos um dia');
   if (simulando) { const contas = appsEscolhidos().map(app => ({app, G: semanaDe(app)})).filter(c => c.G.some(v => v > 0)).map(c => ({...c, ops: opcoes(c.app, c.G)})).filter(c => c.ops.length);
     if (contas.some(c => c.G.some(v => v > 3000))) return msg('Tem dia passando de R$ 3.000: lance quanto entra em cada dia');
@@ -983,7 +1003,7 @@ async function vitrineMes(contas) {
   return `<p class="mes-titulo">🗓️ O seu mês, neste ritmo</p>
     <div class="mes-num">vão uns<b>${real(passe)}</b>de passe no mês, para levar uns ${real(T)}</div>
     ${acaba.length ? `<p class="mes-alerta">⚡ ${acaba.join(' ')} <b style="display:inline">Você sabe quanto precisa fazer nesse dia?</b></p>` : ''}
-    <p style="margin:12px 0 4px"><b>No mês todo você vê:</b></p><ul class="vitrine"><li>✅ <b style="display:inline">Os 28 dias do seu jeito:</b> a semana fraca, o fim do mês, o domingo que você não trabalha.</li><li>✅ <b style="display:inline">O dia exato em que cada pacote acaba</b> e a meta de cada dia.</li><li>✅ <b style="display:inline">Folga com a família sem perder o mês:</b> quanto fazer a mais para folgar o sábado, o domingo ou o fim de semana.</li></ul>
+    <p style="margin:12px 0 4px"><b>No mês todo você vê:</b></p><ul class="vitrine"><li>✅ <b style="display:inline">Os 28 dias do seu jeito:</b> a semana fraca, o fim do mês, o domingo que você não trabalha.</li><li>✅ <b style="display:inline">O dia exato em que cada pacote acaba</b> e a meta de cada dia.</li><li>✅ <b style="display:inline">Folga sem perder o mês:</b> quanto fazer a mais para folgar o sábado, o domingo ou o fim de semana.</li></ul>
     <p class="dica">Estimativa com a semana que você lançou.</p>`;
 }
 function cartaoMes(cel, contas) {
@@ -1042,7 +1062,7 @@ async function pagar() {
 }
 
 // ---- o formulário: 4 semanas, a 1ª já vem com a semana informada ----
-const semanaMes = (app, w) => DIAS.map((_, i) => { const el = $(`#m-${w}-${app}-${i}`); return el ? num(el.value) || 0 : 0; });
+const semanaMes = (app, w) => DIAS.map((_, i) => valorDia($(`#m-${w}-${app}-${i}`)));
 function abrirMes() {
   const a = mesApps, dois = a.length > 1, cl = `sem${dois ? ' tres' : ''}`;
   const cab = `<div class="${cl}"><span></span>${a.map(x => `<span class="cab">${x} (R$)</span>`).join('')}${dois ? '<span class="cab">Total</span>' : ''}</div>`;
@@ -1050,10 +1070,11 @@ function abrirMes() {
     <p class="dica" style="margin-top:0">Os 28 dias já vieram com a sua <b class="realce">semana informada</b>. Mude o que for diferente: a semana fraca, o fim do mês, o domingo que você não trabalha. Dia de folga: em branco.</p>
     ${[...Array(SEMANAS)].map((_, w) => `<div class="sem-mes" data-w="${w}"><p class="titulo-campo" style="margin:14px 0 2px">Semana ${w + 1} <small id="mt-${w}" style="font-weight:400"></small></p>${cab}${DIAS.map((d, i) => `<div class="${cl}"><label>${CURTO[i]}</label>${a.map(x => `<input id="m-${w}-${x}-${i}" inputmode="decimal" placeholder="não rodo" value="${semanaDe(x)[i] || ''}">`).join('')}${dois ? `<span class="tot" id="mtd-${w}-${i}"></span>` : ''}</div>`).join('')}
       <p class="dica" style="text-align:center;margin:4px 0 0">${w ? `<button class="link" data-copia="${w}">Igual à semana ${w}</button> · ` : ''}<button class="link" data-zera="${w}">Folga a semana toda</button></p></div>`).join('')}
-    <div class="${cl} soma"><label>Mês</label>${a.map(x => `<span class="tot" id="mm-${x}"></span>`).join('')}${dois ? '<span class="tot" id="mm-tot"></span>' : ''}</div>
+    <div class="${cl} soma"><label>Mês</label>${a.map(x => `<span class="tot" id="mm-${x}"></span>`).join('')}${dois ? '<span class="tot" id="mm-tot"></span>' : ''}</div><p class="erro-campo" id="err-mes"></p>
     <button class="btn" id="verMes">Ver o meu mês</button>
     <button class="btn claro" id="voltaSem">Voltar ao resultado da semana</button>`;
   const totais = () => {
+    conferirDias($('#mes'), $('#err-mes'));
     let m = a.map(() => 0);
     for (let w = 0; w < SEMANAS; w++) {
       const t = a.map(x => semanaMes(x, w).reduce((s, v) => s + v, 0)); t.forEach((v, k) => m[k] += v);
@@ -1135,14 +1156,14 @@ function blocoMes(c) {
     <p class="aviso">⚠️ <b>Cuidado:</b> parou nos ${real(pl.T)} de sempre? No mês, leva só <b>${real(Math.max(0, leva))}</b>.</p>`;
 }
 
-// ---- folgas com a família (23/10): tira o dia, o que ele levava nele vai para os outros dias; o passe é refeito na linha do tempo ----
+// ---- folgas (23/10; título sem 'família' porque nem todo motorista tem, pedido dele): tira o dia, o que ele levava nele vai para os outros dias; o passe é refeito na linha do tempo ----
 let folgas = [];
 const maisDia = v => v >= 0.5 ? `<span class="ruim">${real(v)} a mais por dia</span>` : v <= -0.5 ? `<span class="bom">${real(-v)} a menos por dia</span>` : 'a mesma meta por dia';
 function blocoFolgas(fo) {
   folgas = fo.lista;
   if (!folgas.length) return '';
-  return `<div class="card bloco-fam"><span class="etq-cmp">🏡 Família</span><h2>Quer folgar com a família?</h2>
-    <p class="dica" style="margin-top:0">Tirando o dia, o que você levava nele vai para os outros dias. A conta do passe é refeita no mês todo. Hoje sua meta é ${real(fo.m0)} por dia, em ${fo.n0} dias.</p>` +
+  return `<div class="card bloco-fam"><span class="etq-cmp">🏖️ Folga</span><h2>Quer um dia de folga?</h2>
+    <p class="dica" style="margin-top:0">Para descansar, ficar com a família, cuidar da saúde ou do que for seu. Tirando o dia, o que você levava nele vai para os outros dias. A conta do passe é refeita no mês todo. Hoje sua meta é ${real(fo.m0)} por dia, em ${fo.n0} dias.</p>` +
     folgas.map((f, k) => `<div class="regua"><b>${f.nome}</b>Nos outros ${f.n1} dias: meta de <b style="display:inline">${real(f.m1)} por dia</b>, ${maisDia(f.mais)}.<br>${Math.abs(f.dif) < 1 ? 'O passe do mês continua o mesmo valor.' : f.dif > 0 ? `No mês: ${real(f.dif)} a mais de passe.` : `<span class="bom">No mês: ${real(-f.dif)} a menos de passe.</span>`}${f.muda.length ? ' ' + f.muda.join('; ') + '.' : ' O passe mais viável não muda.'}<br><button class="link" data-folga="${k}">Usar esta folga no meu mês</button></div>`).join('') + '</div>';
 }
 function usarFolga(k) {
@@ -1155,6 +1176,7 @@ function usarFolga(k) {
 // cada 'Ver o meu mês' gasta 1 das 5 simulações (no servidor); 'Usar esta folga' é parte da mesma simulação e não gasta
 let simAtual = null, ultimoMes = null;
 async function verMes() {
+  if (barrarDias($('#mes'), $('#err-mes'))) return;
   if (mesApps.some(x => mesDe(x).some(v => v > 3000))) return msg('Tem dia passando de R$ 3.000: lance quanto entra em cada dia');
   if (!mesApps.some(x => mesDe(x).some(v => v > 0))) return msg('Lance pelo menos um dia em alguma semana');
   try { const r = await contaMes(pedidoMes('calcular', mesDe));
@@ -1191,7 +1213,7 @@ function textoMes(contas) {
     [...Array(SEMANAS)].forEach((_, w) => { const s = semPl(pl, w); l.push(s.T ? `Semana ${w + 1}: fazer ${real(s.P)} (fazia ${real(s.T)})` : `Semana ${w + 1}: não roda`); });
     l.push('Sequência de passes:', ...grupos(pl).map((x, k) => `${k + 1}. ${periodo(x)}: ${nomeGrupo(x).replace(/<[^>]+>/g, '')}`));
     l.push(''); });
-  if (folgas.length) l.push(`Folga com a família: ${folgas[0].nome.toLowerCase()} meta de ${real(folgas[0].m1)} por dia nos outros dias (${maisDia(folgas[0].mais).replace(/<[^>]+>/g, '')}).`, '');
+  if (folgas.length) l.push(`Folga: ${folgas[0].nome.toLowerCase()} meta de ${real(folgas[0].m1)} por dia nos outros dias (${maisDia(folgas[0].mais).replace(/<[^>]+>/g, '')}).`, '');
   l.push('O app desconta o passe das primeiras corridas; só depois o dinheiro cai.', 'Refaça a conta quando a oferta mudar: ' + location.origin + location.pathname);
   return l.join('\n');
 }
