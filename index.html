@@ -113,6 +113,7 @@ input.errado,select.errado{border-color:var(--verm);box-shadow:0 0 0 3px var(--v
 .nums span{font-size:12px;color:var(--suave)}
 .outras{margin-top:14px}.sem-passe{margin-top:14px}.sem-passe summary{cursor:pointer}.ex-app{margin-top:10px}.ex-app .lado{align-items:end}.erro-campo{display:block;color:var(--verm);font-size:12px;font-weight:600;margin:3px 0 0;min-height:0}.erro-campo:empty{display:none}.passe.avulso.com-erro{border-color:var(--verm)!important;background:var(--verm-l)}.passe .invalido{border-color:var(--verm)!important;outline:1px solid var(--verm)}.bloco-cmp{background:var(--dourado-l);border:2px solid var(--dourado);margin-top:26px}.bloco-cmp .cmp-app{background:var(--cartao)}.etq-cmp{display:inline-block;background:var(--dourado);color:#14202C;font-weight:700;font-size:13px;padding:3px 10px;border-radius:99px;margin-bottom:6px}.cmp .valor small{display:block;font-size:12px;text-align:right}.realce{display:inline;background:#FFE58A;color:#14202C;padding:0 4px;border-radius:4px}.bom{color:var(--verde)}.ruim{color:var(--verm)}
 .bloco-mes{border:2px solid var(--verde,#1a7f37)}.bloco-fam{border:2px solid var(--verde,#1a7f37);margin-top:26px}.bloco-fam .etq-cmp{background:var(--verde,#1a7f37);color:#fff}.vitrine{margin:6px 0 10px;padding:0;list-style:none}.vitrine li{margin:8px 0}
+.seq{border:2px solid var(--verde,#1a7f37);border-radius:14px;padding:12px;margin:12px 0}.seq-tit{font-weight:800;font-size:17px;margin:0 0 6px}.seq ol{margin:0;padding-left:22px}.seq li{margin:8px 0}
 .mes-titulo{font-size:20px;font-weight:800;margin:0 0 10px}.mes-num{background:var(--verde,#1a7f37);color:#fff;border-radius:14px;padding:14px;text-align:center;font-size:15px}.mes-num b{display:block;font-size:40px;line-height:1.15;margin:2px 0}
 .mes-alerta{background:var(--ambar-l);border-left:5px solid #b7791f;border-radius:10px;padding:10px 12px;margin:12px 0 0}.btn-mes{font-size:19px;padding:18px}
 .memo td:not(:first-child),.memo th:not(:first-child){white-space:nowrap}
@@ -859,7 +860,7 @@ async function vitrineMes(contas) {
   const pls = (await contaMes(pedidoMes('vitrine', app => G[app]))).vitrine;
   if (!pls.length) return '';
   const passe = pls.reduce((a, x) => a + x.pl.passe, 0), T = pls.reduce((a, x) => a + x.pl.T, 0);
-  const acaba = pls.filter(x => x.pl.tipo != 'tempo' && x.pl.compras.length > 1).map(x => `Na ${x.app}, o 1º pacote acaba na <b style="display:inline">${diaNome(x.pl.compras[1].d)}</b> e o app já desconta o próximo das suas corridas.`);
+  const acaba = pls.filter(x => x.pl.tipo == 'ganhos' && x.pl.compras.length > 1).map(x => `Na ${x.app}, o 1º pacote acaba na <b style="display:inline">${diaNome(x.pl.compras[1].d)}</b> e o app já desconta o próximo das suas corridas.`);
   // 22/10 noite (ele: "muito suave… a gente tem que instigar esse cara"): número grande, alerta e benefícios em destaque
   return `<p class="mes-titulo">🗓️ O seu mês, neste ritmo</p>
     <div class="mes-num">vão uns<b>${real(passe)}</b>de passe no mês, para levar uns ${real(T)}</div>
@@ -970,16 +971,36 @@ async function contaMes(d) {
 // semana w de um plano: quanto fazia e quanto precisa fazer
 const semPl = (pl, w) => { const s = (v, a) => v.slice(7 * w, 7 * w + 7).reduce((x, y) => x + y, 0); return {T: s(pl.N), P: s(pl.g)}; };
 // parou no que fazia de sempre (sem o a mais): o que sobra no fim do mês
-const levaSo = pl => pl.tipo == 'tempo' ? pl.T - pl.compras.reduce((a, x) => a + x.p.preco, 0) : pl.T - Math.ceil(pl.T / pl.p.tam - 1e-9) * pl.p.preco;
+const levaSo = pl => pl.tipo != 'ganhos' ? pl.T - pl.compras.reduce((a, x) => a + x.p.preco, 0) : pl.T - Math.ceil(pl.T / pl.p.tam - 1e-9) * pl.p.preco;
 
 const mesDe = app => [...Array(SEMANAS)].flatMap((_, w) => semanaMes(app, w));
 
 // quando o app desconta cada passe: é isso que a semana sozinha não mostra
+// a SEQUÊNCIA de passes do mês (22/10 noite, ele: "uma sequência do que é melhor para o cara"): passe a passe, de que dia a que dia
+const chaveP = p => `${p.tipo}|${p.tam}|${p.preco}|${p.validade || ''}`;
+function grupos(pl) {
+  const gs = [];
+  pl.compras.forEach(x => { const u = gs[gs.length - 1];
+    if (u && chaveP(u.p) == chaveP(x.p)) { u.n++; u.fim = x.fim; u.segue = x.segue; } else gs.push({p: x.p, de: x.d, fim: x.fim, segue: x.segue, n: 1}); });
+  return gs;
+}
+const nomeGrupo = x => x.p.tipo == 'tempo' ? `${x.n > 1 ? `${x.n} passes de ${horas(x.p)}, um atrás do outro,` : `Passe de ${horas(x.p)}`} por ${brlc(x.p.preco)}${x.n > 1 ? ' cada' : ''}`
+  : `${x.n > 1 ? `${x.n} pacotes de ` : 'Pacote de '}${real(x.p.tam)} em ganhos por ${brlc(x.p.preco)}${x.n > 1 ? ' cada' : ''}`;
+const periodo = x => `${diaNome(x.de)}${x.fim > x.de || x.segue ? ` até ${x.segue ? 'o mês seguinte' : diaNome(x.fim)}` : ''}`;
+function sequencia(pl) {
+  const gs = grupos(pl), troca = gs.length > 1;
+  return `<div class="seq"><p class="seq-tit">🔢 A sequência de passes do seu mês</p><ol>${gs.map(x => `<li><b>${periodo(x)}</b><br>${nomeGrupo(x)}${x.p.tipo != 'tempo' ? ' (acaba no dia em que completa o valor)' : ''}</li>`).join('')}</ol>
+    ${troca ? '<p class="dica" style="margin:6px 0 0">🔁 Antes de cada troca, mude o passe padrão no app: o app só passa para o próximo quando o atual acaba.</p>' : ''}</div>`;
+}
+// o que a sequência não mostra: sobra, passe parado, pacote que vence
 function quando(pl) {
-  const n = pl.compras.length;
-  if (pl.tipo != 'tempo') return `<p class="aviso">📆 <b>Quando o app desconta cada pacote:</b> ${pl.compras.map((x, k) => `${k ? `o ${k + 1}º na ` : 'o 1º na '}<b style="display:inline">${diaNome(x.d)}</b>`).join(', ')}. Em cada um, os ${brlc(pl.p.preco)} saem das primeiras corridas; depois, até completar ${real(pl.p.tam)}, a corrida é sua sem taxa.${pl.sobra >= 1 ? ` Sobram ${real(pl.sobra)} do último pacote para o mês seguinte, já pagos.` : ''}${pl.perdeu >= 1 ? ` <b class="ruim">O pacote vence em ${validadeDe(pl.p)} dias antes de completar: perde ${real(pl.perdeu)}.</b>` : ''}</p>`;
-  const lista = n <= 6 ? `: ${pl.compras.map(x => `${horas(x.p)} na ${diaNome(x.d)}`).join(', ')}` : '';
-  return `<p class="aviso">📆 <b>${n} ${n > 1 ? 'passes' : 'passe'} no mês${lista}.</b> Cada um é descontado das primeiras corridas do dia da compra.${pl.parado ? ` ${pl.parado} ${pl.parado > 1 ? 'dias' : 'dia'} de passe parado (folga dentro do passe).` : ''}${pl.sobraDias ? ` O último ainda vale ${pl.sobraDias} ${pl.sobraDias > 1 ? 'dias' : 'dia'} no mês seguinte.` : ''}${pl.mistura ? ' Exige trocar o passe padrão antes de cada um acabar.' : ''}</p>`;
+  const ex = [], pac = pl.compras.some(x => x.p.tipo != 'tempo');
+  ex.push(pac ? 'Em cada pacote, o preço sai das primeiras corridas; depois, até completar o valor, a corrida é sua sem taxa.' : 'Cada passe é descontado das primeiras corridas do dia da compra.');
+  if (pl.sobra >= 1) ex.push(`Sobram ${real(pl.sobra)} do último pacote para o mês seguinte, já pagos.`);
+  if (pl.sobraDias) ex.push(`O último passe ainda vale ${pl.sobraDias} ${pl.sobraDias > 1 ? 'dias' : 'dia'} no mês seguinte.`);
+  if (pl.parado) ex.push(`${pl.parado} ${pl.parado > 1 ? 'dias' : 'dia'} de passe parado (folga dentro do passe).`);
+  if (pl.perdeu >= 1) ex.push(`<b class="ruim">Um pacote vence antes de completar: perde ${real(pl.perdeu)}.</b>`);
+  return `<p class="aviso">📆 ${ex.join(' ')}</p>`;
 }
 function blocoMes(c) {
   const pl = c.planos[0], comprou = new Set(pl.compras.map(x => x.d));
@@ -991,7 +1012,7 @@ function blocoMes(c) {
   return `<div class="app-rot"><span class="logo ${c.app == '99' ? 'l99' : 'luber'}">${c.app}</span> no seu mês</div><div class="grande">${pl.nome}</div>
     <p class="dica">Para levar os ${real(pl.T)} do seu <b class="realce">mês informado</b>, faça <b>${real(pl.P)}</b> no app: ${real(pl.passe)} de passe no mês inteiro.</p>
     <table class="memo"><tr><th>Semana</th><th>Fazia</th><th>Precisa fazer</th><th>A mais</th></tr>${linhas}<tr><th>Mês</th><th>${real(pl.T)}</th><th>${real(pl.P)}</th><th class="ruim">+${real(pl.passe)}</th></tr></table>
-    ${quando(pl)}<details><summary class="dica">Ver a meta de cada dia, semana a semana (🛒 = dia em que o app desconta um passe novo)</summary>${dias}</details>
+    ${sequencia(pl)}${quando(pl)}<details><summary class="dica">Ver a meta de cada dia, semana a semana (🛒 = dia em que o app desconta um passe novo)</summary>${dias}</details>
     <p class="aviso">⚠️ <b>Cuidado:</b> parou nos ${real(pl.T)} de sempre? No mês, leva só <b>${real(Math.max(0, leva))}</b>.</p>`;
 }
 
@@ -1049,7 +1070,7 @@ function textoMes(contas) {
   contas.forEach(c => { const pl = c.planos[0];
     l.push(`*${c.app}:* ${pl.nome}`, `${real(pl.passe)} de passe no mês inteiro. Para levar os ${real(pl.T)}, fazer ${real(pl.P)} no app:`);
     [...Array(SEMANAS)].forEach((_, w) => { const s = semPl(pl, w); l.push(s.T ? `Semana ${w + 1}: fazer ${real(s.P)} (fazia ${real(s.T)})` : `Semana ${w + 1}: não roda`); });
-    if (pl.tipo != 'tempo') l.push('Pacote novo descontado na ' + pl.compras.map(x => diaNome(x.d)).join(', na '));
+    l.push('Sequência de passes:', ...grupos(pl).map((x, k) => `${k + 1}. ${periodo(x)}: ${nomeGrupo(x).replace(/<[^>]+>/g, '')}`));
     l.push(''); });
   if (folgas.length) l.push(`Folga com a família: ${folgas[0].nome.toLowerCase()} meta de ${real(folgas[0].m1)} por dia nos outros dias (${maisDia(folgas[0].mais).replace(/<[^>]+>/g, '')}).`, '');
   l.push('O app desconta o passe das primeiras corridas; só depois o dinheiro cai.', 'Refaça a conta quando a oferta mudar: ' + location.origin + location.pathname);

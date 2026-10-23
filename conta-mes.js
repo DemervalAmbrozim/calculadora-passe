@@ -15,14 +15,16 @@ const curto = p => p.tipo == 'tempo' ? `Passe de ${horas(p)} por ${brlc(p.preco)
 function diaGanhos(p, N) {
   const g = N.map(() => 0), compras = []; let r = 0, deve = 0, desde = -1e9, perdeu = 0;
   N.forEach((n, d) => {
-    if (r > 0 && d - desde >= validadeDe(p)) { perdeu += r; r = 0; deve = 0; }
+    if (r > 0 && d - desde >= validadeDe(p)) { perdeu += r; r = 0; deve = 0; compras[compras.length - 1].fim = d - 1; }
     for (let falta = n, k = 0; falta > 1e-9 && k < 500; k++) {
       if (r <= 1e-9) { r = p.tam; deve = p.preco; desde = d; compras.push({d, p}); }
       const x = Math.min(deve > 0 ? deve : falta, r);
       g[d] += x; r -= x; if (deve > 0) deve -= x; else falta -= x;
+      if (r <= 1e-9) compras[compras.length - 1].fim = d;   // o dia em que completa (roteiro)
     }
   });
   // o que sobrou do último pacote passa para o mês seguinte (já pago)
+  const ult = compras[compras.length - 1]; if (ult && ult.fim == null) { ult.fim = DM - 1; ult.segue = true; }
   return {g, compras, credito: compras.length ? p.preco * r / p.tam : 0, sobra: compras.length ? r : 0, perdeu};
 }
 // passe(s) por tempo: o jeito mais barato de cobrir todo dia rodado (um passe por vez; comprado num dia, cobre os seguintes)
@@ -33,9 +35,36 @@ function diaTempo(lista, N) {
     lista.forEach(p => { const d = durac(p), j = Math.min(DM, i + d), fora = i + d - j, c = p.preco * (1 - fora / d) + best[j].c;
       if (!best[i] || c < best[i].c - 1e-9) best[i] = {c, k: [{d: i, p, fora}, ...best[j].k]}; });
   }
-  const k = best[0].k, g = N.slice(); k.forEach(x => g[x.d] += x.p.preco);
+  const k = best[0].k.map(x => ({...x, fim: Math.min(DM, x.d + durac(x.p)) - 1, segue: x.fora > 0})), g = N.slice(); k.forEach(x => g[x.d] += x.p.preco);
   const parado = k.reduce((a, x) => a + Array.from({length: durac(x.p) - x.fora}, (_, j) => x.d + j).filter(d => !(N[d] > 0)).length, 0);
   return {g, compras: k, credito: k.reduce((a, x) => a + x.p.preco * x.fora / durac(x.p), 0), sobraDias: k.length ? k[k.length - 1].fora : 0, parado, perdeu: 0};
+}
+// ROTEIRO (22/10 noite, ele: "o melhor passe de dia tal a dia tal é esse, depois esse"): o caminho mais barato do mês
+// misturando TODAS as ofertas, um passe por vez. Posição = (dia, quanto já caiu nesse dia): o pacote acaba no meio do dia
+// e o próximo é descontado das corridas seguintes; o passe por tempo cobre o resto do dia e os seguintes.
+const chave = p => `${p.tipo}|${p.tam}|${p.preco}|${p.validade || ''}`;
+function diaRoteiro(ps, N) {
+  const anda = (d, f) => { while (d < DM && f >= N[d] - 1e-9) { d++; f = 0; } return [d, f]; };   // pula o dia já feito e o dia parado
+  const tempo = (p, d) => { const du = durac(p), j = Math.min(DM, d + du), fora = d + du - j;
+    return {d: j, f: 0, ded: [[d, p.preco]], credito: p.preco * fora / du, fim: j - 1, segue: fora > 0, sobra: 0}; };
+  const pacote = (p, d, f) => { let r = p.tam; const ini = d, val = validadeDe(p), ded = [[d, p.preco]]; r -= p.preco;   // o preço sai das primeiras corridas
+    for (let ult = d;;) { [d, f] = anda(d, f);
+      if (d >= DM) return {d, f: 0, ded, credito: p.preco * r / p.tam, fim: ult, segue: true, sobra: r};
+      if (d - ini >= val) return {d, f: 0, ded, credito: 0, fim: d - 1, perdeu: r, sobra: 0};
+      const x = Math.min(N[d] - f, r); f += x; r -= x; ult = d;
+      if (r <= 1e-9) return {d, f, ded, credito: 0, fim: d, sobra: 0}; } };
+  const de = (p, d, f) => p.tipo == 'tempo' ? tempo(p, d) : pacote(p, d, f), memo = new Map();
+  const melhor = (d, f) => { [d, f] = anda(d, f); if (d >= DM) return {c: 0};
+    const k = d * 1e9 + Math.round(f * 100); if (memo.has(k)) return memo.get(k);
+    let m = null;
+    for (const p of ps) { const s = de(p, d, f), c = p.preco - s.credito + melhor(s.d, s.f).c; if (!m || c < m.c - 1e-9) m = {c, p}; }
+    memo.set(k, m); return m; };
+  const g = N.slice(), compras = []; let d = 0, f = 0, credito = 0, perdeu = 0, sobra = 0, sobraDias = 0;
+  for (;;) { [d, f] = anda(d, f); if (d >= DM) break;
+    const p = melhor(d, f).p, s = de(p, d, f);
+    s.ded.forEach(([x, v]) => g[x] += v); compras.push({d, p, fim: s.fim, segue: !!s.segue});
+    credito += s.credito; perdeu += s.perdeu || 0; sobra = s.sobra; sobraDias = p.tipo == 'tempo' && s.segue ? d + durac(p) - DM : 0; d = s.d; f = s.f; }
+  return {g, compras, credito, perdeu, sobra, sobraDias, parado: 0};
 }
 export function planosMes(ps, N) {
   const T = N.reduce((a, b) => a + b, 0), pl = [];
@@ -46,10 +75,11 @@ export function planosMes(ps, N) {
   // tempo: fora o que tem outro da mesma duração mais barato (nunca compensa)
   const tempos = ps.filter(p => p.tipo == 'tempo' && !ps.some(q => q !== p && q.tipo == 'tempo' && durac(q) == durac(p) && (q.preco < p.preco || q.preco == p.preco && ps.indexOf(q) < ps.indexOf(p))));
   tempos.forEach(p => add(curto(p), `${horas(p)} por ${brlc(p.preco)}`, 'tempo', diaTempo([p], N), {p}));
-  if (tempos.length > 1) { const r = diaTempo(tempos, N), tipos = [...new Set(r.compras.map(x => x.p))];
-    const so = Math.min(...pl.filter(x => x.tipo == 'tempo').map(x => x.ef));
-    if (tipos.length > 1 && r.g.reduce((a, b) => a + b, 0) - T - r.credito < so - 1)
-      add(`Misturando passes de ${tipos.sort((a, b) => a.tam - b.tam).map(horas).join(' e ')}`, `Misturando ${tipos.map(horas).join(' e ')}`, 'tempo', r, {p: tipos[0], mistura: true}); }
+  // roteiro: trocar de passe no meio do mês quando sai mais barato que ficar num só
+  const ganhos = ps.filter(p => p.tipo != 'tempo' && !ps.some(q => q !== p && q.tipo != 'tempo' && q.tam == p.tam && validadeDe(q) >= validadeDe(p) && (q.preco < p.preco || q.preco == p.preco && ps.indexOf(q) < ps.indexOf(p))));
+  const r = diaRoteiro([...ganhos, ...tempos], N), tipos = [...new Map(r.compras.map(x => [chave(x.p), x.p])).values()];
+  if (tipos.length > 1 && r.g.reduce((a, b) => a + b, 0) - T - r.credito < Math.min(...pl.map(x => x.ef)) - 1)
+    add('Trocando de passe no mês', 'Trocando: ' + tipos.map(p => p.tipo == 'tempo' ? horas(p) : `${brlc(p.tam)} em ganhos`).join(' + '), 'roteiro', r, {p: tipos[0], mistura: true});
   // a melhor é a que pede menos no app no mês (descontado o que fica pago para o mês seguinte)
   return pl.sort((a, b) => a.ef - b.ef || a.P - b.P);
 }
