@@ -124,6 +124,7 @@ input.errado,select.errado{border-color:var(--verm);box-shadow:0 0 0 3px var(--v
 .btn.zap{background:#1FA855;text-align:center;text-decoration:none;margin-top:12px}
 .app-rot{font-size:16px;font-weight:700;color:var(--texto);margin-top:20px;display:flex;align-items:center;gap:8px}
 .grande{font-size:24px;font-weight:800;line-height:1.15;margin:2px 0 8px}
+.amais-mes{background:var(--ambar-l);border:2px solid var(--ambar);border-radius:14px;padding:12px 14px;margin:8px 0;text-align:center}.amais-mes span{display:block;font-size:13px;color:var(--suave)}.amais-mes b{display:block;font-size:34px;font-weight:800;line-height:1.1;margin:2px 0}
 .dias{display:grid;gap:8px;margin:6px 0 10px}
 .total{margin:4px 0 0;font-size:14px;font-weight:700;color:var(--suave)}
 .dia{background:var(--verde-l);border-radius:14px;padding:12px 14px}
@@ -986,7 +987,7 @@ function grupos(pl) {
 }
 const nomeGrupo = x => x.p.tipo == 'tempo' ? `${x.n > 1 ? `${x.n} passes de ${horas(x.p)}, um atrás do outro,` : `Passe de ${horas(x.p)}`} por ${brlc(x.p.preco)}${x.n > 1 ? ' cada' : ''}`
   : `${x.n > 1 ? `${x.n} pacotes de ` : 'Pacote de '}${real(x.p.tam)} em ganhos por ${brlc(x.p.preco)}${x.n > 1 ? ' cada' : ''}`;
-const periodo = x => `${diaNome(x.de)}${x.fim > x.de || x.segue ? ` até ${x.segue ? 'o mês seguinte' : diaNome(x.fim)}` : ''}`;
+const periodo = x => `${diaNome(x.de)}${x.fim > x.de || x.segue ? ` até ${x.segue ? 'o fim da semana 4 (e continua no mês seguinte)' : diaNome(x.fim)}` : ''}`;
 function sequencia(pl) {
   const gs = grupos(pl), troca = gs.length > 1;
   return `<div class="seq"><p class="seq-tit">🔢 A sequência de passes do seu mês</p><ol>${gs.map(x => `<li><b>${periodo(x)}</b><br>${nomeGrupo(x)}${x.p.tipo != 'tempo' ? ' (acaba no dia em que completa o valor)' : ''}</li>`).join('')}</ol>
@@ -1010,6 +1011,7 @@ function blocoMes(c) {
     return v > 0 ? `<tr><td>${CURTO[i]}${comprou.has(d) ? ' 🛒' : ''}</td><td>${real(v)}</td><td><b>${real(gv)}</b></td><td class="${gv - v >= 0.5 ? 'ruim' : 'bom'}">${gv - v >= 0.5 ? '+' + real(gv - v) : 'nada'}</td></tr>` : ''; }).join('')}</table>`).join('');
   const leva = levaSo(pl);
   return `<div class="app-rot"><span class="logo ${c.app == '99' ? 'l99' : 'luber'}">${c.app}</span> no seu mês</div><div class="grande">${pl.nome}</div>
+    <div class="amais-mes"><span>A mais no mês, por cima dos ${real(pl.T)} de sempre</span><b>+${real(pl.passe)}</b><span>≈ ${real(pl.passe / Math.max(1, [...Array(SEMANAS)].filter((_, w) => semPl(pl, w).T).length))} a mais por semana rodada · é o passe do mês, pago pelas próprias corridas</span></div>
     <p class="dica">Para levar os ${real(pl.T)} do seu <b class="realce">mês informado</b>, faça <b>${real(pl.P)}</b> no app: ${real(pl.passe)} de passe no mês inteiro.</p>
     <table class="memo"><tr><th>Semana</th><th>Fazia</th><th>Precisa fazer</th><th>A mais</th></tr>${linhas}<tr><th>Mês</th><th>${real(pl.T)}</th><th>${real(pl.P)}</th><th class="ruim">+${real(pl.passe)}</th></tr></table>
     ${sequencia(pl)}${quando(pl)}<details><summary class="dica">Ver a meta de cada dia, semana a semana (🛒 = dia em que o app desconta um passe novo)</summary>${dias}</details>
@@ -1068,7 +1070,7 @@ function mostrarMes(res) {
 function textoMes(contas) {
   const l = ['*Meu mês na Calculadora de Passe*', `Mês de ${celTxt(mesCel)}, com as ofertas do print de ${dataCurta(new Date())}`, ''];
   contas.forEach(c => { const pl = c.planos[0];
-    l.push(`*${c.app}:* ${pl.nome}`, `${real(pl.passe)} de passe no mês inteiro. Para levar os ${real(pl.T)}, fazer ${real(pl.P)} no app:`);
+    l.push(`*${c.app}:* ${pl.nome}`, `*A mais no mês: +${real(pl.passe)}*`, `${real(pl.passe)} de passe no mês inteiro. Para levar os ${real(pl.T)}, fazer ${real(pl.P)} no app:`);
     [...Array(SEMANAS)].forEach((_, w) => { const s = semPl(pl, w); l.push(s.T ? `Semana ${w + 1}: fazer ${real(s.P)} (fazia ${real(s.T)})` : `Semana ${w + 1}: não roda`); });
     l.push('Sequência de passes:', ...grupos(pl).map((x, k) => `${k + 1}. ${periodo(x)}: ${nomeGrupo(x).replace(/<[^>]+>/g, '')}`));
     l.push(''); });
