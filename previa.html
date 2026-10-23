@@ -874,6 +874,8 @@ function combinacoes(c) {
   // tirando os dias mais fracos, um de cada vez
   const fracos = rod.slice().sort((a, b) => c.G[a] - c.G[b]);
   for (let k = 1; k <= 2 && rod.length - k >= 3; k++) { const tira = fracos.slice(0, k); testar(rod.filter(i => !tira.includes(i)), `Sem ${tira.map(i => DIAS[i]).join(' e ')}`); }
+  // folga no sábado e folga no domingo, sempre as duas (23/10, ele: "faltou um sem domingo")
+  [5, 6].forEach(i => { if (rod.includes(i) && rod.length - 1 >= 3) testar(rod.filter(j => j != i), `Sem ${DIAS[i]}`); });
   // 6 dias seguidos com 1 folga (encaixa dois passes de 72 h)
   const folga = DIAS.map((_, i) => i).sort((a, b) => (c.G[a] || 0) - (c.G[b] || 0))[0];
   testar(DIAS.map((_, i) => i).filter(i => i != folga), `6 dias seguidos, folga ${folga > 4 ? 'no' : 'na'} ${DIAS[folga]}`);
