@@ -534,11 +534,19 @@ const semanaDe = app => DIAS.map((_, i) => { const el = $(`#s-${app}-${i}`); ret
 // todas as formas de pagar a semana de um app, da mais barata para a mais cara
 // por ganhos: o pacote sozinho (cada real no app gasta preço/limite; se não usar o limite em 180 dias, paga o preço pelo prazo)
 // por tempo: diários e de 72 h combinados para cobrir os dias que ele roda, sem deixar dia rodado descoberto
-function opcoes(app, G) {
+function opcoes(app, G, semMistura) {
   const total = G.reduce((a, b) => a + b, 0), res = [];
   doApp(app).filter(p => p.tipo != 'tempo').forEach(p => {
-    const custo = Math.max(total * p.preco / p.tam, p.preco * 7 / validadeDe(p));
-    res.push({nome: curto(p), curto: `${brlc(p.tam)} em ganhos por ${brlc(p.preco)}`, passes: [p], custo, uso: G.map((v, i) => v > 0 ? {p, paga: custo * v / total} : null),
+    let custo = Math.max(total * p.preco / p.tam, p.preco * 7 / validadeDe(p));
+    // vence antes de usar tudo: simula pacote a pacote (o app desconta o preço das corridas; vencido, o próximo só no dia em que volta a rodar) até repetir o dia e a sobra
+    let ciclo = null;
+    if (total > 0 && total * validadeDe(p) / 7 < p.tam) { const val = validadeDe(p), N = t => G[t % 7] > 0 ? G[t % 7] : 0, viu = new Map();
+      for (let t = G.findIndex(v => v > 0), f = 0, n = 0; n < 5000; n++) {
+        const k = t % 7 + '|' + Math.round(f * 100); if (viu.has(k)) { const [t0, n0] = viu.get(k); ciclo = 7 * (n - n0) * p.preco / (t - t0); break; }
+        viu.set(k, [t, n]); let r = p.tam - p.preco; const ini = t;
+        for (;;) { while (f >= N(t) - 1e-9) { t++; f = 0; } if (t - ini >= val) break; const x = Math.min(N(t) - f, r); f += x; r -= x; if (r <= 1e-9) break; } }
+      if (ciclo != null) custo = Math.max(total * p.preco / p.tam, ciclo); }
+    res.push({nome: curto(p), curto: `${brlc(p.tam)} em ganhos por ${brlc(p.preco)}`, passes: [p], custo, ciclo, uso: G.map((v, i) => v > 0 ? {p, paga: custo * v / total} : null),
       alerta: total * validadeDe(p) / 7 < p.tam ? `Vence em ${validadeDe(p)} dias antes de você usar tudo: perde ${real(p.tam - total * validadeDe(p) / 7)}.` : p.tam / total < 1 ? `Acaba em ${diasTxt(7 * p.tam / total)}; o app compra outro.` : null});
   });
   // um passe por vez: o próximo só entra quando o ativo acaba. Misturar diário e 72 h exige trocar o passe padrão antes de cada um acabar.
@@ -572,12 +580,19 @@ function opcoes(app, G) {
   // um atrás do outro, sem pausa: o de 72 h não cabe certinho na semana, mas emendado sai mais barato para quem roda quase todo dia
   const rodados = G.filter(v => v > 0).length, melhorTempo = Math.min(Infinity, ...res.filter(o => o.passes[0].tipo == 'tempo').map(o => o.custo));
   todosTempo.forEach(p => { const d = durac(p), longo = d > 7; if (d < 2 || 7 % d == 0) return;
-    const custo = 7 * p.preco / d; if (!longo && !(custo < melhorTempo - 0.5)) return;
+    // compra o próximo só no dia em que volta a rodar: segue o ciclo até o dia da semana da compra repetir
+    const viu = new Map(); let t = G.findIndex(v => v > 0), n = 0, custo = 7 * p.preco / d;
+    while (t >= 0) { if (viu.has(t % 7)) { const [t0, n0] = viu.get(t % 7); custo = 7 * (n - n0) * p.preco / (t - t0); break; }
+      viu.set(t % 7, [t, n]); t += d; n++; while (!(G[t % 7] > 0)) t++; }
+    if (!longo && !(custo < melhorTempo - 0.5)) return;
     const parado = 7 - rodados, porSem = (7 / d).toLocaleString('pt-BR', {maximumFractionDigits: 1});
     res.push({nome: longo ? curto(p) : `Só ${curto(p).replace('Passe de ', 'o passe de ')}, um atrás do outro`, curto: longo ? `${horas(p)} por ${brlc(p.preco)}` : `${horas(p)} por ${brlc(p.preco)}, um atrás do outro`, passes: [p], custo, emendado: !longo, longo,
       uso: G.map(v => v > 0 ? {p, paga: custo * v / total} : null),
-      alerta: (longo ? `${brlc(p.preco)} a cada ${d} dias: ${real(custo)} de passe na semana inteira.` : `Um emendado no outro: uns ${porSem} por semana; o dia da troca varia.`) + (parado ? ` ${parado} ${parado > 1 ? 'dias' : 'dia'} de passe parado por semana.` : '')}); });
+      alerta: (longo ? `${brlc(p.preco)} por ${d} dias${custo < 7 * p.preco / d - 0.01 ? '; se ele vencer num dia de folga, compre o próximo só quando voltar a rodar' : ''}: ${real(custo)} de passe na semana inteira${custo < 7 * p.preco / d - 0.01 ? ', na média' : ''}.` : `Um emendado no outro: uns ${porSem} por semana; o dia da troca varia.`) + (parado ? ` ${parado} ${parado > 1 ? 'dias' : 'dia'} de passe parado por semana.` : '')}); });
   if (tempos.length > 1) cobrir(tempos);
+  // pacote nos dias fracos + passe por tempo nos fortes (22/10, ele: "fecha um pacote no sábado… e na segunda passa para outro")
+  const rot = semMistura ? null : roteiroSemana(app, G), melhorAgora = Math.min(Infinity, ...res.map(o => precisaCom(o, total) - total));
+  if (rot && rot.custo < melhorAgora - 1) res.push(rot);
   // a melhor é a que pede menos a mais no app para levar o mesmo (20/10): o pacote cobra também sobre o que vem a mais
   return res.sort((a, b) => precisaCom(a, total) - precisaCom(b, total) || a.custo - b.custo);
 }
@@ -667,6 +682,7 @@ function textoZap(contas) {
   contas.forEach(c => {
     const o = c.ops[0];
     linhas.push(`*${c.app}:* ${o.nome}`, `${brl(precisaCom(o, metaDe(c.app)) - metaDe(c.app))} de passe na semana inteira, fazendo o que precisa para levar os ${brl(metaDe(c.app))}.`);
+    if (o.roteiro) linhas.push('Sequência da semana (mude o passe padrão antes de cada troca):', ...o.itens.map((x, k) => `${k + 1}. ${x.quando}: ${x.oque}`));
     const t = document.createElement('div'); t.innerHTML = pesado(c) + metaSemana(c) + semPasse(c) + caixa(c); if (t.textContent.trim()) linhas.push(...[...t.children].map(e => e.textContent.trim()));
     const pd = precisaDia(c);
     c.G.forEach((v, i) => { if (v > 0) linhas.push(`• ${CURTO[i]}: fazia ${real(v)}, agora preciso fazer ${real(pd[i])} (+${real(pd[i] - v)})`); });
@@ -678,6 +694,75 @@ function textoZap(contas) {
 }
 
 // destaca que é a semana que ele lançou (o que fazia antes), para não confundir com a meta nova
+// ===== MISTURA PACOTE + TEMPO NA SEMANA (22/10) =====
+// A semana se repete: linha do tempo de RS semanas com a mesma regra do mês (um passe por vez; o pacote acaba no meio do dia
+// e o próximo sai das corridas seguintes; o passe por tempo cobre o resto do dia e os seguintes). O preço de cada passe é
+// dividido pelos dias que ele cobriu, na proporção do que caiu em cada dia; o custo da semana é a média das semanas do meio.
+// O tamanho da linha do tempo acompanha o ciclo mais longo (passe de 30 dias, pacote que dura semanas): 8 a 26 semanas.
+const rotMemo = new Map();
+function roteiroSemana(app, G) {
+  const chaveR = app + '|' + G.join() + '|' + doApp(app).map(p => `${p.tipo}/${p.tam}/${p.preco}/${p.validade || ''}`).join();
+  if (!rotMemo.has(chaveR)) rotMemo.set(chaveR, roteiroCalc(app, G));
+  return rotMemo.get(chaveR);
+}
+function roteiroCalc(app, G) {
+  const ofs = doApp(app), ganhos = ofs.filter(p => p.tipo != 'tempo' && !ofs.some(q => q !== p && q.tipo != 'tempo' && q.tam == p.tam && validadeDe(q) >= validadeDe(p) && (q.preco < p.preco || q.preco == p.preco && ofs.indexOf(q) < ofs.indexOf(p)))),
+    tempos = ofs.filter(p => p.tipo == 'tempo' && !ofs.some(q => q !== p && q.tipo == 'tempo' && durac(q) == durac(p) && (q.preco < p.preco || q.preco == p.preco && ofs.indexOf(q) < ofs.indexOf(p))));
+  const longos = tempos.filter(p => durac(p) > 7);   // 15/30 dias: a troca entre passes por tempo atravessa semanas (não cabe no cobrir)
+  if (!(ganhos.length && tempos.length || longos.length && tempos.length > 1 || ganhos.length > 1) || !G.some(v => v > 0)) return null;
+  const sem = G.reduce((a, b) => a + (b > 0 ? b : 0), 0), ciclo = Math.max(...tempos.map(durac), ...ganhos.map(p => Math.min(validadeDe(p), 7 * p.tam / sem)));
+  const ps = [...tempos, ...ganhos];   // empate: o passe por tempo primeiro (sequência mais simples)
+  // custo de uma semana a mais no caminho mais barato: (custo em 2R semanas − custo em R) ÷ R; a média das semanas do meio distorcia quando o ciclo não fecha na semana
+  const rodar = RS => {
+    const DS = 7 * RS, N = Array.from({length: DS}, (_, d) => G[d % 7] > 0 ? G[d % 7] : 0);
+    const anda = (d, f) => { while (d < DS && f >= N[d] - 1e-9) { d++; f = 0; } return [d, f]; };
+    const tempo = (p, d, f) => { const du = durac(p), j = Math.min(DS, d + du), fora = d + du - j, pc = [];
+      for (let x = d; x < j; x++) pc.push([x, x == d ? N[x] - f : N[x]]);
+      return {d: j, f: 0, credito: p.preco * fora / du, pc}; };
+    const pacote = (p, d, f) => { let r = p.tam - p.preco; const ini = d, pc = [];
+      for (;;) { [d, f] = anda(d, f);
+        if (d >= DS) return {d, f: 0, credito: p.preco * r / (p.tam - p.preco), pc, segue: true};
+        if (d - ini >= validadeDe(p)) return {d, f: 0, credito: 0, pc};
+        const x = Math.min(N[d] - f, r); f += x; r -= x; pc.push([d, x]);
+        if (r <= 1e-9) return {d, f, credito: 0, pc}; } };
+    const de = (p, d, f) => p.tipo == 'tempo' ? tempo(p, d, f) : pacote(p, d, f), memo = new Map();
+    const melhor = (d, f) => { [d, f] = anda(d, f); if (d >= DS) return {c: 0};
+      const k = d * 1e9 + Math.round(f * 100); if (memo.has(k)) return memo.get(k);
+      let m = null;
+      for (const p of ps) { const s = de(p, d, f), c = p.preco - s.credito + melhor(s.d, s.f).c; if (!m || c < m.c - 1e-9) m = {c, p}; }
+      memo.set(k, m); return m; };
+    const paga = Array(DS).fill(0), compras = [];
+    for (let d = 0, f = 0;;) { [d, f] = anda(d, f); if (d >= DS) break;
+      const p = melhor(d, f).p, s = de(p, d, f), soma = s.pc.reduce((a, x) => a + x[1], 0);
+      s.pc.forEach(([x, v]) => paga[x] += soma > 0 ? p.preco * v / soma : 0);
+      compras.push({d, p, ate: s.pc.length ? s.pc[s.pc.length - 1][0] : d}); d = s.d; f = s.f; }
+    return {total: melhor(0, 0).c, paga, compras};
+  };
+  const R1 = Math.min(26, Math.max(12, Math.ceil(8 * ciclo / 7) + 4)), RS = 2 * R1, curta = rodar(R1), longa = rodar(RS), {paga, compras} = longa, custo = (longa.total - curta.total) / R1;
+  const q = Math.floor(RS / 4), MEIO = Array.from({length: RS - 2 * q}, (_, k) => q + k);
+  const semana = w => paga.slice(7 * w, 7 * w + 7).reduce((a, b) => a + b, 0), pesos = MEIO.map(semana);
+  const media0 = DIAS.map((_, i) => MEIO.reduce((a, w) => a + paga[7 * w + i], 0) / MEIO.length), soma0 = media0.reduce((a, b) => a + b, 0), media = media0.map(v => soma0 > 0 ? v * custo / soma0 : 0);   // dia a dia na proporção do caminho, somando o custo da semana
+  // semana típica: as compras que começam numa semana do meio
+  const w0 = MEIO[Math.floor(MEIO.length / 2)], doMeio = compras.filter(x => x.d >= 7 * w0 && x.d < 7 * w0 + 7);
+  const tipos = [...new Set(compras.filter(x => x.d >= 7 * MEIO[0] && x.d < 7 * (MEIO[MEIO.length - 1] + 1)).map(x => x.p))];
+  const soTempo = !tipos.some(p => p.tipo != 'tempo'), soPacote = !tipos.some(p => p.tipo == 'tempo');
+  if (tipos.length < 2 || soTempo && !tipos.some(p => durac(p) > 7)) return null;   // não misturou: já está nas opções sozinhas
+  const gs = []; doMeio.forEach(x => { const u = gs[gs.length - 1]; if (u && u.p === x.p && x.d <= u.ate + 1) { u.n++; u.ate = x.ate; } else gs.push({p: x.p, n: 1, de: x.d, ate: x.ate}); });
+  const herda = compras.find(x => x.d < 7 * w0 && x.ate >= 7 * w0);
+  const faixa = (a, b) => { const i = a % 7, j = Math.min(b, 7 * w0 + 6) % 7; return a == b || i == j ? CURTO[i] : j == i + 1 ? `${CURTO[i]} e ${CURTO[j]}` : `${CURTO[i]} a ${CURTO[j]}`; };
+  const itens = gs.map(x => ({quando: faixa(x.de, x.ate), oque: x.p.tipo == 'tempo' ? `${x.n > 1 ? `${x.n} passes de ${horas(x.p)}, um atrás do outro, por ${brlc(x.p.preco)} cada` : `passe de ${horas(x.p)} por ${brlc(x.p.preco)}`}`
+      : `${x.n > 1 ? `${x.n} pacotes` : 'pacote'} de ${brlc(x.p.tam)} em ganhos por ${brlc(x.p.preco)}${x.n > 1 ? ' cada' : ''}${x.ate > 7 * w0 + 6 ? ` (a sobra entra nas primeiras corridas de ${CURTO[x.ate % 7]}, sem taxa)` : ''}`}));
+  const nomeT = p => p.tipo == 'tempo' ? horas(p) : `${brlc(p.tam)} em ganhos`;
+  const ordem = tipos.slice().sort((a, b) => (a.tipo == 'tempo') - (b.tipo == 'tempo') || a.tam - b.tam);
+  return {nome: soTempo ? 'Misturando passes por tempo, um depois do outro' : soPacote ? 'Misturando pacotes de ganhos, um depois do outro' : 'Misturando passes: pacote nos dias fracos, passe por tempo nos fortes', soTempo, curto: 'Misturando: ' + ordem.map(nomeT).join(' + '),
+    detalhe: itens.map(x => `${x.quando}: ${x.oque}`).join('; '), itens, herda: herda && herda.p.tipo != 'tempo',
+    passes: [...tipos.filter(p => p.tipo == 'tempo'), ...tipos.filter(p => p.tipo != 'tempo')], custo, mistura: true, roteiro: true, soPacote,
+    varia: Math.max(...pesos) - Math.min(...pesos) >= 1, uso: G.map((v, i) => v > 0 ? {p: tipos[0], paga: media[i]} : null),
+    alerta: 'Um passe por vez: antes de cada troca, mude o passe padrão no app. O app só passa para o próximo quando o atual acaba.'};
+}
+// a sequência da semana típica, para ele seguir no app
+const seqSemana = o => !o.roteiro ? '' : `<div class="seq"><p class="seq-tit">🔢 A sequência de passes da sua semana</p><ol>${o.itens.map(x => `<li><b>${x.quando}</b><br>${x.oque[0].toUpperCase() + x.oque.slice(1)}</li>`).join('')}</ol>${o.herda ? '<p class="dica" style="margin:6px 0 0">A semana começa com a sobra do último pacote da semana anterior.</p>' : ''}</div>`;
+
 const SI = '<b class="realce">semana informada</b> (o que você fazia antes do passe)';
 // a memória de cálculo da semana dele: dia a dia, o que faz, o que paga de passe e o que fica
 function memoria(c) {
@@ -687,9 +772,10 @@ function memoria(c) {
   const tp = pd.reduce((a, b) => a + b, 0);
   const total = c.G.reduce((a, b) => a + b, 0);
   let nota = '';
-  if (diario && g) {
-    const min = diario.preco / (g.preco / g.tam), fortes = c.G.map((v, i) => v > min ? CURTO[i] : null).filter(x => x), fracos = c.G.map((v, i) => v > 0 && v <= min ? CURTO[i] : null).filter(x => x);
-    nota = `<p class="dica">O diário (${brlc(diario.preco)}) vale mais que o pacote no dia acima de ${real(min)}. ${!fortes.length ? `Na sua ${SI} nenhum dia passa disso.` : !fracos.length ? `Na sua ${SI} todos os dias passam.` : `Na sua ${SI}: ${fortes.join(', ')} passa${fortes.length > 1 ? 'm' : ''}; ${fracos.join(', ')} não.`} ${o.passes[0].tipo == 'tempo' ? (fracos.length ? 'Os fortes compensam os fracos: o passe por tempo é mais viável.' : 'Por isso, passe por tempo.') : (fortes.length ? 'Um passe por vez: não dá para usar o diário só nos dias fortes. O pacote é mais viável.' : 'Por isso, pacote de ganhos.')}</p>`;
+  if (o.roteiro) nota = `<p class="dica">Na sua ${SI}, ficar num passe só sai mais caro: ${o.soTempo ? 'trocar entre os passes por tempo encaixa melhor nos dias que você roda' : o.soPacote ? 'trocar entre os pacotes encaixa melhor no que você faz antes de cada um vencer' : 'o pacote rende mais nos dias fracos e o passe por tempo nos fortes'}. Trocando na ordem acima, o passe fica em ${real(o.custo)} por semana${o.varia ? ', na média' : ''}.</p>`;
+  else if (diario && g) {
+    const min = diario.preco / (g.preco / g.tam), fortes = c.G.map((v, i) => v > 0 && pd[i] > min ? CURTO[i] : null).filter(x => x), fracos = c.G.map((v, i) => v > 0 && pd[i] <= min ? CURTO[i] : null).filter(x => x);   // compara com o que ele PRECISA fazer agora (22/10, ele)
+    nota = `<p class="dica">O diário (${brlc(diario.preco)}) vale mais que o pacote no dia acima de ${real(min)} no app. ${!fortes.length ? 'Com a meta nova da tabela, nenhum dia passa disso.' : !fracos.length ? 'Com a meta nova da tabela, todos os dias passam.' : `Com a meta nova da tabela: ${fortes.join(', ')} passa${fortes.length > 1 ? 'm' : ''}; ${fracos.join(', ')} não.`} ${o.passes[0].tipo == 'tempo' ? (fracos.length ? 'Os fortes compensam os fracos: o passe por tempo é mais viável.' : 'Por isso, passe por tempo.') : (fortes.length ? 'Um passe por vez: não dá para usar o diário só nos dias fortes. O pacote é mais viável.' : 'Por isso, pacote de ganhos.')}</p>`;
   }
   // quanto custa a mais rodar em cada dia, com o mesmo tipo de passe: é aqui que o dia fraco aparece
   const tempo = o.passes[0].tipo == 'tempo', fracosAvisos = c.G.map((v, i) => {
@@ -697,7 +783,7 @@ function memoria(c) {
     const G2 = c.G.map((x, k) => k == i ? 0 : x), alt = G2.some(x => x > 0) ? Math.min(...opcoes(c.app, G2).filter(x => (x.passes[0].tipo == 'tempo') == tempo).map(x => x.custo)) : 0;
     const marg = o.custo - alt, sobra = v - marg;
     if (!(sobra < v / 2)) return '';
-    return `<div class="aviso">⚠️ <b>${DIAS[i][0].toUpperCase() + DIAS[i].slice(1)}:</b> faz ${real(v)}, mas custa ${brl(marg)} de passe. ${sobra < -0.5 ? `Prejuízo de ${brl(-sobra)}: melhor não rodar.` : sobra < 0.5 ? 'Não sobra nada: melhor não rodar.' : `Sobram só ${brl(sobra)}.`}${total - v - alt > 0 ? ` Sem ele, a semana deixa ${brl(total - v - alt)} (com ele, ${brl(Math.max(0, total - o.custo))}).` : ''}</div>`;
+    return `<div class="aviso">⚠️ <b>${DIAS[i][0].toUpperCase() + DIAS[i].slice(1)}:</b> faz ${real(v)}, mas rodar nele aumenta o passe da semana em ${brl(marg)} (na tabela, o passe aparece dividido entre os dias). ${sobra < -0.5 ? `Prejuízo de ${brl(-sobra)}: melhor não rodar.` : sobra < 0.5 ? 'Não sobra nada: melhor não rodar.' : `Sobram só ${brl(sobra)}.`}${total - v - alt > 0 ? ` Sem ele, a semana deixa ${brl(total - v - alt)} (com ele, ${brl(Math.max(0, total - o.custo))}).` : ''}</div>`;
   }).join('');
   let semFracos = '';
   if (!tempo && diario && g) {
@@ -706,7 +792,7 @@ function memoria(c) {
     if (o3 && o3.passes[0].tipo == 'tempo' && t3 - o3.custo > total - o.custo)
       semFracos = `<p class="dica">🔎 São os dias fracos (${tirou.join(' e ')}) seguram você no pacote. Sem eles, o melhor seria <b style="display:inline">${o3.curto}</b> e a semana deixaria ${brl(t3 - o3.custo)} no bolso (hoje, ${brl(total - o.custo)}).</p>`;
   }
-  return `<p class="dica" style="margin:6px 0 0">${o.longo ? 'Meta de cada dia para levar o mesmo (média):' : tempo ? 'Meta de cada dia, toda semana, para levar o mesmo:' : 'Meta de cada dia do pacote para levar o mesmo:'}</p><table class="memo"><tr><th>Dia</th><th>Fazia</th><th>Precisa fazer</th><th>A mais</th></tr>${linhas}
+  return `<p class="dica" style="margin:6px 0 0">${o.longo || o.emendado || o.varia ? 'Meta de cada dia para levar o mesmo (média por semana):' : tempo ? 'Meta de cada dia, toda semana, para levar o mesmo:' : 'Meta de cada dia do pacote para levar o mesmo:'}</p><table class="memo"><tr><th>Dia</th><th>Fazia</th><th>Precisa fazer</th><th>A mais</th></tr>${linhas}
     <tr><th>Semana</th><th>${real(total)}</th><th>${real(tp)}</th><th class="ruim">+${real(tp - total)}</th></tr></table>${nota}${semFracos}${fracosAvisos}
     ${o.alerta ? `<div class="aviso">${o.alerta}</div>` : ''}`;
 }
@@ -717,6 +803,8 @@ function memoria(c) {
 function caixa(c) {
   const o = c.ops[0], p = o.passes[0], rodados = c.G.filter(v => v > 0).length, total = c.G.reduce((a, b) => a + b, 0), media = total / rodados;
   if (!(media > 0)) return '';
+  if (o.roteiro) return `<p class="aviso">📅 <b>${o.varia ? 'Na média por semana' : 'Vale para toda semana'}:</b> ${o.soTempo ? 'cada passe é descontado das primeiras corridas e só depois o dinheiro cai.' : 'cada passe e cada pacote é descontado das primeiras corridas e só depois o dinheiro cai. No pacote, depois de pago, a corrida é sua sem taxa até completar o valor.'}</p>`;
+  if (o.emendado) return `<p class="aviso">📅 <b>Na média por semana:</b> um passe de ${horas(p)} emendado no outro não cabe certinho na semana. Numa semana o app desconta ${Math.ceil(7 / durac(p))} passes, nas outras ${Math.floor(7 / durac(p))}; a meta da tabela é a média. Cada passe sai das primeiras corridas do dia em que começa.</p>`;
   if (p.tipo == 'tempo' && !o.longo) return `<p class="aviso">📅 <b>Vale para toda semana:</b> cada passe é descontado das primeiras corridas e só depois o dinheiro cai. Não tem semana mais leve.</p>`;
   const pagar = p.preco / media, dura = p.tam / media, sem = dura / rodados;
   return `<p class="aviso">💰 <b>Como sai do bolso:</b> os ${brlc(p.preco)} saem das suas primeiras corridas; só depois o dinheiro cai. Na sua média de ${real(media)} por dia, ${pagar < 0.95 ? `as primeiras corridas do primeiro dia, até juntar ${brlc(p.preco)}, só pagam o passe` : Math.abs(pagar - 1) < 0.05 ? 'o primeiro dia de trabalho só paga o passe' : `os primeiros ${diasTxt(pagar)} de trabalho só pagam o passe`}. Nesses dias, busque o valor novo.</p>${p.preco > total ? (() => {
@@ -728,7 +816,7 @@ function caixa(c) {
 function precisaDia(c) {
   const o = c.ops[0], p = o.passes[0];
   // pacote que vence antes de usar tudo: o preço sai pelo prazo (uso[i].paga), não pela taxa
-  return c.G.map((v, i) => !(v > 0) ? 0 : p.tipo == 'tempo' ? v + o.uso[i].paga : Math.max(v / (1 - p.preco / p.tam), v + o.uso[i].paga));
+  return c.G.map((v, i) => !(v > 0) ? 0 : p.tipo == 'tempo' || o.roteiro ? v + o.uso[i].paga : Math.max(v / (1 - p.preco / p.tam), v + o.uso[i].paga));
 }
 // outras combinações de dias que deixam o mesmo no bolso: para o motorista se reprogramar
 // para cada jeito de rodar, acha o passe que pede menos no app e a meta de cada dia
@@ -736,7 +824,7 @@ function combinacoes(c) {
   const quer = metaDe(c.app), rod = c.G.map((v, i) => v > 0 ? i : -1).filter(i => i >= 0), media = quer / rod.length;
   const pedir = G => {
     let m = null;
-    opcoes(c.app, G).filter(o => !o.mistura).forEach(o => { const p = o.passes[0];
+    opcoes(c.app, G, true).filter(o => !o.mistura).forEach(o => { const p = o.passes[0];
       const req = p.tipo == 'tempo' ? quer + o.custo : Math.max(quer / (1 - p.preco / p.tam), quer + p.preco * 7 / validadeDe(p));
       if (!m || req < m.req) m = {o, req}; });
     return m;
@@ -773,7 +861,7 @@ function outras(c) {
 }
 const metaSemanaValor = c => precisaDia(c).reduce((a, b) => a + b, 0);
 // com cada oferta: quanto fazer no app na semana para continuar levando a semana informada (mesma conta das Outras formas)
-const precisaCom = (o, quer) => { const p = o.passes[0]; return p.tipo == 'tempo' ? quer + o.custo : Math.max(quer / (1 - p.preco / p.tam), quer + p.preco * 7 / validadeDe(p)); };
+const precisaCom = (o, quer) => { const p = o.passes[0]; return p.tipo == 'tempo' || o.roteiro ? quer + o.custo : Math.max(quer / (1 - p.preco / p.tam), quer + (o.ciclo ?? p.preco * 7 / validadeDe(p))); };
 // semana fraca: o passe come uma parte grande do que ele faz, e aí rodar sem passe pode sair melhor
 function pesado(c) {
   const total = metaDe(c.app), custo = c.ops[0].custo, pct = Math.round(100 * custo / total);
@@ -782,7 +870,7 @@ function pesado(c) {
   return '';
 }
 // o nome do passe por tempo como ele vai usar: um tipo só (quantos por semana) ou a mistura de 24 h e 72 h
-const nomeTempo = o => o.longo ? curto(o.passes[0]) : o.mistura ? `misturando passes: ${o.detalhe}, ${real(o.custo)} por semana` : o.curto;
+const nomeTempo = o => o.roteiro ? `a sequência de passes acima (${real(o.custo)} por semana${o.varia ? ', na média' : ''})` : o.longo ? curto(o.passes[0]) : o.mistura ? `misturando passes: ${o.detalhe}, ${real(o.custo)} por semana` : o.curto;
 // sem passe x com passe, com a taxa real do extrato dele (opcional)
 // sem passe: ele leva o que fazia (já sem a taxa). Com passe: as mesmas corridas aparecem no app sem a taxa, e sai o passe.
 function taxaDe(app) {
@@ -794,7 +882,7 @@ function semPasse(c) {
   const t = taxaDe(c.app), N = metaDe(c.app), o = c.ops[0], p = o.passes[0];
   if (t == null || !(N > 0)) return '';
   const G = N / (1 - t), fica = p.tipo == 'tempo' ? G - o.custo : G * (1 - p.preco / p.tam), dif = fica - N;
-  return `<p class="aviso">⚖️ <b>Sem passe × com passe (pelo seu extrato):</b> sem passe, o app fica com ${real(100 * t)} de cada R$ 100 e você leva ${real(N)}. Com ${p.tipo == 'tempo' ? (o.mistura ? `os passes misturados (${o.detalhe}, ${real(o.custo)} por semana)` : 'o passe de ' + o.curto) : curto(p)}, as mesmas corridas dão ${real(G)} e, pago o passe, ${fica > 0 ? `deixam <b>${real(fica)}</b>` : `<b>não cobrem nem o passe</b>`}: ${Math.abs(dif) < 10 ? 'praticamente o mesmo' : dif > 0 ? `<b class="bom">${real(dif)} a mais por semana</b>` : `<b class="ruim">${real(-dif)} a menos por semana</b>`}. ${dif >= 10 ? 'O passe compensa.' : dif <= -10 ? 'Sem passe compensa mais.' : 'Tanto faz.'}</p>`;
+  return `<p class="aviso">⚖️ <b>Sem passe × com passe (pelo seu extrato):</b> sem passe, o app fica com ${real(100 * t)} de cada R$ 100 e você leva ${real(N)}. Com ${p.tipo == 'tempo' ? (o.roteiro ? 'a sequência de passes acima' : o.mistura ? `os passes misturados (${o.detalhe}, ${real(o.custo)} por semana)` : 'o passe de ' + o.curto) : curto(p)}, as mesmas corridas dão ${real(G)} e, pago o passe, ${fica > 0 ? `deixam <b>${real(fica)}</b>` : `<b>não cobrem nem o passe</b>`}: ${Math.abs(dif) < 10 ? 'praticamente o mesmo' : dif > 0 ? `<b class="bom">${real(dif)} a mais por semana</b>` : `<b class="ruim">${real(-dif)} a menos por semana</b>`}. ${dif >= 10 ? 'O passe compensa.' : dif <= -10 ? 'Sem passe compensa mais.' : 'Tanto faz.'}</p>`;
 }
 // quanto fazer no app para levar o que levava antes
 // por tempo: toda semana; por ganhos: o passe é pago a cada pacote, então o valor a mais é por pacote (dá para concentrar no começo)
@@ -803,7 +891,7 @@ function metaSemana(c) {
   if (!(quer > 0)) return '';
   const precisa = metaSemanaValor(c);
   if (o.longo) return `<p class="destaque">🎯 Sua semana na ${c.app} dá ${real(quer)}. Com ${curto(p)}, faça <b>${real(precisa)} no app</b> por semana, na média: <b class="ruim">${real(precisa - quer)} a mais</b>. O app desconta os ${brlc(p.preco)} das suas corridas a cada ${durac(p)} dias, e só depois o dinheiro cai: sem esse a mais, você não chega na ${SI}.</p>`;
-  if (p.tipo == 'tempo') return `<p class="destaque">🎯 Sua semana na ${c.app} dá ${real(quer)}. Com ${nomeTempo(o)}, faça <b>${real(precisa)} no app</b> toda semana: <b class="ruim">${real(precisa - quer)} a mais</b>. O app desconta cada passe das suas corridas, e só depois o dinheiro cai: sem esse a mais, você não chega na ${SI}.</p>`;
+  if (p.tipo == 'tempo') return `<p class="destaque">🎯 Sua semana na ${c.app} dá ${real(quer)}. Com ${nomeTempo(o)}, faça <b>${real(precisa)} no app</b> ${o.emendado || o.varia ? 'por semana, na média' : 'toda semana'}: <b class="ruim">${real(precisa - quer)} a mais</b>. O app desconta cada passe das suas corridas, e só depois o dinheiro cai: sem esse a mais, você não chega na ${SI}.</p>`;
   // quantos pacotes entram por semana no ritmo novo (o passe cobra também sobre o que vem a mais)
   const dura = p.tam / (precisa / rodados), porSem = precisa / p.tam, n1 = v => v.toLocaleString('pt-BR', {maximumFractionDigits: 1});
   const ciclo = porSem >= 1.15 ? `cada pacote dura ${dura < 0.95 ? '' : 'uns '}${diasTxt(dura)} ${dura < 1.05 ? 'rodado' : 'rodados'}, menos que uma semana: entram uns ${n1(porSem)} pacotes por semana` : porSem >= 0.85 ? 'cada pacote dura mais ou menos 1 semana' : `cada pacote dura cerca de ${n1(1 / porSem)} semanas`;
@@ -813,7 +901,7 @@ function metaSemana(c) {
 
 function mostrar(contas, cel) {
   const topo = contas.map(c => { const o = c.ops[0];
-    return `<div class="app-rot"><span class="logo ${c.app == '99' ? 'l99' : 'luber'}">${c.app}</span> na sua semana</div><div class="grande">${o.nome}</div>${memoria(c)}${metaSemana(c)}${semPasse(c)}${caixa(c)}
+    return `<div class="app-rot"><span class="logo ${c.app == '99' ? 'l99' : 'luber'}">${c.app}</span> na sua semana</div><div class="grande">${o.nome}</div>${seqSemana(o)}${memoria(c)}${metaSemana(c)}${semPasse(c)}${caixa(c)}
       ${pesado(c)}<p class="aviso">⚠️ <b>Cuidado:</b> ${metaDe(c.app) - o.custo <= 0 ? `o passe custa ${real(o.custo)} na semana inteira, mais do que os ${real(metaDe(c.app))} que você faz.` : o.passes[0].tipo == 'tempo' && !o.longo ? `parou nos ${real(metaDe(c.app))} de sempre? Leva só <b>${real(metaDe(c.app) - o.custo)}</b> na semana.` : `no ritmo de sempre, você leva só <b>${real(metaDe(c.app) - o.custo)}</b> por semana, não ${real(metaDe(c.app))}.`}</p>${outras(c)}`; }).join('');
   const zap = `https://wa.me/55${cel}?text=${encodeURIComponent(textoZap(contas))}`;
   let h = `<div class="card"><p class="destaque">O passe da sua semana</p>${topo}

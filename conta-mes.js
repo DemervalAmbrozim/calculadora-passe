@@ -25,7 +25,8 @@ function diaGanhos(p, N) {
   });
   // o que sobrou do último pacote passa para o mês seguinte (já pago)
   const ult = compras[compras.length - 1]; if (ult && ult.fim == null) { ult.fim = DM - 1; ult.segue = true; }
-  return {g, compras, credito: compras.length ? p.preco * r / p.tam : 0, sobra: compras.length ? r : 0, perdeu};
+  return {g, compras, credito: compras.length ? p.preco * (r - deve) / (p.tam - p.preco) - deve : 0,   // a sobra vale o que foi pago por ela: o pacote entrega (tam − preço) livre
+    sobra: compras.length ? r : 0, perdeu};
 }
 // passe(s) por tempo: o jeito mais barato de cobrir todo dia rodado (um passe por vez; comprado num dia, cobre os seguintes)
 function diaTempo(lista, N) {
@@ -49,7 +50,7 @@ function diaRoteiro(ps, N) {
     return {d: j, f: 0, ded: [[d, p.preco]], credito: p.preco * fora / du, fim: j - 1, segue: fora > 0, sobra: 0}; };
   const pacote = (p, d, f) => { let r = p.tam; const ini = d, val = validadeDe(p), ded = [[d, p.preco]]; r -= p.preco;   // o preço sai das primeiras corridas
     for (let ult = d;;) { [d, f] = anda(d, f);
-      if (d >= DM) return {d, f: 0, ded, credito: p.preco * r / p.tam, fim: ult, segue: true, sobra: r};
+      if (d >= DM) return {d, f: 0, ded, credito: p.preco * r / (p.tam - p.preco), fim: ult, segue: true, sobra: r};
       if (d - ini >= val) return {d, f: 0, ded, credito: 0, fim: d - 1, perdeu: r, sobra: 0};
       const x = Math.min(N[d] - f, r); f += x; r -= x; ult = d;
       if (r <= 1e-9) return {d, f, ded, credito: 0, fim: d, sobra: 0}; } };
