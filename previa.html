@@ -868,32 +868,37 @@ function combinacoes(c) {
       if (k.length >= 3 && k[k.length - 1] - k[0] == k.length - 1) return `${CURTO[(k[0] + r) % 7]} a ${CURTO[(k[k.length - 1] + r) % 7]}`; }
     return d.slice().sort((a, b) => a - b).map(i => CURTO[i]).join(', '); };
   const vistos = new Set([rod.join()]), res = [];
-  const testar = (dias, nome) => { const key = dias.slice().sort((a, b) => a - b).join(); if (vistos.has(key) || dias.length < 2) return; vistos.add(key);
+  const testar = (dias, nome, fixa = false) => { const key = dias.slice().sort((a, b) => a - b).join(); if (vistos.has(key) || dias.length < 2) return; vistos.add(key);
     const G = DIAS.map((_, i) => dias.includes(i) ? (c.G[i] > 0 ? c.G[i] : media) : 0), soma = G.reduce((a, b) => a + b, 0), m = pedir(G);
-    if (m) res.push({nome, dias, G: G.map(v => v * m.req / soma), ...m}); };
+    if (m) res.push({nome, dias, fixa, G: G.map(v => v * m.req / soma), ...m}); };
+  // folgas da família, sempre na lista mesmo que não baixem a semana (23/10, ele: "faltou um sem domingo"): sábado, domingo e o fim de semana
+  [[5], [6], [5, 6]].forEach(f => { if (f.every(i => rod.includes(i))) testar(rod.filter(j => !f.includes(j)), f.length > 1 ? 'Sem o fim de semana' : `Sem ${DIAS[f[0]]}`, true); });
   // tirando os dias mais fracos, um de cada vez
   const fracos = rod.slice().sort((a, b) => c.G[a] - c.G[b]);
   for (let k = 1; k <= 2 && rod.length - k >= 3; k++) { const tira = fracos.slice(0, k); testar(rod.filter(i => !tira.includes(i)), `Sem ${tira.map(i => DIAS[i]).join(' e ')}`); }
-  // folga no sábado e folga no domingo, sempre as duas (23/10, ele: "faltou um sem domingo")
-  [5, 6].forEach(i => { if (rod.includes(i) && rod.length - 1 >= 3) testar(rod.filter(j => j != i), `Sem ${DIAS[i]}`); });
   // 6 dias seguidos com 1 folga (encaixa dois passes de 72 h)
   const folga = DIAS.map((_, i) => i).sort((a, b) => (c.G[a] || 0) - (c.G[b] || 0))[0];
   testar(DIAS.map((_, i) => i).filter(i => i != folga), `6 dias seguidos, folga ${folga > 4 ? 'no' : 'na'} ${DIAS[folga]}`);
   // rodar todos os dias
   testar(DIAS.map((_, i) => i), 'Todos os dias');
-  // só o que ajuda: semana menor que a de hoje em pelo menos R$ 10
-  const hoje = metaSemanaValor(c);
-  return res.filter(r => r.req < hoje - 10).sort((a, b) => a.req - b.req).slice(0, 3).map(r => ({...r, txt: txt(r.dias)}));
+  // as folgas da família sempre; das outras, só as 3 que mais ajudam (semana menor que a de hoje em pelo menos R$ 10)
+  const hoje = metaSemanaValor(c), ajuda = res.filter(r => !r.fixa && r.req < hoje - 10).sort((a, b) => a.req - b.req).slice(0, 3);
+  return [...res.filter(r => r.fixa), ...ajuda].sort((a, b) => a.req - b.req).map(r => ({...r, txt: txt(r.dias)}));
 }
 // dias que ele roda hoje e que a opção deixa de fora: vira folga (pedido dele, 22/10)
-const folgaTxt = (c, r) => { const f = c.G.map((v, i) => v > 0 && !r.dias.includes(i) ? i : -1).filter(i => i >= 0);
-  return !f.length ? '' : f.join() == '5,6' ? ' <b class="bom" style="display:inline">e ainda descansa no fim de semana</b>' : ` <b class="bom" style="display:inline">e ainda folga ${f.map(i => (i > 4 ? 'no ' : 'na ') + DIAS[i]).join(' e ')}</b>`; };
-function outras(c) {
+// com Uber e 99: se o outro app ainda roda naquele dia, não é folga, só tira o dia deste app
+const folgaTxt = (c, r, contas = []) => { const f = c.G.map((v, i) => v > 0 && !r.dias.includes(i) ? i : -1).filter(i => i >= 0);
+  if (!f.length) return '';
+  const roda = f.some(i => contas.some(x => x.app != c.app && x.G[i] > 0)), dias = f.join() == '5,6' ? 'o fim de semana' : f.map(i => (i > 4 ? 'o ' : 'a ') + DIAS[i]).join(' e ');
+  return roda ? ` e tira ${dias} da ${c.app}` : f.join() == '5,6' ? ' <b class="bom" style="display:inline">e ainda descansa no fim de semana</b>' : ` <b class="bom" style="display:inline">e ainda folga ${f.map(i => (i > 4 ? 'no ' : 'na ') + DIAS[i]).join(' e ')}</b>`; };
+// a diferença para a semana de hoje, sem esconder quando sai igual ou mais caro
+const difTxt = d => d >= 10 ? `<span class="bom">${real(d)} a menos que hoje</span>` : d > -10 ? 'praticamente o mesmo que hoje' : `<span class="ruim">${real(-d)} a mais que hoje</span>`;
+function outras(c, contas) {
   const quer = metaDe(c.app), hoje = metaSemanaValor(c), cs = combinacoes(c);
   if (!cs.length) return c.ops[0].passes[0].tipo == 'tempo' ? '' : `<p class="dica">🔁 No pacote de ganhos, mudar os dias não muda o total da semana, só a meta de cada dia.</p>`;
   const faixa = G => { const v = G.filter(x => x > 0).map(Math.round), a = Math.min(...v), b = Math.max(...v); return a == b ? `${real(a)} por dia` : `${real(a)} a ${real(b)} por dia`; };
   return `<div class="outras"><p class="titulo-campo" style="margin:0 0 2px">🔁 Outras formas de levar os mesmos ${real(quer)}</p><p class="dica" style="margin-top:0">Mudando os dias, muda o passe e a meta. Escolha a que cabe na sua rotina.</p>` +
-    cs.map(r => `<div class="regua"><b>${r.nome} (${r.txt})</b>Meta: <b style="display:inline">${faixa(r.G)}</b>, com ${curto(r.o.passes[0]).replace('Passe de ', 'o passe de ')}${r.o.passes[0].tipo == 'tempo' ? (r.o.longo ? `, pago a cada ${durac(r.o.passes[0])} dias` : r.o.emendado ? ', um atrás do outro' : `, ${Math.round(r.o.custo / r.o.passes[0].preco)} por semana`) : ''}.<br>Semana: ${real(r.req)} no app, <span class="bom">${real(hoje - r.req)} a menos que hoje</span>${folgaTxt(c, r)}.</div>`).join('') + '</div>';
+    cs.map(r => `<div class="regua"><b>${r.nome} (${r.txt})</b>Meta: <b style="display:inline">${faixa(r.G)}</b>, com ${curto(r.o.passes[0]).replace('Passe de ', 'o passe de ')}${r.o.passes[0].tipo == 'tempo' ? (r.o.longo ? `, pago a cada ${durac(r.o.passes[0])} dias` : r.o.emendado ? ', um atrás do outro' : `, ${Math.round(r.o.custo / r.o.passes[0].preco)} por semana`) : ''}.<br>Semana: ${real(r.req)} no app, ${difTxt(hoje - r.req)}${folgaTxt(c, r, contas)}.</div>`).join('') + '</div>';
 }
 const metaSemanaValor = c => precisaDia(c).reduce((a, b) => a + b, 0);
 // com cada oferta: quanto fazer no app na semana para continuar levando a semana informada (mesma conta das Outras formas)
@@ -925,7 +930,7 @@ function metaSemana(c) {
 function mostrar(contas, cel) {
   const topo = contas.map(c => { const o = c.ops[0];
     return `<div class="app-rot"><span class="logo ${c.app == '99' ? 'l99' : 'luber'}">${c.app}</span> na sua semana</div><div class="grande">${o.nome}</div>${seqSemana(o)}${memoria(c)}${metaSemana(c)}${caixa(c)}
-      ${pesado(c)}<p class="aviso">⚠️ <b>Cuidado:</b> ${metaDe(c.app) - o.custo <= 0 ? `o passe custa ${real(o.custo)} na semana inteira, mais do que os ${real(metaDe(c.app))} que você faz.` : o.passes[0].tipo == 'tempo' && !o.longo ? `parou nos ${real(metaDe(c.app))} de sempre? Leva só <b>${real(metaDe(c.app) - o.custo)}</b> na semana.` : `no ritmo de sempre, você leva só <b>${real(metaDe(c.app) - o.custo)}</b> por semana, não ${real(metaDe(c.app))}.`}</p>${outras(c)}`; }).join('');
+      ${pesado(c)}<p class="aviso">⚠️ <b>Cuidado:</b> ${metaDe(c.app) - o.custo <= 0 ? `o passe custa ${real(o.custo)} na semana inteira, mais do que os ${real(metaDe(c.app))} que você faz.` : o.passes[0].tipo == 'tempo' && !o.longo ? `parou nos ${real(metaDe(c.app))} de sempre? Leva só <b>${real(metaDe(c.app) - o.custo)}</b> na semana.` : `no ritmo de sempre, você leva só <b>${real(metaDe(c.app) - o.custo)}</b> por semana, não ${real(metaDe(c.app))}.`}</p>${outras(c, contas)}`; }).join('');
   const zap = `https://wa.me/55${cel}?text=${encodeURIComponent(textoZap(contas))}`;
   let h = `<div class="card"><p class="destaque">O passe da sua semana</p>${topo}
     <a class="btn zap" href="${zap}" target="_blank" rel="noopener">Mandar o resultado pro meu WhatsApp</a></div>
