@@ -18,14 +18,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --marca:#0F2A44;--marca2:#1D4A73;--dourado:#B8862B;--dourado-l:#F6EBD3;--verde:#12915A;--verde-l:#E2F4EB;
+  --marca:#0F2A44;--marca2:#1D4A73;--dourado:#B8862B;--dourado-l:#F6EBD3;--verde:#0F8251;--verde-l:#E2F4EB;
   --verm:#C93C3C;--verm-l:#FBE7E7;--ambar:#C27C0E;--ambar-l:#FBF0DC;--fundo:#EEF2F6;--cartao:#fff;--texto:#14202C;
   --suave:#5E6E7E;--borda:#DCE3EA;--campo:#F5F7FA;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --dourado:#E2B65A;--dourado-l:#3A3020;--verde:#2BC27A;--verde-l:#163326;--verm:#F07070;--verm-l:#3A1D1D;--ambar:#F2B356;--ambar-l:#3A2E18;
+  --dourado:#E2B65A;--dourado-l:#3A3020;--verde:#2BC27A;--sobre-verde:#08170F;--verde-l:#163326;--verm:#F07070;--verm-l:#3A1D1D;--ambar:#F2B356;--ambar-l:#3A2E18;
   --fundo:#0B131C;--cartao:#15202B;--texto:#E6EDF3;--suave:#9DB0C2;--borda:#26343F;--campo:#0F1922;color-scheme:dark}}
-:root[data-theme="dark"]{--dourado:#E2B65A;--dourado-l:#3A3020;--verde:#2BC27A;--verde-l:#163326;--verm:#F07070;--verm-l:#3A1D1D;--ambar:#F2B356;--ambar-l:#3A2E18;
+:root[data-theme="dark"]{--dourado:#E2B65A;--dourado-l:#3A3020;--verde:#2BC27A;--sobre-verde:#08170F;--verde-l:#163326;--verm:#F07070;--verm-l:#3A1D1D;--ambar:#F2B356;--ambar-l:#3A2E18;
   --fundo:#0B131C;--cartao:#15202B;--texto:#E6EDF3;--suave:#9DB0C2;--borda:#26343F;--campo:#0F1922;color-scheme:dark}
 *{box-sizing:border-box}
 body{margin:0;background:var(--fundo);color:var(--texto);font:16px/1.45 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
@@ -45,9 +45,9 @@ input:focus,select:focus{border-color:var(--marca2);box-shadow:0 0 0 3px rgba(29
 .print{border:1px solid var(--borda);border-radius:16px;padding:14px;margin-top:12px;background:var(--campo)}
 .print-cab{display:flex;justify-content:space-between;align-items:center}
 .passos{margin:10px 0 0;padding-left:20px;font-size:14px;color:var(--suave)}.passos li{margin:3px 0}.passos b{color:var(--texto)}
-.print .arquivo{text-align:center;margin-top:12px;background:var(--marca2);font-size:16px;padding:14px}
+.print .arquivo{text-align:center;margin-top:12px;background:var(--marca2);color:#fff;font-size:16px;padding:14px}
 .print.ok{border-color:var(--verde);background:var(--verde-l)}.print.ok .passos{display:none}.print.ok .arquivo{background:transparent;color:var(--marca2);border:1px solid var(--borda);font-size:14px;padding:10px;margin-top:10px}
-.imp{font-size:14px;font-weight:700}.imp:empty{display:none}.print.ok .imp{background:#12915A;color:#fff;border-radius:8px;padding:4px 10px}
+.imp{font-size:14px;font-weight:700}.imp:empty{display:none}.print.ok .imp{background:#0F8251;color:#fff;border-radius:8px;padding:4px 10px}
 .link{border:0;background:none;color:var(--marca2);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer;padding:0}
 @media (prefers-color-scheme:dark){.link,.print.ok .arquivo{color:#8EC5F0}}
 .estado{font-size:14px;margin:8px 0 0;color:var(--suave)}.estado:empty{display:none}.estado.ok{color:var(--verde)}.estado.ruim{color:var(--verm)}.alerta-print{display:block;margin-top:8px;padding:10px 12px;background:var(--verm-l);border-left:4px solid var(--verm);border-radius:8px;color:var(--texto);font-weight:700;font-size:15px}
@@ -72,7 +72,7 @@ input:focus,select:focus{border-color:var(--marca2);box-shadow:0 0 0 3px rgba(29
 .rg tr.top td{background:var(--dourado-l)}.rg tr.top td b{color:var(--dourado)}.rg tr.fora td{color:var(--suave)}.rg tr.fora td b{color:var(--suave)}
 .rg tr.grupo td{padding-top:14px;border-top:0}
 .pct{margin-top:10px}.pct .rg td:nth-child(n+2),.pct .rg th:nth-child(n+2){text-align:right;width:auto}.pct .rg td b{font-size:14px}.pct .rg td.mv{background:var(--dourado-l)}.pct .rg td.mv b{color:var(--dourado)}.pct .rg small.emp{margin-top:3px;font-weight:600;color:var(--texto,inherit)}.pct-res{margin:8px 0 0;padding:10px 12px;border-radius:10px;background:var(--dourado-l);font-size:14px;line-height:1.4}.pct-res b{white-space:nowrap}
-.selo{display:inline-block;font-weight:800;font-size:14px;border-radius:8px;padding:3px 12px;color:#fff}.selo.g{background:#12915A}.selo.t{background:#1D5FD1}.selo.d{background:#B7791F}
+.selo{display:inline-block;font-weight:800;font-size:14px;border-radius:8px;padding:3px 12px;color:#fff}.selo.g{background:#0F8251}.selo.t{background:#1D5FD1}.selo.d{background:#8A5A12}
 .gancho{margin:22px 0 0;padding:16px;border-radius:14px;background:var(--marca);color:#fff}.gancho p{margin:0 0 8px;font-size:15px;color:#fff;opacity:.9}.gancho b{display:block;font-size:19px;line-height:1.3}
 .abas{display:flex;gap:8px;margin-bottom:10px}.aba{flex:1;border:2px solid var(--borda);background:var(--campo);border-radius:12px;padding:8px;cursor:pointer}.aba.on{border-color:var(--marca2)}
 .logo{display:inline-block;font-weight:800;font-size:15px;border-radius:8px;padding:3px 12px}.luber{background:#000;color:#fff}.l99{background:#FFD400;color:#111}
@@ -81,7 +81,7 @@ input:focus,select:focus{border-color:var(--marca2);box-shadow:0 0 0 3px rgba(29
 .x{border:0;background:none;color:var(--suave);font-size:22px;cursor:pointer;line-height:1}
 .mini{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 .mini label{margin-top:8px}
-.btn{display:block;width:100%;border:0;border-radius:14px;padding:16px;font:inherit;font-weight:700;font-size:17px;cursor:pointer;margin-top:16px;background:var(--verde);color:#fff}
+.btn{display:block;width:100%;border:0;border-radius:14px;padding:16px;font:inherit;font-weight:700;font-size:17px;cursor:pointer;margin-top:16px;background:var(--verde);color:var(--sobre-verde,#fff)}
 .btn.claro{background:transparent;color:var(--marca2);border:1px solid var(--borda);font-size:15px;padding:12px}
 .print .digitar{margin-top:8px}
 @media (prefers-color-scheme:dark){.btn.claro{color:#8EC5F0}}
@@ -724,7 +724,8 @@ $('#ver').onclick = async () => {
 async function guardar(dados) {
   if (!CONFIG.url) return;
   try {
-    await fetch(CONFIG.url + '/rest/v1/motoristas', {method: 'POST',
+    // no máximo 6 s: banco lento num pico não pode prender o motorista no "Calculando…"
+    await fetch(CONFIG.url + '/rest/v1/motoristas', {method: 'POST', signal: AbortSignal.timeout ? AbortSignal.timeout(6000) : undefined,
       headers: {apikey: CONFIG.chave, Authorization: 'Bearer ' + CONFIG.chave, 'Content-Type': 'application/json', Prefer: 'return=minimal'},
       body: JSON.stringify(dados)});
   } catch (e) { /* o resultado aparece mesmo sem internet boa */ }
@@ -1032,7 +1033,7 @@ function prepararMes(contas, cel) {
 
 // a função do pagamento (Supabase Edge Function "mensal", Pix pelo Mercado Pago)
 async function chamar(d) {
-  const r = await fetch(CONFIG.url + '/functions/v1/mensal', {method: 'POST', headers: {apikey: CONFIG.chave, 'Content-Type': 'application/json'}, body: JSON.stringify(d)});
+  const r = await fetch(CONFIG.url + '/functions/v1/mensal', {method: 'POST', signal: AbortSignal.timeout ? AbortSignal.timeout(20000) : undefined, headers: {apikey: CONFIG.chave, 'Content-Type': 'application/json'}, body: JSON.stringify(d)});
   if (!r.ok) throw new Error('mensal ' + r.status);
   return r.json();
 }
@@ -1048,14 +1049,24 @@ async function pagar() {
       <p class="dica" id="pixst" aria-live="polite">Esperando o pagamento… a tela abre sozinha quando o Pix cair.</p></div>`;
     $('#pixcopia').value = r.copia;
     $('#copiar').onclick = () => { $('#pixcopia').select(); (navigator.clipboard ? navigator.clipboard.writeText(r.copia) : Promise.reject()).then(() => msg('Código copiado: cole no app do seu banco'), () => { document.execCommand('copy'); msg('Código copiado'); }); };
-    const fim = Date.now() + 30 * 60 * 1000;
+    // muito acesso: não consulta com a tela escondida (ele está no app do banco), confere na hora em que volta
+    // e espaça com o tempo (5 s nos 2 primeiros minutos, depois 15 s): ~60 chamadas por Pix, não 360
+    const ini = Date.now(), fim = ini + 30 * 60 * 1000;
+    let timer, ocupado = false;
     const olhar = async () => {
-      if (!document.body.contains($('#pixst'))) return;
-      if (Date.now() > fim) { $('#pixst').innerHTML = 'O Pix expirou. <button class="link" id="denovo">Gerar outro</button>'; $('#denovo').onclick = pagar; return; }
-      try { const st = await chamar({acao: 'status', id: r.id}); if (st.pago) { guardarLib(mesCel, st.ate); msg('Pagamento confirmado!'); return abrirMes(); } } catch (e) { /* tenta de novo */ }
-      setTimeout(olhar, 5000);
+      clearTimeout(timer);
+      if (!document.body.contains($('#pixst'))) return document.removeEventListener('visibilitychange', voltou);
+      if (Date.now() > fim) { document.removeEventListener('visibilitychange', voltou); $('#pixst').innerHTML = 'O Pix expirou. <button class="link" id="denovo">Gerar outro</button>'; $('#denovo').onclick = pagar; return; }
+      if (!document.hidden && !ocupado) {
+        ocupado = true;
+        try { const st = await chamar({acao: 'status', id: r.id}); if (st.pago) { document.removeEventListener('visibilitychange', voltou); guardarLib(mesCel, st.ate); msg('Pagamento confirmado!'); return abrirMes(); } } catch (e) { /* tenta de novo */ }
+        ocupado = false;
+      }
+      timer = setTimeout(olhar, Date.now() - ini < 2 * 60 * 1000 ? 5000 : 15000);
     };
-    setTimeout(olhar, 5000);
+    const voltou = () => { if (!document.hidden) olhar(); };
+    document.addEventListener('visibilitychange', voltou);
+    timer = setTimeout(olhar, 5000);
   } catch (e) {
     box.innerHTML = '<p>Não consegui gerar o Pix agora. Nada foi cobrado.</p><button class="btn" id="denovo">Tentar de novo</button>'; $('#denovo').onclick = pagar;
   }
