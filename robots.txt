@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://calculadoradepasse.com.br/sitemap.xml
