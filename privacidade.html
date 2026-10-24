@@ -8,7 +8,7 @@
 <title>Privacidade • Calculadora de Passe</title>
 <meta name="robots" content="noindex">
 <style>
-:root{--fundo:#EEF2F6;--cartao:#fff;--texto:#14202C;--suave:#5E6E7E;--marca:#0F2A44;--verde:#12915A;--borda:#DCE3EA;--claro:#F5F8FB}
+:root{--fundo:#EEF2F6;--cartao:#fff;--texto:#14202C;--suave:#5E6E7E;--marca:#0F2A44;--verde:#0F8251;--borda:#DCE3EA;--claro:#F5F8FB}
 @media (prefers-color-scheme:dark){:root{--fundo:#0B131C;--cartao:#15202B;--texto:#E6EDF3;--suave:#9DB0C2;--borda:#2A3A4A;--claro:#1B2836;color-scheme:dark}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--fundo);color:var(--texto);font:16px/1.55 Inter,system-ui,sans-serif}
@@ -27,7 +27,7 @@ ul{margin:0;padding-left:20px}li{margin:4px 0;color:var(--suave)}p{color:var(--s
 .opcoes label:has(input:checked){border-color:var(--verde);background:var(--claro)}
 .rot{display:block;font-size:14px;font-weight:600;margin:14px 0 6px}
 input[type=text]{width:100%;font:inherit;padding:12px;border-radius:12px;border:1px solid var(--borda);background:var(--cartao);color:var(--texto)}
-button{width:100%;margin-top:16px;padding:15px;border:0;border-radius:12px;background:var(--verde);color:#fff;font:inherit;font-weight:700;font-size:16px;cursor:pointer}
+button{width:100%;margin-top:16px;padding:15px;border:0;border-radius:12px;background:var(--verde);color:var(--sobre-verde,#fff);font:inherit;font-weight:700;font-size:16px;cursor:pointer}
 #ret{margin-top:10px;font-weight:600;color:var(--texto)}
 footer{text-align:center;font-size:13px;color:var(--suave);padding:8px 16px 28px}
 footer a{color:inherit}
@@ -37,7 +37,7 @@ footer a{color:inherit}
 <header>
   <div class="marca">Calculadora de Passe</div>
   <h1>Como cuidamos dos seus dados</h1>
-  <p>A Calculadora de Passe é uma ferramenta gratuita para motoristas de aplicativo escolherem o passe da Uber e da 99. Aqui você vê o que guardamos, para quê, e como pedir o que quiser sobre os seus dados.</p>
+  <p>A Calculadora de Passe é uma ferramenta para motoristas de aplicativo escolherem o passe da Uber e da 99. A semana é grátis e o mês todo é pago. Aqui você vê o que guardamos, para quê, e como pedir o que quiser sobre os seus dados.</p>
 </header>
 <main>
   <section class="card">
@@ -53,6 +53,8 @@ footer a{color:inherit}
     <ul>
       <li>Nome, celular (WhatsApp), modelo e ano do carro, cidade e estado.</li>
       <li>Os apps e as categorias em que você roda, o que você faz por dia, as ofertas de passe que você informou e o resultado da conta.</li>
+      <li>Se você tocar em <b>Quero o mês todo</b>, anotamos esse interesse com o seu celular, para avisar pelo WhatsApp quando abrir.</li>
+      <li>Se você comprar o mês todo, guardamos o celular, o valor, a data e o código do pagamento, para liberar o acesso e cumprir a lei fiscal (art. 7º, II e V da LGPD), por 5 anos. O pagamento é feito pelo Mercado Pago, que segue as próprias regras de privacidade. Não vemos dados do seu banco nem do seu cartão.</li>
     </ul>
   </section>
   <section class="card">
@@ -61,11 +63,11 @@ footer a{color:inherit}
       <li>Mostrar e mandar o seu resultado (aceite obrigatório para usar a calculadora).</li>
       <li>Só se você marcar a caixa opcional: avisar pelo WhatsApp quando as ofertas de passe mudarem e mandar novidades para motoristas.</li>
     </ul>
-    <p style="margin-top:10px">Usamos os dados porque você deu o seu aceite na calculadora (Lei Geral de Proteção de Dados, art. 7º, I), com uma caixa para cada finalidade. Guardamos a data e a versão do texto que você aceitou. Você pode retirar o aceite quando quiser.</p><p style="margin-top:10px">Também usamos o mínimo necessário para proteger a calculadora contra abuso, como limitar cadastros repetidos do mesmo celular (legítimo interesse, art. 7º, IX), e para cumprir a lei, como guardar o registro dos pedidos que você fizer (art. 7º, II).</p><p style="margin-top:10px">Toda mensagem que mandarmos pelo WhatsApp diz como parar de receber: é só responder SAIR.</p>
+    <p style="margin-top:10px">Usamos os dados porque você deu o seu aceite na calculadora (Lei Geral de Proteção de Dados, art. 7º, I), com uma caixa para cada finalidade. Guardamos a data e a versão do texto que você aceitou. Você pode retirar o aceite quando quiser.</p><p style="margin-top:10px">Também usamos o mínimo necessário para proteger a calculadora contra abuso, como limitar cadastros repetidos do mesmo celular (legítimo interesse, art. 7º, IX), e para cumprir a lei, como guardar o registro dos pedidos que você fizer (art. 7º, II). O aviso de quando o mês todo abrir é feito a seu pedido (art. 7º, V).</p><p style="margin-top:10px">Toda mensagem que mandarmos pelo WhatsApp diz como parar de receber: é só responder SAIR.</p>
   </section>
   <section class="card">
     <h2><span>🚫</span>O que não fazemos</h2>
-    <p>Não vendemos os seus dados. Não passamos os seus dados para a Uber, para a 99 nem para outras empresas. O print que você manda é lido no seu próprio celular e não sai dele: guardamos só os valores das ofertas que você confirmou.</p><p>A calculadora não usa cookies e não guarda nada no seu navegador.</p><p>Podemos usar números gerais, sem identificar ninguém (por exemplo, qual passe sai mais vezes como o mais viável), para melhorar a calculadora.</p>
+    <p>Não vendemos os seus dados. Não passamos os seus dados para a Uber, para a 99 nem para outras empresas, fora o Mercado Pago, que recebe o Pix de quem compra o mês todo. O print que você manda é lido no seu próprio celular e não sai dele: guardamos só os valores das ofertas que você confirmou.</p><p>A calculadora não usa cookies. No navegador, guarda só até quando o seu mês todo está liberado, para abrir sem pagar de novo.</p><p>Podemos usar números gerais, sem identificar ninguém (por exemplo, qual passe sai mais vezes como o mais viável), para melhorar a calculadora.</p>
   </section>
   <section class="card">
     <h2><span>👤</span>Quem é o responsável</h2>
@@ -73,7 +75,7 @@ footer a{color:inherit}
   </section>
   <section class="card">
     <h2><span>🔒</span>Onde e por quanto tempo</h2>
-    <p>Os dados ficam num provedor de nuvem com servidores no Brasil (São Paulo), com acesso restrito ao responsável. Guardamos enquanto você quiser receber o resultado e as novidades, e apagamos quando você pedir ou depois de 2 anos sem uso. Depois de apagar, fica só o registro do pedido (a data e o que foi pedido), para provar que atendemos.</p><p>Para funcionar, usamos dois serviços: o provedor do banco de dados (servidores em São Paulo) e o que hospeda o site. Como todo site, eles registram dados técnicos da visita, como o endereço de internet (IP) e o tipo de navegador, para manter o serviço no ar e protegido. O serviço que hospeda o site fica nos Estados Unidos, então esses dados técnicos da visita podem passar por lá. O seu cadastro fica no Brasil.</p><p>A calculadora é para maiores de 18 anos. Se soubermos que guardamos dados de um menor, apagamos.</p><p>Só mostramos os seus dados a alguém se a lei ou uma autoridade exigir. Se a calculadora passar a ser de uma empresa, os dados vão junto com os mesmos compromissos desta página, e avisamos antes. Se acontecer algum incidente de segurança com os seus dados, avisamos você e a Autoridade Nacional de Proteção de Dados (ANPD).</p>
+    <p>Os dados ficam num provedor de nuvem com servidores no Brasil (São Paulo), com acesso restrito ao responsável. Guardamos enquanto você quiser receber o resultado e as novidades, e apagamos quando você pedir ou depois de 2 anos sem uso. Os dados do pagamento ficam 5 anos, mesmo se você pedir para apagar, porque a lei fiscal exige. Depois de apagar, fica só o registro do pedido (a data e o que foi pedido), para provar que atendemos.</p><p>Para funcionar, usamos três serviços: o provedor do banco de dados (servidores em São Paulo), o que hospeda o site e o Mercado Pago, que recebe o Pix do mês todo. Como todo site, eles registram dados técnicos da visita, como o endereço de internet (IP) e o tipo de navegador, para manter o serviço no ar e protegido. O serviço que hospeda o site fica nos Estados Unidos, então esses dados técnicos da visita podem passar por lá. O seu cadastro fica no Brasil.</p><p>A calculadora é para maiores de 18 anos. Se soubermos que guardamos dados de um menor, apagamos.</p><p>Só mostramos os seus dados a alguém se a lei ou uma autoridade exigir. Se a calculadora passar a ser de uma empresa, os dados vão junto com os mesmos compromissos desta página, e avisamos antes. Se acontecer algum incidente de segurança com os seus dados, avisamos você e a Autoridade Nacional de Proteção de Dados (ANPD).</p>
   </section>
   <section class="card">
     <h2><span>⚖️</span>Seus direitos</h2>
@@ -87,6 +89,7 @@ footer a{color:inherit}
       <label><input type="radio" name="tipo" value="corrigir">Corrigir os meus dados</label>
       <label><input type="radio" name="tipo" value="sair">Não receber mais mensagens</label>
       <label><input type="radio" name="tipo" value="apagar">Apagar os meus dados</label>
+      <label><input type="radio" name="tipo" value="desistir">Desistir da compra e receber o Pix de volta (até 7 dias)</label>
     </div>
     <label class="rot" for="cel">Celular cadastrado (com DDD)</label>
     <input type="text" id="cel" inputmode="numeric" autocomplete="tel" placeholder="(99) 9 9999-9999" maxlength="16">
@@ -94,7 +97,7 @@ footer a{color:inherit}
     <p id="ret" aria-live="polite"></p>
   </section>
 </main>
-<footer>Calculadora de Passe · ferramenta independente, sem ligação com a Uber ou a 99 · privacidade versão 5 · atualizado em 22/10/2026<br><a href="termos.html">Termos de uso</a> · <a href="./">Voltar para a calculadora</a></footer>
+<footer>Calculadora de Passe · ferramenta independente, sem ligação com a Uber ou a 99 · privacidade versão 7 · atualizado em 23/10/2026<br><a href="termos.html">Termos de uso</a> · <a href="./">Voltar para a calculadora</a></footer>
 <script>
 // o pedido entra no mesmo banco (o público só cadastra); o responsável atende pelo painel
 const CONFIG = { url: 'https://ixeuemgxmteuezcqovtz.supabase.co', chave: 'sb_publishable_QaLESJ7_nc-UQLQjQyJi8Q_fSdxiSXU' };

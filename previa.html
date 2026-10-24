@@ -717,7 +717,7 @@ $('#ver').onclick = async () => {
   $('#ver').disabled = true; $('#ver').textContent = 'Calculando…';
   await guardar({nome, celular: cel, carro, ano, cidade: $('#cidade').value.trim() + '/' + $('#uf').value, apps: appsEscolhidos().join('+'),
     categoria: catsEscolhidas(), faturamento_dia: null, dias_semana: new Set(contas.flatMap(c => c.G.map((v, i) => v > 0 ? i : -1)).filter(i => i >= 0)).size,
-    melhor_passe: contas.map(c => `${c.app} • ${c.ops[0].nome}`).join(' + '), passes: {passes: validos(), formatos_novos: novosFormatos.slice(0, 10), semana: Object.fromEntries(contas.map(c => [c.app, c.G])), meta_semana: Object.fromEntries(contas.map(c => [c.app, metaDe(c.app)]))}, origem: new URLSearchParams(location.search).get('o') || '', versao_aceite: 'termos-v4+privacidade-v6-2026-10-23', aceite_novidades: $('#novidades').checked});
+    melhor_passe: contas.map(c => `${c.app} • ${c.ops[0].nome}`).join(' + '), passes: {passes: validos(), formatos_novos: novosFormatos.slice(0, 10), semana: Object.fromEntries(contas.map(c => [c.app, c.G])), meta_semana: Object.fromEntries(contas.map(c => [c.app, metaDe(c.app)]))}, origem: new URLSearchParams(location.search).get('o') || '', versao_aceite: 'termos-v5+privacidade-v7-2026-10-23', aceite_novidades: $('#novidades').checked});
   mostrar(contas, cel);
 };
 
@@ -982,7 +982,7 @@ function mostrar(contas, cel) {
 // ===== O MÊS TODO (22/10): 4 semanas diferentes, pago à parte. Pronto e DESLIGADO até ele mandar ligar. =====
 // ligado:false → o resultado só mostra o teste de preço (anota quem clica, nada é cobrado).
 // ?mes=teste → abre o mês sem cobrar, para conferir. Com ligado:true o ?mes=teste não vale mais.
-const CONFIG_MES = {ligado: false, preco: 9.9, dias: 30, sims: 5};   // 23/10: 1 Pix = 5 simulações do mês, contadas no servidor
+const CONFIG_MES = {ligado: true, preco: 9.9, dias: 30, sims: 5};   // 23/10: 1 Pix = 5 simulações do mês, contadas no servidor
 // a prévia (previa.html) abre sempre com o mês em teste: tudo que está pronto aparece para ele revisar (23/10)
 const ePrevia = location.pathname.endsWith('previa.html'), testeMes = !CONFIG_MES.ligado && (ePrevia || new URLSearchParams(location.search).get('mes') == 'teste');
 const SEMANAS = 4;
@@ -1011,7 +1011,7 @@ function cartaoMes(cel, contas) {
   const topo = '<div id="vitrine"><p class="mes-titulo">🗓️ E o seu mês? Quanto vai de passe?</p></div>';
   if (testeMes) return `<div class="card bloco-mes" id="mensal">${topo}<button class="btn" id="querMes">Montar o meu mês (teste, sem cobrar)</button></div>`;
   if (CONFIG_MES.ligado) { const ate = liberadoAte(cel);
-    return `<div class="card bloco-mes" id="mensal">${topo}<button class="btn" id="querMes">${ate ? `Abrir o meu mês` : `Ver o mês todo: ${brlc(CONFIG_MES.preco)} no Pix`}</button><p class="dica" id="mesInfo">${ate ? '' : `Pagamento único: ${CONFIG_MES.sims} simulações do mês, em até ${CONFIG_MES.dias} dias, neste celular. Acabaram ou chegou print novo? Novo Pix.`}</p></div>`; }
+    return `<div class="card bloco-mes" id="mensal">${topo}<button class="btn" id="querMes">${ate ? `Abrir o meu mês` : `Ver o mês todo: ${brlc(CONFIG_MES.preco)} no Pix`}</button><p class="dica" id="mesInfo">${ate ? '' : `Pagamento único: ${CONFIG_MES.sims} simulações do mês, em até ${CONFIG_MES.dias} dias, neste celular. Acabaram ou chegou print novo? Novo Pix.<br>Ao gerar o Pix você aceita a parte paga dos <a href="termos.html">termos</a>: ${CONFIG_MES.sims} simulações em ${CONFIG_MES.dias} dias neste celular, 7 dias para desistir.`}</p></div>`; }
   return `<div class="card bloco-mes" id="mensal">${topo}<button class="btn btn-mes" id="querMes">Quero ver o meu mês: R$ 9,90</button><p class="dica" style="text-align:center">Pagamento único, sem assinatura.</p></div>`;
 }
 
@@ -1027,7 +1027,7 @@ function prepararMes(contas, cel) {
   }
   // teste de preço (22/10): só anota quem clica com o preço na tela; nada é cobrado
   $('#querMes').onclick = () => {
-    guardar({nome: 'INTERESSE MENSAL', celular: cel, carro: 'interesse', ano: 2000, apps: mesApps.join('+'), origem: ePrevia || new URLSearchParams(location.search).has('teste') ? 'mensal-teste' : 'mensal-990', aceite_lgpd: $('#ok').checked, versao_aceite: 'termos-v4+privacidade-v6-2026-10-23'});
+    guardar({nome: 'INTERESSE MENSAL', celular: cel, carro: 'interesse', ano: 2000, apps: mesApps.join('+'), origem: ePrevia || new URLSearchParams(location.search).has('teste') ? 'mensal-teste' : 'mensal-990', aceite_lgpd: $('#ok').checked, versao_aceite: 'termos-v5+privacidade-v7-2026-10-23'});
     $('#mensal').innerHTML = `<p>✅ <b>Anotado!</b> A conta do mês todo ainda está sendo preparada. Quando abrir, avisamos você no WhatsApp ${celTxt(cel)}. Nada foi cobrado.</p>`; };
 }
 
