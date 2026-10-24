@@ -242,7 +242,7 @@ ul.regras li{margin:6px 0}
 </div></main>
 <datalist id="carros"><option>Onix</option><option>Onix Plus</option><option>HB20</option><option>HB20S</option><option>Argo</option><option>Cronos</option><option>Mobi</option><option>Kwid</option><option>Logan</option><option>Sandero</option><option>Virtus</option><option>Polo</option><option>Voyage</option><option>Gol</option><option>Corolla</option><option>Yaris</option><option>Etios</option><option>City</option><option>Fit</option><option>Spin</option><option>Cobalt</option><option>Prisma</option><option>Versa</option><option>Kicks</option><option>Tracker</option><option>Creta</option><option>T-Cross</option><option>Nivus</option><option>Pulse</option><option>Renegade</option><option>Compass</option><option>Corolla Cross</option><option>HR-V</option><option>Dolphin Mini</option><option>Song Plus</option></datalist>
 <div id="toast" hidden role="status"></div>
-<footer>Calculadora de Passe · ferramenta independente, sem ligação com a Uber ou a 99. Uber e 99 são marcas dos seus donos.<br>Os resultados são de acordo com o que for informado. <a href="termos.html">Termos de uso</a> · <a href="privacidade.html">Privacidade</a></footer>
+<footer>Calculadora de Passe · ferramenta independente, sem ligação com a Uber ou a 99. Uber e 99 são marcas dos seus donos.<br>Os resultados são de acordo com o que for informado. <a href="termos.html">Termos de uso</a> · <a href="privacidade.html">Privacidade</a> · <a href="https://www.instagram.com/calculadoradepasse/" target="_blank" rel="noopener">Instagram</a></footer>
 
 <script>
 // Onde os cadastros são guardados (Supabase, só inserção pelo público). Preenchido na publicação.
@@ -977,7 +977,8 @@ function mostrar(contas, cel) {
     ${cartaoMes(cel, contas)}`;
   const txt = encodeURIComponent('Motorista, você sabe qual passe da Uber e da 99 vale mais a pena pra você? Eu fiz a conta da minha semana aqui, dia a dia. Faz a sua, é de graça e leva 1 minuto: ' + location.origin + location.pathname + '?o=zap');
   h += `<div class="card"><p style="margin:0 0 10px"><b style="display:inline">👥 Conhece outro motorista que paga passe?</b> Manda pelo Zap: ele faz a conta dele, de graça, em 1 minuto.</p><a class="btn zap" style="margin-top:0" href="https://wa.me/?text=${txt}" target="_blank" rel="noopener">Mandar pelo Zap para outro motorista fazer a conta dele</a>
-    <button class="btn claro" onclick="location.reload()">Refazer a conta</button></div>`;
+    <button class="btn claro" onclick="location.reload()">Refazer a conta</button></div>
+    <div class="card"><p style="margin:0 0 10px"><b style="display:inline">📲 Siga a Calculadora no Instagram</b>: dicas para o passe render mais e as novidades dos passes da Uber e da 99.</p><a class="btn claro" style="margin-top:0" href="https://www.instagram.com/calculadoradepasse/" target="_blank" rel="noopener">Seguir @calculadoradepasse</a></div>`;
   ['#p1', '#p2', '#pf', '#p3'].forEach(id => $(id).classList.add('oculto'));
   const res = $('#resultado'); res.innerHTML = h; res.classList.remove('oculto'); window.scrollTo({top: 0, behavior: 'smooth'});
   // volta para a semana com os dias preenchidos; o novo resultado sai direto, sem pedir o contato nem gravar de novo
