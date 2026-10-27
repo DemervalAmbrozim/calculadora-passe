@@ -249,6 +249,11 @@ ul.regras li{margin:6px 0}
 const CONFIG = { url: 'https://ixeuemgxmteuezcqovtz.supabase.co', chave: 'sb_publishable_QaLESJ7_nc-UQLQjQyJi8Q_fSdxiSXU' };   // fase de teste: projeto do Recibo Saúde, tabela própria
 
 const $ = s => document.querySelector(s);
+// contador anônimo por passo (27/10): só a etapa, a origem e um código aleatório desta visita; cada etapa conta 1 vez
+const VISITA = Math.random().toString(36).slice(2, 12).padEnd(8, '0'), contadas = new Set();
+const etapa = e => { if (contadas.has(e)) return; contadas.add(e); const q = new URLSearchParams(location.search);
+  try { fetch(CONFIG.url + '/rest/v1/funil', {method: 'POST', keepalive: true, headers: {apikey: CONFIG.chave, Authorization: 'Bearer ' + CONFIG.chave, 'Content-Type': 'application/json', Prefer: 'return=minimal'},
+    body: JSON.stringify({visita: VISITA, etapa: e, origem: (q.has('teste') || q.has('previa') ? 'teste' : q.get('o') || '').slice(0, 40)})}).catch(() => {}); } catch (x) {} };
 // valor de um dia no app (23/10, ele lançou 50.000 num sábado e passou): em branco = não roda; senão de R$ 10 a R$ 1.500
 const DIA_MIN = 10, DIA_MAX = 1500;
 const erroDia = t => { const s = String(t || '').trim().replace(/^R\$\s*/i, ''); if (!s) return '';
@@ -365,7 +370,7 @@ document.querySelectorAll('.print input[type=file]').forEach(inp => inp.onchange
   }
   const tot = passes.filter(p => p.app == app && p.lido).length, novosApp = [...new Set(novosFormatos.filter(x => x.app == app).map(x => x.linha))];
   if (tot) {
-    caixa.classList.add('ok'); caixa.querySelector('.imp').textContent = '✓ Importado com sucesso';
+    caixa.classList.add('ok'); caixa.querySelector('.imp').textContent = '✓ Importado com sucesso'; etapa('print');
     caixa.querySelector('.arquivo span').textContent = '+ Mandar outro print da ' + app;
     estado.textContent = `${tot} oferta${tot > 1 ? 's' : ''} da ${app}. Se alguma ficou de fora, mande outro print.`;
   }
@@ -376,6 +381,7 @@ document.querySelectorAll('.print input[type=file]').forEach(inp => inp.onchange
     falhou && `⛔ Não consegui ler ${falhou > 1 ? `${falhou} prints` : 'um print'}: tire de novo com as opções na tela.`].filter(Boolean);
   // erro de print chama a atenção: caixa vermelha, rola até ela e vibra (pedido dele, 22/10)
   const alerta = t => { estado.innerHTML = (tot ? estado.textContent : '') + `<span class="alerta-print" role="alert">${t}</span>`; estado.scrollIntoView({behavior: 'smooth', block: 'center'}); try { navigator.vibrate && navigator.vibrate(200); } catch (e) {} };
+  if (avisos.length || !tot) etapa('erro');
   if (avisos.length) alerta(avisos.join('<br>'));
   else if (!tot) alerta('⛔ Não consegui ler os preços. Tente outro print, com as opções na tela, ou digite as ofertas.');
   inp.value = ''; desenharLista();
@@ -663,10 +669,10 @@ $('#ir2').onclick = () => {
   if (!appsEscolhidos().length) return msg('Marque pelo menos uma categoria, da Uber ou da 99');
   mostrarCats(); desenharLista(); $('#p2').classList.remove('oculto'); $('#p2').scrollIntoView({behavior: 'smooth'});
 };
-$('#mais').onclick = () => { passes.push({app: appsEscolhidos()[0] || 'Uber', tipo: 'tempo', preco: 0, tam: 24, avulso: true, txt: {}}); desenharLista(); };
+$('#mais').onclick = () => { etapa('digitou'); passes.push({app: appsEscolhidos()[0] || 'Uber', tipo: 'tempo', preco: 0, tam: 24, avulso: true, txt: {}}); desenharLista(); };
 // digitar é uma opção do mesmo tamanho que o print: ninguém é obrigado a mandar print da tela do app
 document.querySelectorAll('.digitar').forEach(b => b.onclick = () => {
-  passes.push({app: b.dataset.app, tipo: 'ganhos', preco: 0, tam: 0, avulso: true, txt: {}}); desenharLista();
+  passes.push({app: b.dataset.app, tipo: 'ganhos', preco: 0, tam: 0, avulso: true, txt: {}}); desenharLista(); etapa('digitou');
   const ult = [...document.querySelectorAll('#lista .passe')].pop(); if (ult) { ult.scrollIntoView({behavior: 'smooth', block: 'center'}); ult.querySelector('[data-k=preco]')?.focus(); }
 });
 $('#ir3').onclick = () => {
@@ -1238,6 +1244,12 @@ function textoMes(contas) {
   l.push('O app desconta o passe das primeiras corridas; só depois o dinheiro cai.', 'Refaça a conta quando a oferta mudar: ' + location.origin + location.pathname);
   return l.join('\n');
 }
+
+// cada tela que aparece conta uma etapa (abriu → p2 → régua → Zap → resultado)
+etapa('abriu');
+[['#p2', 'p2'], ['#pf', 'p3regua'], ['#p3', 'p4zap'], ['#resultado', 'resultado']].forEach(([id, e]) => {
+  const el = $(id); if (!el) return;
+  new MutationObserver(() => { if (!el.classList.contains('oculto')) etapa(e); }).observe(el, {attributes: true, attributeFilter: ['class']}); });
 </script>
 </body>
 </html>
