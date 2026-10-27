@@ -988,7 +988,9 @@ function mostrar(contas, cel) {
 // ===== O MÊS TODO (22/10): 4 semanas diferentes, pago à parte. Pronto e DESLIGADO até ele mandar ligar. =====
 // ligado:false → o resultado só mostra o teste de preço (anota quem clica, nada é cobrado).
 // ?mes=teste → abre o mês sem cobrar, para conferir. Com ligado:true o ?mes=teste não vale mais.
-const CONFIG_MES = {ligado: true, preco: 9.9, dias: 30, sims: 5};   // 23/10: 1 Pix = 5 simulações do mês, contadas no servidor
+const CONFIG_MES = {ligado: true, preco: 5, dias: 30, sims: 5, aPartir: '2026-10-30T00:00:00-03:00'};   // 23/10: 1 Pix = 5 simulações do mês, contadas no servidor
+// 26/10 (ele): preço baixou para R$ 5,00 e a oferta paga só aparece a partir de 30/10, depois do anúncio (25/10 11h a 29/10 11h): quem chega pelo anúncio vê tudo grátis
+const mesVisivel = () => new Date() >= new Date(CONFIG_MES.aPartir) || new URLSearchParams(location.search).has('oferta');   // ?oferta = conferir antes da data
 // a prévia (previa.html) abre sempre com o mês em teste: tudo que está pronto aparece para ele revisar (23/10)
 const ePrevia = location.pathname.endsWith('previa.html'), testeMes = !CONFIG_MES.ligado && (ePrevia || new URLSearchParams(location.search).get('mes') == 'teste');
 const SEMANAS = 4;
@@ -1016,13 +1018,15 @@ async function vitrineMes(contas) {
 function cartaoMes(cel, contas) {
   const topo = '<div id="vitrine"><p class="mes-titulo">🗓️ E o seu mês? Quanto vai de passe?</p></div>';
   if (testeMes) return `<div class="card bloco-mes" id="mensal">${topo}<button class="btn" id="querMes">Montar o meu mês (teste, sem cobrar)</button></div>`;
+  if (!mesVisivel()) return '';
   if (CONFIG_MES.ligado) { const ate = liberadoAte(cel);
     return `<div class="card bloco-mes" id="mensal">${topo}<button class="btn" id="querMes">${ate ? `Abrir o meu mês` : `Ver o mês todo: ${brlc(CONFIG_MES.preco)} no Pix`}</button><p class="dica" id="mesInfo">${ate ? '' : `Pagamento único: ${CONFIG_MES.sims} simulações do mês, em até ${CONFIG_MES.dias} dias, neste celular. Acabaram ou chegou print novo? Novo Pix.<br>Ao gerar o Pix você aceita a parte paga dos <a href="termos.html">termos</a>: ${CONFIG_MES.sims} simulações em ${CONFIG_MES.dias} dias neste celular, 7 dias para desistir.`}</p></div>`; }
-  return `<div class="card bloco-mes" id="mensal">${topo}<button class="btn btn-mes" id="querMes">Quero ver o meu mês: R$ 9,90</button><p class="dica" style="text-align:center">Pagamento único, sem assinatura.</p></div>`;
+  return `<div class="card bloco-mes" id="mensal">${topo}<button class="btn btn-mes" id="querMes">Quero ver o meu mês: ${brlc(CONFIG_MES.preco)}</button><p class="dica" style="text-align:center">Pagamento único, sem assinatura.</p></div>`;
 }
 
 function prepararMes(contas, cel) {
   mesApps = contas.map(c => c.app); mesCel = cel;
+  if (!$('#querMes')) return;   // oferta escondida (antes de CONFIG_MES.aPartir)
   vitrineMes(contas).then(h => { if (h && $('#vitrine')) $('#vitrine').innerHTML = h; }).catch(() => { /* sem a vitrine, fica a pergunta */ });
   if (testeMes) return $('#querMes').onclick = abrirMes;
   if (CONFIG_MES.ligado) {
