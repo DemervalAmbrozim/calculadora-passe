@@ -36,6 +36,8 @@ header{background:linear-gradient(135deg,var(--marca),var(--marca2));color:#fff;
 .marca{font-weight:800;letter-spacing:.18em;font-size:13px;opacity:.85}
 h1{font-size:clamp(22px,6.6vw,28px);line-height:1.15;margin:14px 0 10px;font-weight:800}
 header p{margin:0;color:#C9D6E3;font-size:15px}
+/* 29/10: 134 visitas do anúncio, só 3 passaram da tela 1; no navegador do Instagram o "Continuar" ficava abaixo da dobra. Topo compacto em tela baixa */
+@media (max-height:820px){header{padding-block:14px 52px}h1{font-size:clamp(20px,5.8vw,26px);margin:6px 0 6px}header p{font-size:14px}}
 main{padding-block:0 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));margin-top:-44px}
 .card{background:var(--cartao);border-radius:20px;padding:20px 18px;box-shadow:0 2px 10px rgba(15,42,68,.08);margin-bottom:14px;border:1px solid transparent}
 @media (prefers-color-scheme:dark){.card{border-color:var(--borda);box-shadow:none}}
