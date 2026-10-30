@@ -389,7 +389,7 @@ document.querySelectorAll('.print input[type=file]').forEach(inp => inp.onchange
   inp.value = ''; desenharLista();
 });
 
-document.querySelectorAll('[id^=cats-] .chip').forEach(b => b.onclick = () => { b.classList.toggle('on'); mostrarCats(); });
+document.querySelectorAll('[id^=cats-] .chip').forEach(b => b.onclick = () => { etapa('toque'); b.classList.toggle('on'); mostrarCats(); });
 // "Marcar todas" liga todas as categorias do app; se já estão todas, desliga
 document.querySelectorAll('.todas').forEach(b => b.onclick = () => {
   const cs = [...document.querySelectorAll(`#cats-${b.dataset.app} .chip`)], liga = cs.some(c => !c.classList.contains('on'));
@@ -668,7 +668,7 @@ function curto(p) { return p.tipo == 'tempo' ? `Passe de ${horas(p)} por ${brlc(
 function nomePasse(p) { return `${p.app} • ` + (p.tipo == 'tempo' ? `${horas(p)} por ${brl(p.preco)}` : `${brl(p.tam)} em ganhos por ${brl(p.preco)} de passe`); }
 
 $('#ir2').onclick = () => {
-  if (!appsEscolhidos().length) return msg('Marque pelo menos uma categoria, da Uber ou da 99');
+  if (!appsEscolhidos().length) { etapa('semcat'); return msg('Marque pelo menos uma categoria, da Uber ou da 99'); }
   mostrarCats(); desenharLista(); $('#p2').classList.remove('oculto'); $('#p2').scrollIntoView({behavior: 'smooth'});
 };
 $('#mais').onclick = () => { etapa('digitou'); passes.push({app: appsEscolhidos()[0] || 'Uber', tipo: 'tempo', preco: 0, tam: 24, avulso: true, txt: {}}); desenharLista(); };
