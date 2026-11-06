@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex"><title>Acerto semanal do passe</title>
+<style>
+:root{--bg:#f6f7f9;--fg:#15181d;--card:#fff;--bd:#d9dde3;--ac:#0b6b3a;--al:#b3261e}
+@media(prefers-color-scheme:dark){:root{--bg:#111418;--fg:#eceff3;--card:#1b2027;--bd:#2f3640;--ac:#4cc38a;--al:#ff8a80}}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px system-ui,sans-serif;padding:16px max(16px,env(safe-area-inset-left))}
+main{max-width:560px;margin:auto}h1{font-size:1.3rem}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin:12px 0}
+label{display:block;font-size:.9rem;margin:10px 0 4px}
+input{width:100%;box-sizing:border-box;font-size:1.05rem;padding:10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--fg)}
+button{font-size:1rem;padding:11px 14px;border-radius:8px;border:0;background:var(--ac);color:#fff;margin:8px 8px 0 0}
+button.s{background:transparent;color:var(--fg);border:1px solid var(--bd)}
+.r{font-size:1.15rem;font-weight:700}.dev{color:var(--al)}small{opacity:.75}
+</style></head><body><main>
+<h1>Acerto semanal do passe</h1>
+<p>Com o passe, a Uber fecha a semana e pode ficar devendo uma diferença, paga junto do depósito da semana seguinte. Preencha com o que aparece no app.</p>
+<div id="semanas"></div>
+<button id="add" class="s">+ Adicionar semana</button><button id="calc">Calcular</button>
+<div id="res"></div>
+<div class="card"><b>Semana em andamento: quanto deve cair</b>
+<label>Produção até agora (aba GANHOS, R$)</label><input id="pg" inputmode="decimal">
+<label>Passe que a Uber vai debitar (R$, 0 se não)</label><input id="pp" inputmode="decimal">
+<label>Diferença a receber da semana anterior (R$)</label><input id="pd" inputmode="decimal">
+<button id="prev">Prever depósito</button><div id="pv"></div></div>
+<p><small>Os números ficam só no seu aparelho. Confira sempre com a aba GANHOS e o extrato do app.</small></p>
+<script>
+function brl(v){return v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
+function num(s){s=String(s||'').trim();if(!s)return 0;s=s.replace(/[^\d,.-]/g,'');if(s.includes(','))s=s.replace(/\./g,'').replace(',','.');return parseFloat(s)||0}
+/* Regra: devido = produção − passe − (depósito − reembolso de semana anterior já incluído nele).
+   Cada semana: a diferença dela é paga junto do depósito da semana seguinte. */
+function acerto(sem){
+  const out=[];let reembPrev=0;
+  sem.forEach((s,i)=>{
+    const depSemana=s.deposito-reembPrev;
+    const dif=s.producao-s.passe-depSemana;
+    out.push({producao:s.producao,passe:s.passe,deposito:s.deposito,reembolsoIncluido:reembPrev,depSemana,dif});
+    reembPrev=Math.max(dif,0);
+  });
+  return out;
+}
+const box=document.getElementById('semanas');
+function add(v){const d=document.createElement('div');d.className='card';
+ d.innerHTML='<b>Semana '+(box.children.length+1)+'</b><label>Período (ex.: 19-26/10)</label><input class="p" value="'+(v?v[0]:'')+'">'+
+ '<label>Produção na aba GANHOS (R$)</label><input class="g" inputmode="decimal" value="'+(v?v[1]:'')+'">'+
+ '<label>Passe descontado na semana (R$, 0 se não houve)</label><input class="pa" inputmode="decimal" value="'+(v?v[2]:'')+'">'+
+ '<label>Depósito recebido na conta (R$)</label><input class="d" inputmode="decimal" value="'+(v?v[3]:'')+'">';
+ box.appendChild(d)}
+function ler(){return [...box.children].map(c=>({per:c.querySelector('.p').value,producao:num(c.querySelector('.g').value),passe:num(c.querySelector('.pa').value),deposito:num(c.querySelector('.d').value)}))}
+function mostrar(){
+  const sem=ler(),r=acerto(sem);let h='';
+  r.forEach((x,i)=>{h+='<div class="card"><b>Semana '+(i+1)+(sem[i].per?' ('+sem[i].per+')':'')+'</b><br>Produção '+brl(x.producao)+' − passe '+brl(x.passe)+' − depósito da semana '+brl(x.depSemana)+(x.reembolsoIncluido?'<br><small>(depósito de '+brl(x.deposito)+' já inclui '+brl(x.reembolsoIncluido)+' da semana anterior)</small>':'')+
+   '<br><span class="r '+(x.dif>0.005?'dev':'')+'">'+(x.dif>0.005?'A Uber ainda deve '+brl(x.dif)+' — chega junto do depósito da próxima semana.':(x.dif<-0.005?'Depósito '+brl(-x.dif)+' acima do esperado: confira os valores.':'Sem diferença nesta semana.'))+'</span></div>'});
+  document.getElementById('res').innerHTML=h}
+document.getElementById('prev').onclick=()=>{const g=num(pg.value),p=num(pp.value),d=num(pd.value);
+ document.getElementById('pv').innerHTML='<p class="r">Depósito previsto: '+brl(g-p+d)+'</p><small>'+brl(g)+' − '+brl(p)+' + '+brl(d)+'. Cada real a mais de produção até o fechamento entra direto. A diferença desta semana só aparece depois do depósito.</small>'};
+document.getElementById('add').onclick=()=>add();
+document.getElementById('calc').onclick=mostrar;
+add();
+if(typeof module!=='undefined')module.exports={acerto,num};
+</script></main></body></html>
