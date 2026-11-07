@@ -24,7 +24,7 @@ button.s{background:transparent;color:var(--fg);border:1px solid var(--bd)}
 <label>Passe que a Uber vai debitar (R$, 0 se não)</label><input id="pp" inputmode="decimal">
 <label>Diferença a receber da semana anterior (R$)</label><input id="pd" inputmode="decimal"><label>Resgates já feitos nesta semana (dia e valor)</label><div id="prgs"></div><button type="button" class="s" id="pmais">+ resgate</button>
 <button id="prev">Prever quanto cai</button><div id="pv"></div></div>
-<p><small>Os números ficam só no seu aparelho. Confira sempre com a aba GANHOS e o extrato do app.</small></p>
+<p><small>Os números ficam só no seu aparelho e voltam quando você abrir de novo. Confira sempre com a aba GANHOS e o extrato do app.</small></p>
 <script>
 function brl(v){return v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
 function num(s){s=String(s||'').trim();if(!s)return 0;s=s.replace(/[^\d,.-]/g,'');if(s.includes(','))s=s.replace(/\./g,'').replace(',','.');return parseFloat(s)||0}
@@ -49,17 +49,17 @@ function lerRg(root){return [...root.querySelectorAll('.rr')].map(r=>({d:r.query
 function dia(d){if(!d)return 'sem data';const[a,m,dd]=d.split('-');const n=['dom','seg','ter','qua','qui','sex','sáb'][new Date(a,m-1,dd).getDay()];return n+' '+dd+'/'+m}
 function tabela(rs,total){let ac=0;return '<table style="width:100%;border-collapse:collapse;margin-top:8px"><tr><th align=left>Dia<th align=right>Resgate<th align=right>Acumulado'+(total!=null?'<th align=right>Falta':'')+'</tr>'+rs.map(x=>{ac+=x.v;return '<tr><td>'+dia(x.d)+'<td align=right>'+brl(x.v)+'<td align=right>'+brl(ac)+(total!=null?'<td align=right>'+brl(total-ac):'')+'</tr>'}).join('')+'</table>'}
 function add(v){const d=document.createElement('div');d.className='card';
- d.innerHTML='<b>Semana '+(box.children.length+1)+'</b><label>Período (ex.: 19-26/10)</label><input class="p">'+
+ d.innerHTML='<b>Semana '+(box.children.length+1)+'</b><label>App</label><select class="ap"><option value="uber">Uber</option><option value="99">99</option></select><label>Período (ex.: 19-26/10)</label><input class="p">'+
  '<label>Produção na aba GANHOS (R$)</label><input class="g" inputmode="decimal">'+
  '<label>Passe descontado na semana (R$, 0 se não houve)</label><input class="pa" inputmode="decimal">'+
  '<label>Resgates da semana (R$). Um por linha: pode ser 1 ou vários, em qualquer dia</label><div class="rgs"></div>'+
  '<button type="button" class="s mais">+ resgate</button>'+
  '<label>Reembolso da semana anterior que veio nesses resgates (R$) <small>deixe em branco se foi o valor calculado</small></label><input class="rb" inputmode="decimal">';
  box.appendChild(d);addRg(d);d.querySelector('.mais').onclick=()=>addRg(d)}
-function ler(){return [...box.children].map(c=>{const rb=c.querySelector('.rb').value.trim();return {per:c.querySelector('.p').value,producao:num(c.querySelector('.g').value),passe:num(c.querySelector('.pa').value),resgs:lerRg(c),resgates:lerRg(c).map(x=>x.v),reembolso:rb===''?null:num(rb)}})}
+function ler(){return [...box.children].map(c=>{const rb=c.querySelector('.rb').value.trim();return {app:c.querySelector('.ap').value,per:c.querySelector('.p').value,producao:num(c.querySelector('.g').value),passe:num(c.querySelector('.pa').value),resgs:lerRg(c),resgates:lerRg(c).map(x=>x.v),reembolso:rb===''?null:num(rb)}})}
 function mostrar(){
   const sem=ler(),r=acerto(sem);let h='';
-  r.forEach((x,i)=>{h+='<div class="card"><b>Semana '+(i+1)+(sem[i].per?' ('+sem[i].per+')':'')+'</b><br>Produção '+brl(x.producao)+' − passe '+brl(x.passe)+' − resgatado da semana '+brl(x.depSemana)+(x.reembolsoIncluido?'<br><small>('+x.n+' resgate(s) somam '+brl(x.deposito)+' e já incluem '+brl(x.reembolsoIncluido)+' da semana anterior)</small>':(x.n>1?'<br><small>('+x.n+' resgates somam '+brl(x.deposito)+')</small>':''))+
+  r.forEach((x,i)=>{h+='<div class="card"><b>Semana '+(i+1)+' '+(sem[i].app=='99'?'99':'Uber')+(sem[i].per?' ('+sem[i].per+')':'')+'</b><br>Produção '+brl(x.producao)+' − passe '+brl(x.passe)+' − resgatado da semana '+brl(x.depSemana)+(x.reembolsoIncluido?'<br><small>('+x.n+' resgate(s) somam '+brl(x.deposito)+' e já incluem '+brl(x.reembolsoIncluido)+' da semana anterior)</small>':(x.n>1?'<br><small>('+x.n+' resgates somam '+brl(x.deposito)+')</small>':''))+
    '<br><span class="r '+(x.dif>0.005?'dev':'')+'">'+(x.dif>0.005?'A Uber ainda deve '+brl(x.dif)+' — chega em um dos próximos resgates.':(x.dif<-0.005?'Resgatou '+brl(-x.dif)+' acima do esperado: confira os valores.':'Sem diferença nesta semana.'))+'</span>'+(x.resgs&&x.resgs.length?tabela(x.resgs):'')+'</div>'});
   document.getElementById('res').innerHTML=h}
 document.getElementById('prev').onclick=()=>{const g=num(pg.value),p=num(pp.value),d=num(pd.value);
@@ -67,6 +67,14 @@ document.getElementById('prev').onclick=()=>{const g=num(pg.value),p=num(pp.valu
 const pg0=document.getElementById('prgs');pg0.appendChild(rgRow());document.getElementById('pmais').onclick=()=>pg0.appendChild(rgRow());
 document.getElementById('add').onclick=()=>add();
 document.getElementById('calc').onclick=mostrar;
-add();
+function salvar(){try{localStorage.setItem('acerto-v1',JSON.stringify({s:[...box.children].map(c=>({ap:c.querySelector('.ap').value,p:c.querySelector('.p').value,g:c.querySelector('.g').value,pa:c.querySelector('.pa').value,rb:c.querySelector('.rb').value,r:[...c.querySelectorAll('.rr')].map(r=>[r.querySelector('.rd').value,r.querySelector('.rg').value])})),pv:['pg','pp','pd'].map(i=>document.getElementById(i).value),pr:[...document.querySelectorAll('#prgs .rr')].map(r=>[r.querySelector('.rd').value,r.querySelector('.rg').value])}))}catch(e){}}
+function restaurar(){let d=null;try{d=JSON.parse(localStorage.getItem('acerto-v1'))}catch(e){}
+ if(d&&d.s&&d.s.length){box.innerHTML='';d.s.forEach(w=>{add();const c=box.lastChild;c.querySelector('.ap').value=w.ap||'uber';c.querySelector('.p').value=w.p;c.querySelector('.g').value=w.g;c.querySelector('.pa').value=w.pa;c.querySelector('.rb').value=w.rb;const g=c.querySelector('.rgs');g.innerHTML='';(w.r.length?w.r:[['','']]).forEach(x=>{const r=rgRow();r.querySelector('.rd').value=x[0];r.querySelector('.rg').value=x[1];g.appendChild(r)})});
+  ['pg','pp','pd'].forEach((i,k)=>document.getElementById(i).value=d.pv[k]||'');const pr=document.getElementById('prgs');pr.innerHTML='';(d.pr&&d.pr.length?d.pr:[['','']]).forEach(x=>{const r=rgRow();r.querySelector('.rd').value=x[0];r.querySelector('.rg').value=x[1];pr.appendChild(r)});return true}
+ add();return false}
+const had=restaurar();
+const q=new URLSearchParams(location.search);
+if(q.get('app')){const c=box.firstChild;c.querySelector('.ap').value=q.get('app')=='99'?'99':'uber';if(q.get('passe')&&!c.querySelector('.pa').value)c.querySelector('.pa').value=q.get('passe');document.getElementById('pp').value=document.getElementById('pp').value||q.get('passe')||''}
+document.addEventListener('input',salvar);document.addEventListener('change',salvar);document.addEventListener('click',()=>setTimeout(salvar,0));
 if(typeof module!=='undefined')module.exports={acerto,num};
 </script></main></body></html>
