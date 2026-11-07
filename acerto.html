@@ -19,6 +19,8 @@ button.s{background:transparent;color:var(--fg);border:1px solid var(--bd)}
 <div id="semanas"></div>
 <button id="add" class="s">+ Adicionar semana</button><button id="calc">Calcular</button>
 <div id="res"></div>
+<div class="card"><b>Lembrete diário</b><p style="margin:6px 0">Lance o resgate do dia sem esquecer: crie um aviso todo dia às 20h na agenda do seu Google.</p><a id="lembrar" class="s" style="display:inline-block;padding:11px 14px;border-radius:8px;border:1px solid var(--bd);color:var(--fg);text-decoration:none" target="_blank" rel="noopener">Criar lembrete diário às 20h</a></div>
+
 <div class="card"><b>Semana em andamento: quanto deve cair</b>
 <label>Produção até agora (aba GANHOS, R$)</label><input id="pg" inputmode="decimal">
 <label>Passe que a Uber vai debitar (R$, 0 se não)</label><input id="pp" inputmode="decimal">
@@ -77,6 +79,9 @@ function restaurar(){let d=null;try{d=JSON.parse(localStorage.getItem('acerto-v1
  if(d&&d.s&&d.s.length){box.innerHTML='';d.s.forEach(w=>{add();const c=box.lastChild;c.querySelector('.ap').value=w.ap||'uber';c.querySelector('.p').value=w.p;c.querySelector('.g').value=w.g;c.querySelector('.pa').value=w.pa;c.querySelector('.rb').value=w.rb;const g=c.querySelector('.rgs');g.innerHTML='';(w.r.length?w.r:[['','']]).forEach(x=>{const r=rgRow();r.querySelector('.rd').value=x[0];r.querySelector('.rg').value=x[1];g.appendChild(r)})});
   ['pg','pp','pd'].forEach((i,k)=>document.getElementById(i).value=d.pv[k]||'');const pr=document.getElementById('prgs');pr.innerHTML='';(d.pr&&d.pr.length?d.pr:[['','']]).forEach(x=>{const r=rgRow();r.querySelector('.rd').value=x[0];r.querySelector('.rg').value=x[1];pr.appendChild(r)});return true}
  add();return false}
+(function(){const d=new Date(),p=n=>String(n).padStart(2,'0'),dia=d.getFullYear()+p(d.getMonth()+1)+p(d.getDate());
+ const u='https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent('Lançar meu resgate do dia (acerto do passe)')+'&details='+encodeURIComponent('Abra https://calculadoradepasse.com.br/acerto e lance o resgate de hoje.')+'&dates='+dia+'T200000/'+dia+'T201000&ctz=America/Sao_Paulo&recur='+encodeURIComponent('RRULE:FREQ=DAILY');
+ document.getElementById('lembrar').href=u})();
 const had=restaurar();document.getElementById('cd').textContent='Seu código: '+cod();
 const q=new URLSearchParams(location.search);
 if(q.get('app')){const c=box.firstChild;c.querySelector('.ap').value=q.get('app')=='99'?'99':'uber';if(q.get('passe')&&!c.querySelector('.pa').value)c.querySelector('.pa').value=q.get('passe');document.getElementById('pp').value=document.getElementById('pp').value||q.get('passe')||''}
