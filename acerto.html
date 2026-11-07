@@ -24,6 +24,7 @@ button.s{background:transparent;color:var(--fg);border:1px solid var(--bd)}
 <label>Passe que a Uber vai debitar (R$, 0 se não)</label><input id="pp" inputmode="decimal">
 <label>Diferença a receber da semana anterior (R$)</label><input id="pd" inputmode="decimal"><label>Resgates já feitos nesta semana (dia e valor)</label><div id="prgs"></div><button type="button" class="s" id="pmais">+ resgate</button>
 <button id="prev">Prever quanto cai</button><div id="pv"></div></div>
+<label style="display:flex;gap:8px;align-items:flex-start"><input type="checkbox" id="aceite" style="width:auto;margin-top:3px"><span>Guardar meus acertos com a Calculadora de Passe para me ajudar a acompanhar e a lembrar dos resgates (opcional, sem nome nem telefone). <small id="cd"></small></span></label>
 <p><small>Os números ficam só no seu aparelho e voltam quando você abrir de novo. Confira sempre com a aba GANHOS e o extrato do app.</small></p>
 <script>
 function brl(v){return v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
@@ -67,12 +68,16 @@ document.getElementById('prev').onclick=()=>{const g=num(pg.value),p=num(pp.valu
 const pg0=document.getElementById('prgs');pg0.appendChild(rgRow());document.getElementById('pmais').onclick=()=>pg0.appendChild(rgRow());
 document.getElementById('add').onclick=()=>add();
 document.getElementById('calc').onclick=mostrar;
-function salvar(){try{localStorage.setItem('acerto-v1',JSON.stringify({s:[...box.children].map(c=>({ap:c.querySelector('.ap').value,p:c.querySelector('.p').value,g:c.querySelector('.g').value,pa:c.querySelector('.pa').value,rb:c.querySelector('.rb').value,r:[...c.querySelectorAll('.rr')].map(r=>[r.querySelector('.rd').value,r.querySelector('.rg').value])})),pv:['pg','pp','pd'].map(i=>document.getElementById(i).value),pr:[...document.querySelectorAll('#prgs .rr')].map(r=>[r.querySelector('.rd').value,r.querySelector('.rg').value])}))}catch(e){}}
+const SB={url:'https://ixeuemgxmteuezcqovtz.supabase.co',chave:'sb_publishable_QaLESJ7_nc-UQLQjQyJi8Q_fSdxiSXU'};
+let tEnv=null;function cod(){try{let c=localStorage.getItem('acerto-cod');if(!c){c=Math.random().toString(36).slice(2,12).padEnd(8,'0');localStorage.setItem('acerto-cod',c)}return c}catch(e){return 'semmemoria0'}}
+function enviar(dados){if(!document.getElementById('aceite').checked)return;clearTimeout(tEnv);tEnv=setTimeout(()=>{try{fetch(SB.url+'/rest/v1/acertos',{method:'POST',keepalive:true,headers:{apikey:SB.chave,Authorization:'Bearer '+SB.chave,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({codigo:cod(),dados})}).catch(()=>{})}catch(e){}},4000)}
+function salvar(){try{const obj={s:[...box.children].map(c=>({ap:c.querySelector('.ap').value,p:c.querySelector('.p').value,g:c.querySelector('.g').value,pa:c.querySelector('.pa').value,rb:c.querySelector('.rb').value,r:[...c.querySelectorAll('.rr')].map(r=>[r.querySelector('.rd').value,r.querySelector('.rg').value])})),pv:['pg','pp','pd'].map(i=>document.getElementById(i).value),pr:[...document.querySelectorAll('#prgs .rr')].map(r=>[r.querySelector('.rd').value,r.querySelector('.rg').value])};obj.ac=document.getElementById('aceite').checked;localStorage.setItem('acerto-v1',JSON.stringify(obj));enviar(obj)}catch(e){}}
 function restaurar(){let d=null;try{d=JSON.parse(localStorage.getItem('acerto-v1'))}catch(e){}
+ if(d&&d.ac)document.getElementById('aceite').checked=true;
  if(d&&d.s&&d.s.length){box.innerHTML='';d.s.forEach(w=>{add();const c=box.lastChild;c.querySelector('.ap').value=w.ap||'uber';c.querySelector('.p').value=w.p;c.querySelector('.g').value=w.g;c.querySelector('.pa').value=w.pa;c.querySelector('.rb').value=w.rb;const g=c.querySelector('.rgs');g.innerHTML='';(w.r.length?w.r:[['','']]).forEach(x=>{const r=rgRow();r.querySelector('.rd').value=x[0];r.querySelector('.rg').value=x[1];g.appendChild(r)})});
   ['pg','pp','pd'].forEach((i,k)=>document.getElementById(i).value=d.pv[k]||'');const pr=document.getElementById('prgs');pr.innerHTML='';(d.pr&&d.pr.length?d.pr:[['','']]).forEach(x=>{const r=rgRow();r.querySelector('.rd').value=x[0];r.querySelector('.rg').value=x[1];pr.appendChild(r)});return true}
  add();return false}
-const had=restaurar();
+const had=restaurar();document.getElementById('cd').textContent='Seu código: '+cod();
 const q=new URLSearchParams(location.search);
 if(q.get('app')){const c=box.firstChild;c.querySelector('.ap').value=q.get('app')=='99'?'99':'uber';if(q.get('passe')&&!c.querySelector('.pa').value)c.querySelector('.pa').value=q.get('passe');document.getElementById('pp').value=document.getElementById('pp').value||q.get('passe')||''}
 document.addEventListener('input',salvar);document.addEventListener('change',salvar);document.addEventListener('click',()=>setTimeout(salvar,0));
