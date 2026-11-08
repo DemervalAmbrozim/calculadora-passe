@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="canonical" href="https://calculadoradepasse.com.br/acerto">
-<meta name="description" content="Acerto semanal do passe da Uber e da 99: produção − passe − depósito = diferença a receber. Grátis."><title>Acerto semanal do passe</title>
+<meta name="description" content="Acerto semanal do passe da Uber: produção − passe − depósito = diferença a receber. Grátis."><title>Acerto semanal do passe</title>
 <style>
 :root{--bg:#f6f7f9;--fg:#15181d;--card:#fff;--bd:#d9dde3;--ac:#0b6b3a;--al:#b3261e}
 @media(prefers-color-scheme:dark){:root{--bg:#111418;--fg:#eceff3;--card:#1b2027;--bd:#2f3640;--ac:#4cc38a;--al:#ff8a80}}
@@ -16,7 +16,7 @@ button.s{background:transparent;color:var(--fg);border:1px solid var(--bd)}
 .r{font-size:1.15rem;font-weight:700}.dev{color:var(--al)}small{opacity:.75}
 </style></head><body><main>
 <h1>Acerto semanal do passe</h1>
-<p>Com o passe, a Uber ou a 99 fecha a semana e pode ficar devendo uma diferença, paga junto do depósito da semana seguinte. Preencha com o que aparece no app.</p>
+<p>Com o passe da <b>Uber</b>, o app fecha a semana e pode ficar devendo uma diferença, paga junto do depósito da semana seguinte. Preencha com o que aparece no app. <b>Na 99 não existe esse acerto</b>: quando a cota do passe acaba, outro passe é debitado; escolha 99 em &quot;App&quot; para simular.</p>
 <div id="semanas"></div>
 <button id="add" class="s">+ Adicionar semana</button><button id="calc">Calcular</button>
 <div id="res"></div>
@@ -56,14 +56,14 @@ function add(v){const d=document.createElement('div');d.className='card';
  d.innerHTML='<b>Semana '+(box.children.length+1)+'</b><label>App</label><select class="ap"><option value="uber">Uber</option><option value="99">99</option></select><label>Período (ex.: 19-26/10)</label><input class="p">'+
  '<label>Produção na aba GANHOS (R$)</label><input class="g" inputmode="decimal">'+
  '<label>Passe descontado na semana (R$, 0 se não houve)</label><input class="pa" inputmode="decimal">'+
- '<label>Resgates da semana (R$). Um por linha: pode ser 1 ou vários, em qualquer dia</label><div class="rgs"></div>'+
+ '<div class="uberso"><label>Resgates da semana (R$). Um por linha: pode ser 1 ou vários, em qualquer dia</label><div class="rgs"></div>'+
  '<button type="button" class="s mais">+ resgate</button>'+
- '<label>Reembolso da semana anterior que veio nesses resgates (R$) <small>deixe em branco se foi o valor calculado</small></label><input class="rb" inputmode="decimal">';
- box.appendChild(d);addRg(d);d.querySelector('.mais').onclick=()=>addRg(d)}
+ '<label>Reembolso da semana anterior que veio nesses resgates (R$) <small>deixe em branco se foi o valor calculado</small></label><input class="rb" inputmode="decimal"></div>'+'<div class="so99" style="display:none"><label>Cota do passe: limite de ganhos (R$)</label><input class="li" inputmode="decimal"><small>Na 99 não há acerto: quando a cota acaba, entra outro passe debitando. Aqui você simula quantos passes a sua produção consome.</small></div>';
+ box.appendChild(d);const tg=()=>{const n=d.querySelector('.ap').value=='99';d.querySelector('.uberso').style.display=n?'none':'';d.querySelector('.so99').style.display=n?'':'none'};d.querySelector('.ap').onchange=tg;d.tg=tg;addRg(d);d.querySelector('.mais').onclick=()=>addRg(d)}
 function ler(){return [...box.children].map(c=>{const rb=c.querySelector('.rb').value.trim();return {app:c.querySelector('.ap').value,per:c.querySelector('.p').value,producao:num(c.querySelector('.g').value),passe:num(c.querySelector('.pa').value),resgs:lerRg(c),resgates:lerRg(c).map(x=>x.v),reembolso:rb===''?null:num(rb)}})}
 function mostrar(){
   const sem=ler(),r=acerto(sem);let h='';
-  r.forEach((x,i)=>{h+='<div class="card"><b>Semana '+(i+1)+' '+(sem[i].app=='99'?'99':'Uber')+(sem[i].per?' ('+sem[i].per+')':'')+'</b><br>Produção '+brl(x.producao)+' − passe '+brl(x.passe)+' − resgatado da semana '+brl(x.depSemana)+(x.reembolsoIncluido?'<br><small>('+x.n+' resgate(s) somam '+brl(x.deposito)+' e já incluem '+brl(x.reembolsoIncluido)+' da semana anterior)</small>':(x.n>1?'<br><small>('+x.n+' resgates somam '+brl(x.deposito)+')</small>':''))+
+  r.forEach((x,i)=>{if(sem[i].app=='99'){const L=num(box.children[i].querySelector('.li').value),P=x.passe,G=x.producao;let m='<div class="card"><b>Semana '+(i+1)+' 99'+(sem[i].per?' ('+sem[i].per+')':'')+'</b><br>Na 99 não existe acerto semanal: quando a cota do passe acaba, outro passe é debitado e pronto.';if(L>0&&P>0&&G>0){const n=Math.ceil(G/L);m+='<br>Produção '+brl(G)+' com passe de '+brl(P)+' e cota de '+brl(L)+': cerca de <b>'+n+' passe'+(n>1?'s':'')+'</b>, custo '+brl(n*P)+'. Estimativa: confira no app.'}else m+='<br>Preencha produção, preço do passe e cota para simular.';h+=m+'</div>';return}h+='<div class="card"><b>Semana '+(i+1)+' '+(sem[i].app=='99'?'99':'Uber')+(sem[i].per?' ('+sem[i].per+')':'')+'</b><br>Produção '+brl(x.producao)+' − passe '+brl(x.passe)+' − resgatado da semana '+brl(x.depSemana)+(x.reembolsoIncluido?'<br><small>('+x.n+' resgate(s) somam '+brl(x.deposito)+' e já incluem '+brl(x.reembolsoIncluido)+' da semana anterior)</small>':(x.n>1?'<br><small>('+x.n+' resgates somam '+brl(x.deposito)+')</small>':''))+
    '<br><span class="r '+(x.dif>0.005?'dev':'')+'">'+(x.dif>0.005?(sem[i].app=='99'?'A 99':'A Uber')+' ainda deve '+brl(x.dif)+' — chega em um dos próximos resgates.':(x.dif<-0.005?'Resgatou '+brl(-x.dif)+' acima do esperado: confira os valores.':'Sem diferença nesta semana.'))+'</span>'+(x.resgs&&x.resgs.length?tabela(x.resgs):'')+'</div>'});
   document.getElementById('res').innerHTML=h}
 document.getElementById('prev').onclick=()=>{const g=num(pg.value),p=num(pp.value),d=num(pd.value);
@@ -74,10 +74,10 @@ document.getElementById('calc').onclick=mostrar;
 const SB={url:'https://ixeuemgxmteuezcqovtz.supabase.co',chave:'sb_publishable_QaLESJ7_nc-UQLQjQyJi8Q_fSdxiSXU'};
 let tEnv=null;function cod(){try{let c=localStorage.getItem('acerto-cod');if(!c){c=Math.random().toString(36).slice(2,12).padEnd(8,'0');localStorage.setItem('acerto-cod',c)}return c}catch(e){return 'semmemoria0'}}
 function enviar(dados){if(!document.getElementById('aceite').checked)return;clearTimeout(tEnv);tEnv=setTimeout(()=>{try{fetch(SB.url+'/rest/v1/acertos',{method:'POST',keepalive:true,headers:{apikey:SB.chave,Authorization:'Bearer '+SB.chave,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({codigo:cod(),dados})}).catch(()=>{})}catch(e){}},4000)}
-function salvar(){try{const obj={s:[...box.children].map(c=>({ap:c.querySelector('.ap').value,p:c.querySelector('.p').value,g:c.querySelector('.g').value,pa:c.querySelector('.pa').value,rb:c.querySelector('.rb').value,r:[...c.querySelectorAll('.rr')].map(r=>[r.querySelector('.rd').value,r.querySelector('.rg').value])})),pv:['pg','pp','pd'].map(i=>document.getElementById(i).value),pr:[...document.querySelectorAll('#prgs .rr')].map(r=>[r.querySelector('.rd').value,r.querySelector('.rg').value])};obj.ac=document.getElementById('aceite').checked;localStorage.setItem('acerto-v1',JSON.stringify(obj));enviar(obj)}catch(e){}}
+function salvar(){try{const obj={s:[...box.children].map(c=>({ap:c.querySelector('.ap').value,li:c.querySelector('.li').value,p:c.querySelector('.p').value,g:c.querySelector('.g').value,pa:c.querySelector('.pa').value,rb:c.querySelector('.rb').value,r:[...c.querySelectorAll('.rr')].map(r=>[r.querySelector('.rd').value,r.querySelector('.rg').value])})),pv:['pg','pp','pd'].map(i=>document.getElementById(i).value),pr:[...document.querySelectorAll('#prgs .rr')].map(r=>[r.querySelector('.rd').value,r.querySelector('.rg').value])};obj.ac=document.getElementById('aceite').checked;localStorage.setItem('acerto-v1',JSON.stringify(obj));enviar(obj)}catch(e){}}
 function restaurar(){let d=null;try{d=JSON.parse(localStorage.getItem('acerto-v1'))}catch(e){}
  if(d&&d.ac)document.getElementById('aceite').checked=true;
- if(d&&d.s&&d.s.length){box.innerHTML='';d.s.forEach(w=>{add();const c=box.lastChild;c.querySelector('.ap').value=w.ap||'uber';c.querySelector('.p').value=w.p;c.querySelector('.g').value=w.g;c.querySelector('.pa').value=w.pa;c.querySelector('.rb').value=w.rb;const g=c.querySelector('.rgs');g.innerHTML='';(w.r.length?w.r:[['','']]).forEach(x=>{const r=rgRow();r.querySelector('.rd').value=x[0];r.querySelector('.rg').value=x[1];g.appendChild(r)})});
+ if(d&&d.s&&d.s.length){box.innerHTML='';d.s.forEach(w=>{add();const c=box.lastChild;c.querySelector('.ap').value=w.ap||'uber';c.querySelector('.li').value=w.li||'';c.tg();c.querySelector('.p').value=w.p;c.querySelector('.g').value=w.g;c.querySelector('.pa').value=w.pa;c.querySelector('.rb').value=w.rb;const g=c.querySelector('.rgs');g.innerHTML='';(w.r.length?w.r:[['','']]).forEach(x=>{const r=rgRow();r.querySelector('.rd').value=x[0];r.querySelector('.rg').value=x[1];g.appendChild(r)})});
   ['pg','pp','pd'].forEach((i,k)=>document.getElementById(i).value=d.pv[k]||'');const pr=document.getElementById('prgs');pr.innerHTML='';(d.pr&&d.pr.length?d.pr:[['','']]).forEach(x=>{const r=rgRow();r.querySelector('.rd').value=x[0];r.querySelector('.rg').value=x[1];pr.appendChild(r)});return true}
  add();return false}
 (function(){const d=new Date(),p=n=>String(n).padStart(2,'0'),dia=d.getFullYear()+p(d.getMonth()+1)+p(d.getDate());
@@ -85,7 +85,7 @@ function restaurar(){let d=null;try{d=JSON.parse(localStorage.getItem('acerto-v1
  document.getElementById('lembrar').href=u})();
 const had=restaurar();document.getElementById('cd').textContent='Seu código: '+cod();
 const q=new URLSearchParams(location.search);
-if(q.get('app')){const c=box.firstChild;c.querySelector('.ap').value=q.get('app')=='99'?'99':'uber';if(q.get('passe')&&!c.querySelector('.pa').value)c.querySelector('.pa').value=q.get('passe');document.getElementById('pp').value=document.getElementById('pp').value||q.get('passe')||''}
+if(q.get('app')){const c=box.firstChild;c.querySelector('.ap').value=q.get('app')=='99'?'99':'uber';c.tg&&c.tg();if(q.get('passe')&&!c.querySelector('.pa').value)c.querySelector('.pa').value=q.get('passe');document.getElementById('pp').value=document.getElementById('pp').value||q.get('passe')||''}
 document.addEventListener('input',salvar);document.addEventListener('change',salvar);document.addEventListener('click',()=>setTimeout(salvar,0));
 if(typeof module!=='undefined')module.exports={acerto,num};
 </script></main></body></html>
