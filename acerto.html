@@ -16,7 +16,7 @@ button.s{background:transparent;color:var(--fg);border:1px solid var(--bd)}
 .r{font-size:1.15rem;font-weight:700}.dev{color:var(--al)}small{opacity:.75}
 </style></head><body><main>
 <h1>Acerto semanal do passe</h1>
-<p>Com o passe, a Uber fecha a semana e pode ficar devendo uma diferença, paga junto do depósito da semana seguinte. Preencha com o que aparece no app.</p>
+<p>Com o passe, a Uber ou a 99 fecha a semana e pode ficar devendo uma diferença, paga junto do depósito da semana seguinte. Preencha com o que aparece no app.</p>
 <div id="semanas"></div>
 <button id="add" class="s">+ Adicionar semana</button><button id="calc">Calcular</button>
 <div id="res"></div>
@@ -24,7 +24,7 @@ button.s{background:transparent;color:var(--fg);border:1px solid var(--bd)}
 
 <div class="card"><b>Semana em andamento: quanto deve cair</b>
 <label>Produção até agora (aba GANHOS, R$)</label><input id="pg" inputmode="decimal">
-<label>Passe que a Uber vai debitar (R$, 0 se não)</label><input id="pp" inputmode="decimal">
+<label>Passe que o app vai debitar (R$, 0 se não)</label><input id="pp" inputmode="decimal">
 <label>Diferença a receber da semana anterior (R$)</label><input id="pd" inputmode="decimal"><label>Resgates já feitos nesta semana (dia e valor)</label><div id="prgs"></div><button type="button" class="s" id="pmais">+ resgate</button>
 <button id="prev">Prever quanto cai</button><div id="pv"></div></div>
 <label style="display:flex;gap:8px;align-items:flex-start"><input type="checkbox" id="aceite" style="width:auto;margin-top:3px"><span>Guardar meus acertos com a Calculadora de Passe para me ajudar a acompanhar e a lembrar dos resgates (opcional, sem nome nem telefone). <small id="cd"></small></span></label>
@@ -64,7 +64,7 @@ function ler(){return [...box.children].map(c=>{const rb=c.querySelector('.rb').
 function mostrar(){
   const sem=ler(),r=acerto(sem);let h='';
   r.forEach((x,i)=>{h+='<div class="card"><b>Semana '+(i+1)+' '+(sem[i].app=='99'?'99':'Uber')+(sem[i].per?' ('+sem[i].per+')':'')+'</b><br>Produção '+brl(x.producao)+' − passe '+brl(x.passe)+' − resgatado da semana '+brl(x.depSemana)+(x.reembolsoIncluido?'<br><small>('+x.n+' resgate(s) somam '+brl(x.deposito)+' e já incluem '+brl(x.reembolsoIncluido)+' da semana anterior)</small>':(x.n>1?'<br><small>('+x.n+' resgates somam '+brl(x.deposito)+')</small>':''))+
-   '<br><span class="r '+(x.dif>0.005?'dev':'')+'">'+(x.dif>0.005?'A Uber ainda deve '+brl(x.dif)+' — chega em um dos próximos resgates.':(x.dif<-0.005?'Resgatou '+brl(-x.dif)+' acima do esperado: confira os valores.':'Sem diferença nesta semana.'))+'</span>'+(x.resgs&&x.resgs.length?tabela(x.resgs):'')+'</div>'});
+   '<br><span class="r '+(x.dif>0.005?'dev':'')+'">'+(x.dif>0.005?(sem[i].app=='99'?'A 99':'A Uber')+' ainda deve '+brl(x.dif)+' — chega em um dos próximos resgates.':(x.dif<-0.005?'Resgatou '+brl(-x.dif)+' acima do esperado: confira os valores.':'Sem diferença nesta semana.'))+'</span>'+(x.resgs&&x.resgs.length?tabela(x.resgs):'')+'</div>'});
   document.getElementById('res').innerHTML=h}
 document.getElementById('prev').onclick=()=>{const g=num(pg.value),p=num(pp.value),d=num(pd.value);
  const tot=g-p+d;const rl=lerRg(document.getElementById('prgs')),rs=rl.reduce((a,b)=>a+b.v,0);document.getElementById('pv').innerHTML='<p class="r">Total previsto da semana: '+brl(tot)+'</p>'+(rs?'<p class="r">Ainda a resgatar: '+brl(tot-rs)+'</p>'+tabela(rl,tot):'')+'<small>'+brl(g)+' − '+brl(p)+' + '+brl(d)+'. Cada real a mais de produção até o fechamento entra direto. A diferença desta semana só aparece depois do depósito.</small>'};
